@@ -1,0 +1,166 @@
+.home {
+  padding-top: 1rem;
+}
+
+.hero {
+  padding: 3rem 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 3rem;
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.bio {
+  font-size: 1.2rem;
+  color: var(--muted);
+  max-width: 600px;
+  margin-bottom: 2rem;
+}
+
+.cta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  a {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+}
+
+.primary {
+  background: var(--foreground);
+  color: var(--background);
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.secondary {
+  border: 1px solid var(--border);
+  color: var(--foreground);
+
+  &:hover {
+    border-color: var(--foreground);
+  }
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  a {
+    color: var(--muted);
+    font-size: 0.9rem;
+
+    &:hover {
+      color: var(--foreground);
+    }
+  }
+}
+
+.projectGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.projectCard {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: var(--accent);
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+
+  span {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--code-bg);
+    border-radius: 4px;
+    color: var(--muted);
+  }
+}
+
+.postList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.postItem {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover h3 {
+    color: var(--accent);
+  }
+
+  .date {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+  }
+
+  p {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .bio {
+    font-size: 1rem;
+  }
+
+  .cta a {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}

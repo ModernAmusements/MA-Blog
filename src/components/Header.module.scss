@@ -1,0 +1,48 @@
+.header {
+  padding: 1.5rem 2rem;
+  position: sticky;
+  top: 0;
+  background: var(--background);
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+}
+
+.nav {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--foreground);
+}
+
+.links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+
+  a {
+    color: var(--muted);
+    font-size: 0.95rem;
+
+    &:hover {
+      color: var(--foreground);
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 1rem;
+  }
+
+  .links {
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
+}
