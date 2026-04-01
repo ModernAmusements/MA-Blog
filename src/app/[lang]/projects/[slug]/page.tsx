@@ -3,14 +3,19 @@ import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import styles from '../page.module.scss';
 import { getProject, getProjectPosts } from '@/lib/mdx';
+import { translations } from '@/i18n';
+import type { Lang } from '@/i18n';
 
 interface Props {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ lang: string; slug: string }>;
 }
 
 export async function generateStaticParams() {
   const projects = getProjectPosts();
-  return projects.map((p) => ({ slug: p.slug }));
+  return projects.flatMap((p) => [
+    { lang: 'en', slug: p.slug },
+    { lang: 'de', slug: p.slug },
+  ]);
 }
 
 export async function generateMetadata(props: Props) {
@@ -25,12 +30,16 @@ export async function generateMetadata(props: Props) {
 
 export default async function ProjectPage(props: Props) {
   const params = await props.params;
+  const lang = (params.lang && translations[params.lang as Lang]) ? params.lang as Lang : 'en';
+  const t = translations[lang].common;
+  const tProjects = translations[lang].projects;
+  
   const project = getProject(params.slug);
   if (!project) notFound();
 
   return (
     <div className={styles.postPage}>
-      <Link href="/projects" className={styles.back}>← Back to Projects</Link>
+      <Link href={`/${lang}/projects`} className={styles.back}>← {t.back}</Link>
       <article>
         <header className={styles.header}>
           <span className={styles.date}>{String(project.date)}</span>
@@ -43,10 +52,10 @@ export default async function ProjectPage(props: Props) {
           </div>
           <div className={styles.links}>
             {project.liveUrl && (
-              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">Live Demo</a>
+              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">{tProjects.liveDemo}</a>
             )}
             {project.repoUrl && (
-              <a href={project.repoUrl} target="_blank" rel="noopener noreferrer">GitHub</a>
+              <a href={project.repoUrl} target="_blank" rel="noopener noreferrer">{tProjects.github}</a>
             )}
           </div>
         </header>

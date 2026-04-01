@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ThemeProvider } from 'next-themes';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { languages, defaultLang } from '@/i18n';
 import '@/styles/globals.scss';
 
 export const metadata: Metadata = {
@@ -23,20 +24,29 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export function generateStaticParams() {
+  return Object.keys(languages).map((lang) => ({ lang }));
+}
+
+export default async function RootLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ lang: string }>;
 }) {
+  const resolvedParams = await params;
+  const lang = resolvedParams.lang || defaultLang;
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
-          <Header />
+          <Header lang={lang} />
           <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 3rem', minHeight: 'calc(100vh - 200px)' }}>
             {children}
           </main>
-          <Footer />
+          <Footer lang={lang} />
         </ThemeProvider>
       </body>
     </html>

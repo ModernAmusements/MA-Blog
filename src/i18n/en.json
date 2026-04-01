@@ -1,0 +1,69 @@
+{
+  "nav": {
+    "blog": "Blog",
+    "projects": "Projects",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "home": {
+    "hero": {
+      "title": "Hi, I'm a developer.",
+      "bio": "I build accessible, performant web applications and write about my experiences.",
+      "viewProjects": "View Projects",
+      "getInTouch": "Get in Touch"
+    },
+    "featuredProjects": "Featured Projects",
+    "latestPosts": "Latest Posts",
+    "viewAll": "View all"
+  },
+  "blog": {
+    "title": "Blog",
+    "description": "Thoughts on development, design, and everything in between.",
+    "noPosts": "No posts found."
+  },
+  "projects": {
+    "title": "Projects",
+    "description": "A collection of things I've built.",
+    "noProjects": "No projects found.",
+    "viewDetails": "View Details",
+    "liveDemo": "Live Demo",
+    "github": "GitHub"
+  },
+  "about": {
+    "title": "About Me",
+    "skills": "Skills",
+    "notCoding": "When I'm Not Coding",
+    "content": [
+      "Hi, I'm a developer based in [Your Location]. I specialize in building web applications with a focus on performance, accessibility, and clean code.",
+      "My journey in development started when I built my first website in college. Since then, I've worked on a variety of projects ranging from small business websites to enterprise applications."
+    ],
+    "skillsList": ["JavaScript / TypeScript", "React / Next.js", "Node.js", "Python", "CSS / SCSS", "PostgreSQL", "Docker", "AWS"],
+    "notCodingContent": "You can find me exploring new technologies, contributing to open source, or enjoying outdoor activities. I'm always open to connecting with other developers and learning new things."
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "description": "Have a question or want to work together? Fill out the form below or reach out directly.",
+    "email": "Email",
+    "message": "Message",
+    "send": "Send Message",
+    "sending": "Sending...",
+    "success": "Thanks for reaching out! I'll get back to you soon.",
+    "error": "Something went wrong. Please try again.",
+    "newsletter": {
+      "title": "Subscribe to Newsletter",
+      "description": "Get updates on new posts and projects delivered to your inbox.",
+      "placeholder": "your@email.com",
+      "subscribe": "Subscribe"
+    }
+  },
+  "footer": {
+    "builtWith": "Built with Next.js",
+    "github": "GitHub",
+    "twitter": "Twitter",
+    "linkedin": "LinkedIn"
+  },
+  "common": {
+    "back": "Back",
+    "all": "All"
+  }
+}

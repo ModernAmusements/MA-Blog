@@ -1,13 +1,20 @@
 import Link from 'next/link';
 import styles from './page.module.scss';
 import { getProjectPosts, getAllTags } from '@/lib/mdx';
+import { translations } from '@/i18n';
+import type { Lang } from '@/i18n';
 
 interface Props {
+  params: Promise<{ lang: string }>;
   searchParams: Promise<{ tag?: string }>;
 }
 
 export default async function ProjectsPage(props: Props) {
+  const params = await props.params;
   const searchParams = await props.searchParams;
+  const lang = (params.lang && translations[params.lang as Lang]) ? params.lang as Lang : 'en';
+  const t = translations[lang].projects;
+  
   const projects = getProjectPosts();
   const allTags = getAllTags(projects);
   const selectedTag = searchParams.tag;
@@ -18,18 +25,18 @@ export default async function ProjectsPage(props: Props) {
 
   return (
     <div className={styles.projects}>
-      <h1>Projects</h1>
-      <p className={styles.description}>A collection of things I've built.</p>
+      <h1>{t.title}</h1>
+      <p className={styles.description}>{t.description}</p>
 
       {allTags.length > 0 && (
         <div className={styles.tags}>
-          <Link href="/projects" className={`${styles.tag} ${!selectedTag ? styles.active : ''}`}>
-            All
+          <Link href={`/${lang}/projects`} className={`${styles.tag} ${!selectedTag ? styles.active : ''}`}>
+            {translations[lang].common.all}
           </Link>
           {allTags.map((tag) => (
             <Link
               key={tag}
-              href={`/projects?tag=${encodeURIComponent(tag)}`}
+              href={`/${lang}/projects?tag=${encodeURIComponent(tag)}`}
               className={`${styles.tag} ${selectedTag === tag ? styles.active : ''}`}
             >
               {tag}
@@ -51,18 +58,18 @@ export default async function ProjectsPage(props: Props) {
               </div>
             </div>
             <div className={styles.links}>
-              <Link href={`/projects/${project.slug}`}>View Details</Link>
+              <Link href={`/${lang}/projects/${project.slug}`}>{t.viewDetails}</Link>
               {project.liveUrl && (
-                <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">Live Demo →</a>
+                <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">{t.liveDemo} →</a>
               )}
               {project.repoUrl && (
-                <a href={project.repoUrl} target="_blank" rel="noopener noreferrer">GitHub →</a>
+                <a href={project.repoUrl} target="_blank" rel="noopener noreferrer">{t.github} →</a>
               )}
             </div>
           </div>
         ))}
         {filteredProjects.length === 0 && (
-          <p className={styles.empty}>No projects found.</p>
+          <p className={styles.empty}>{t.noProjects}</p>
         )}
       </div>
     </div>

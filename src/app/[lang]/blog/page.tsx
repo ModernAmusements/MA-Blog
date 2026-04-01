@@ -1,13 +1,20 @@
 import Link from 'next/link';
 import styles from './page.module.scss';
 import { getBlogPosts, getAllTags } from '@/lib/mdx';
+import { translations } from '@/i18n';
+import type { Lang } from '@/i18n';
 
 interface Props {
+  params: Promise<{ lang: string }>;
   searchParams: Promise<{ tag?: string }>;
 }
 
 export default async function BlogPage(props: Props) {
+  const params = await props.params;
   const searchParams = await props.searchParams;
+  const lang = (params.lang && translations[params.lang as Lang]) ? params.lang as Lang : 'en';
+  const t = translations[lang].blog;
+  
   const posts = getBlogPosts();
   const allTags = getAllTags(posts);
   const selectedTag = searchParams.tag;
@@ -18,17 +25,17 @@ export default async function BlogPage(props: Props) {
 
   return (
     <div className={styles.blog}>
-      <h1>Blog</h1>
-      <p className={styles.description}>Thoughts on development, design, and everything in between.</p>
+      <h1>{t.title}</h1>
+      <p className={styles.description}>{t.description}</p>
 
       <div className={styles.tags}>
-        <Link href="/blog" className={`${styles.tag} ${!selectedTag ? styles.active : ''}`}>
-          All
+        <Link href={`/${lang}/blog`} className={`${styles.tag} ${!selectedTag ? styles.active : ''}`}>
+          {translations[lang].common.all}
         </Link>
         {allTags.map((tag) => (
           <Link
             key={tag}
-            href={`/blog?tag=${encodeURIComponent(tag)}`}
+            href={`/${lang}/blog?tag=${encodeURIComponent(tag)}`}
             className={`${styles.tag} ${selectedTag === tag ? styles.active : ''}`}
           >
             {tag}
@@ -38,7 +45,7 @@ export default async function BlogPage(props: Props) {
 
       <div className={styles.posts}>
         {filteredPosts.map((post) => (
-          <Link key={post.slug} href={`/blog/${post.slug}`} className={styles.post}>
+          <Link key={post.slug} href={`/${lang}/blog/${post.slug}`} className={styles.post}>
             <span className={styles.date}>{String(post.date)}</span>
             <h2>{post.title}</h2>
             <p>{post.description}</p>
@@ -50,7 +57,7 @@ export default async function BlogPage(props: Props) {
           </Link>
         ))}
         {filteredPosts.length === 0 && (
-          <p className={styles.empty}>No posts found.</p>
+          <p className={styles.empty}>{t.noPosts}</p>
         )}
       </div>
     </div>

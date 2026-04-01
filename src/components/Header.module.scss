@@ -13,6 +13,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 2rem;
 }
 
 .logo {
@@ -41,8 +42,18 @@
     padding: 1rem;
   }
 
+  .nav {
+    padding: 0 1rem;
+  }
+
   .links {
     gap: 1rem;
     font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .nav {
+    padding: 0 3rem;
   }
 }

@@ -1,0 +1,69 @@
+{
+  "nav": {
+    "blog": "Blog",
+    "projects": "Projekte",
+    "about": "Über mich",
+    "contact": "Kontakt"
+  },
+  "home": {
+    "hero": {
+      "title": "Hallo, ich bin Entwickler.",
+      "bio": "Ich entwickle barrierefreie, performante Webanwendungen und schreibe über meine Erfahrungen.",
+      "viewProjects": "Projekte ansehen",
+      "getInTouch": "Kontakt aufnehmen"
+    },
+    "featuredProjects": "Ausgewählte Projekte",
+    "latestPosts": "Neueste Beiträge",
+    "viewAll": "Alle anzeigen"
+  },
+  "blog": {
+    "title": "Blog",
+    "description": "Gedanken zu Entwicklung, Design und allem drumherum.",
+    "noPosts": "Keine Beiträge gefunden."
+  },
+  "projects": {
+    "title": "Projekte",
+    "description": "Eine Sammlung von Dingen, die ich gebaut habe.",
+    "noProjects": "Keine Projekte gefunden.",
+    "viewDetails": "Details ansehen",
+    "liveDemo": "Live Demo",
+    "github": "GitHub"
+  },
+  "about": {
+    "title": "Über mich",
+    "skills": "Fähigkeiten",
+    "notCoding": "Wenn ich nicht programmiere",
+    "content": [
+      "Hallo, ich bin Entwickler aus [Dein Ort]. Ich spezialisiere mich auf die Entwicklung von Webanwendungen mit Fokus auf Performance, Barrierefreiheit und sauberem Code.",
+      "Meine Reise in der Entwicklung begann, als ich meine erste Website im Studium erstellt habe. Seitdem habe ich an verschiedenen Projekten gearbeitet, von Websites für kleine Unternehmen bis hin zu Enterprise-Anwendungen."
+    ],
+    "skillsList": ["JavaScript / TypeScript", "React / Next.js", "Node.js", "Python", "CSS / SCSS", "PostgreSQL", "Docker", "AWS"],
+    "notCodingContent": "Du findest mich beim Erkunden neuer Technologien, beim Beitrag zu Open Source oder bei Outdoor-Aktivitäten. Ich bin immer offen für Kontakte mit anderen Entwicklern und neue Erfahrungen."
+  },
+  "contact": {
+    "title": "Kontakt",
+    "description": "Hast du eine Frage oder möchtest du zusammenarbeiten? Fülle das Formular aus oder erreiche mich direkt.",
+    "email": "E-Mail",
+    "message": "Nachricht",
+    "send": "Nachricht senden",
+    "sending": "Wird gesendet...",
+    "success": "Danke für die Nachricht! Ich melde mich bald zurück.",
+    "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "newsletter": {
+      "title": "Newsletter abonnieren",
+      "description": "Erhalte Updates zu neuen Beiträgen und Projekten per E-Mail.",
+      "placeholder": "deine@email.de",
+      "subscribe": "Abonnieren"
+    }
+  },
+  "footer": {
+    "builtWith": "Erstellt mit Next.js",
+    "github": "GitHub",
+    "twitter": "Twitter",
+    "linkedin": "LinkedIn"
+  },
+  "common": {
+    "back": "Zurück",
+    "all": "Alle"
+  }
+}
