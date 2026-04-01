@@ -116,8 +116,8 @@ export default async function RootLayout({
   return (
     <html lang={lang} suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="alternate" hrefLang="en" href={`${BASE_URL}/en`} />
         <link rel="alternate" hrefLang="de" href={`${BASE_URL}/de`} />
