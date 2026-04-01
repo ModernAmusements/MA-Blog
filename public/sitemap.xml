@@ -1,28 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://yourdomain.com</loc>
+    <loc>https://modern-amusements.vercel.app/en</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://modern-amusements.vercel.app/de"/>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://yourdomain.com/blog</loc>
+    <loc>https://modern-amusements.vercel.app/de</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://modern-amusements.vercel.app/en"/>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://modern-amusements.vercel.app/en/about</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://modern-amusements.vercel.app/de/about"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://modern-amusements.vercel.app/de/about</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://modern-amusements.vercel.app/en/about"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://modern-amusements.vercel.app/en/blog</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://modern-amusements.vercel.app/de/blog"/>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://yourdomain.com/projects</loc>
+    <loc>https://modern-amusements.vercel.app/de/blog</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://modern-amusements.vercel.app/en/blog"/>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://yourdomain.com/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://modern-amusements.vercel.app/en/projects</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://modern-amusements.vercel.app/de/projects"/>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://yourdomain.com/contact</loc>
+    <loc>https://modern-amusements.vercel.app/de/projects</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://modern-amusements.vercel.app/en/projects"/>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://modern-amusements.vercel.app/en/contact</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://modern-amusements.vercel.app/de/contact"/>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://modern-amusements.vercel.app/de/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://modern-amusements.vercel.app/en/contact"/>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>
