@@ -64,6 +64,113 @@ graph TD
     J --> K[User Interaction]
 ```
 
+### Event Lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> UserLoad: Page Load
+    
+    UserLoad --> ShowIntro: Display intro section
+    ShowIntro --> ScrollMap: User scrolls down
+    
+    ScrollMap --> TimelineReady: Map container visible
+    
+    TimelineReady --> SliderChanged: User drags slider
+    SliderChanged --> UpdateMapYear: updateMapForYear(year)
+    
+    UpdateMapYear --> ClearLayers: Clear markerLayer
+    ClearLayers --> FilterEvents: Filter events by year
+    FilterEvents --> CreateMarkers: Generate markers
+    
+    CreateMarkers --> CheckClustering: Cluster or individual?
+    CheckClustering --> Clustered: >3 events nearby
+    CheckClustering --> Individual: Events spread out
+    
+    Clustered --> AddCluster: Add cluster marker
+    Individual --> AddMarker: Add single marker
+    
+    AddCluster --> UserClicksCluster
+    AddMarker --> UserClicksMarker
+    
+    UserClicksCluster --> ExpandCluster: Show individual events
+    UserClicksMarker --> OpenPopup: Display popup
+    
+    OpenPopup --> UserClicksPopup: User reads details
+    UserClicksPopup --> OpenSidePanel: User wants more info
+    
+    OpenSidePanel --> ShiftContent: Add .shifted class
+    ShiftContent --> DisplayEvents: Show latest 15 events
+    
+    DisplayEvents --> TimelineReady: Map ready for next interaction
+```
+
+### Timeline Slider Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Timeline
+    participant Filter
+    participant Map
+    
+    User->>Timeline: Drag slider to year 1994
+    Timeline->>Filter: getFilteredEventsForYear(1994)
+    Filter->>Filter: Check date ranges
+    Filter->>Filter: Extract end year from ranges
+    Filter->>Filter: Filter by coordinates
+    Filter-->>Map: Return events with valid coords
+    
+   alt No events with coordinates
+        Map->>Timeline: Snap to next valid year
+        Timeline->>Filter: Retry with new year
+    else Events exist
+        Map->>Map: Clear existing layers
+        Map->>Map: Draw NATO symbols
+        Map->>Map: Apply clustering
+    end
+    
+    Map->>User: Display updated map
+```
+
+### Architecture Overview
+
+```mermaid
+graph TB
+    subgraph "Data Layer"
+        CSV[CSV Data File]
+        Parser[Data Parser]
+        Normalizer[Event Normalizer]
+        Geocoder[Location Geocoder]
+    end
+    
+    subgraph "Core Systems"
+        Symbols[NATO Symbol Library]
+        Clustering[Clustering System]
+        Timeline[Timeline Controller]
+    end
+    
+    subgraph "Visualization"
+        Leaflet[Leaflet Map]
+        Markers[Event Markers]
+        Popups[Event Popups]
+        SidePanel[Side Panel]
+    end
+    
+    CSV --> Parser
+    Parser --> Normalizer
+    Normalizer --> Geocoder
+    Geocoder --> Symbols
+    Symbols --> Clustering
+    Clustering --> Leaflet
+    Leaflet --> Markers
+    Markers --> Popups
+    Timeline --> SidePanel
+    
+    style CSV fill:#f9f,stroke:#333
+    style Leaflet fill:#bbf,stroke:#333
+    style Markers fill:#bfb,stroke:#333
+```
+
 ## Development Phases
 
 ### Phase One: Foundation and Data
