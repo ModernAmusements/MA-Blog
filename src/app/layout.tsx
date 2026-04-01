@@ -33,7 +33,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
           <Header />
-          <main style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem', minHeight: 'calc(100vh - 200px)' }}>
+          <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem', minHeight: 'calc(100vh - 200px)' }}>
             {children}
           </main>
           <Footer />
