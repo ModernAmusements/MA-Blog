@@ -20,27 +20,39 @@
 - JetBrains Mono font for developer vibe
 - Orange accent color (#f97316)
 - UI toggle (no emojis)
+- i18n with English (default) and German
 
 ## Project Structure
 ```
 /src
   /app
-    /blog
-      /[slug]
-    /projects
-      /[slug]
-    /about
-    /contact
-    /rss.xml
+    /[lang]
+      /blog
+        /[slug]
+      /projects
+        /[slug]
+      /about
+      /contact
+      page.tsx
+      layout.tsx
+      /rss.xml
   /components
   /lib
   /styles
+  /i18n
+    en.json
+    de.json
+    index.ts
+  /middleware.ts
 /content
   /blog
   /projects
 /public
   /robots.txt
   /sitemap.xml
+  /favicon.svg
+  /manifest.json
+  /og-image.svg
 ```
 
 ## All Completed Features
@@ -48,18 +60,48 @@
 - MDX configuration for blog/projects
 - Global styles with CSS variables for theming
 - Dark/light mode toggle (system preference + manual)
-- Header & Footer components
+- Header & Footer components with i18n
 - Home page with featured content
 - Blog listing with tag filtering
 - Individual blog posts (MDX)
 - Projects showcase listing
 - Individual project pages (MDX)
-- About page (template)
+- About page with translations
 - Contact page with Formspree integration
-- SEO metadata
+- SEO metadata with local keywords (Bielefeld, NRW, Germany)
+- Open Graph & Twitter Cards
+- hreflang for i18n
 - RSS feed at /rss.xml
-- Sitemap at /sitemap.xml
-- Robots.txt
+- Sitemap with hreflang
+- PWA manifest
+- Custom favicon (orange M on dark)
+- Vercel Analytics
+
+## Styling Iterations
+1. Increased max-width from 900px to 1400px
+- Added responsive padding (2rem default, 3rem on >1400px)
+2. Centered hero (headline, bio, CTAs)
+3. Added padding to nav alignment
+4. Renamed logo to "ModernAmusement Development"
+5. Centered and text-aligned hero section
+
+## i18n Implementation
+- Sub-path routing (/en, /de)
+- Middleware for language detection
+- Translation files for all UI text
+- Dynamic metadata per language
+- Sitemap with hreflang
+
+## SEO Features Added
+- Full metadata (title, description, keywords)
+- Open Graph tags
+- Twitter Cards
+- Geo tags (Bielefeld, NRW, DE-NW)
+- Local keywords: Bielefeld, NRW, Deutschland, Ostwestfalen
+- Tech keywords: Swift, Python, React, Next.js, iOS, Backend
+- hreflang alternates
+- PWA manifest
+- Custom favicon
 
 ## Changes Made Post-Launch
 1. Changed font to JetBrains Mono (developer vibe)
@@ -67,6 +109,13 @@
 3. Removed all emojis from codebase
 4. Changed accent color to orange (#f97316)
 5. Added Formspree contact form (form ID: xzdkgrar)
+6. Increased max-width to 1400px with responsive padding
+7. Centered hero section
+8. Renamed logo to "ModernAmusement Development"
+9. Added full i18n (English + German)
+10. Added comprehensive SEO with local keywords
+11. Added Vercel Analytics
+12. Added custom favicon
 
 ## What I Learned
 - Next.js 16 uses Turbopack by default in dev
@@ -77,13 +126,67 @@
 - CSS custom properties work across light/dark themes via data-theme attribute
 - next-themes with `suppressHydrationWarning` prevents hydration mismatches
 - Formspree React library provides easier form handling than manual fetch
+- Root layout should be in [lang] folder for i18n routing
+- Duplicate layouts cause hydration errors (html inside html)
+- SVG favicons work with rel="icon" and type="image/svg+xml"
 
 ## Deployment
-- Vercel: https://ma-website-theta.vercel.app
+- Vercel: https://modern-amusements.vercel.app
 - GitHub: https://github.com/ModernAmusements/MA-Blog
 
 ## Pending/Todo
 - Customize About page with actual bio
 - Add more blog posts and projects
 - Set up newsletter (ConvertKit/Beehiiv)
-- Update sitemap with actual domain when ready
+- Add Google Search Console verification
+- Replace placeholder domain with real domain
+
+## New Project Added: 2026-Conflict (April 1, 2026)
+
+### Project Details
+- **Name**: 2026-Conflict: Israel-Hamas Conflict Timeline
+- **URL**: https://israel-hamas-conflict.vercel.app
+- **GitHub**: https://github.com/ModernAmusements/Conflict-Visulizer
+- **Tech Stack**: Vanilla JavaScript, Leaflet.js, Vite, SCSS
+- **Description**: Interactive timeline visualization of the Israel-Hamas conflict (1900-2025)
+
+### Implementation
+1. Added Mermaid support for diagrams in MDX
+2. Created Mermaid React component with client-side rendering
+3. Added Image component support for project screenshots
+4. Created public/images/projects/ folder for project images
+5. Added 4 screenshots to project page
+6. Updated project frontmatter with live/repo URLs
+
+### Mermaid Integration
+- Installed `mermaid` npm package
+- Created client-side Mermaid component that renders diagrams
+- Components support both `<Mermaid chart="..."/>` and code blocks in MDX
+- Fixed TypeScript errors with proper type annotations
+- Added Image component for MDX img tags with Next.js optimization
+
+### Images Added
+- conflict-full-page-01.png
+- conflict-det-01.png
+- conflict-det-02.png
+- conflict-det-03.png
+
+## What I Learned Today
+- Mermaid.js requires client-side rendering in React/Next.js
+- Use `typeof children === 'string'` to detect mermaid in code blocks
+- next-mdx-remote/rsc supports custom components
+- MDX images work with custom img component using Next.js Image
+- Images should be in public/ folder for proper serving
+- TypeScript interfaces for component props need proper React.ReactNode types
+- mermaid.initialize() with securityLevel: 'loose' allows diagram rendering
+
+## Deployment
+- Vercel: https://modern-amusements.vercel.app
+- GitHub: https://github.com/ModernAmusements/MA-Blog
+
+## Pending/Todo
+- Customize About page with actual bio
+- Add more blog posts and projects
+- Set up newsletter (ConvertKit/Beehiiv)
+- Add Google Search Console verification
+- Replace placeholder domain with real domain

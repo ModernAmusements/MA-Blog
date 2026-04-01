@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import { Mermaid } from '@/components/Mermaid';
 import styles from '../page.module.scss';
 import { getBlogPost, getBlogPosts } from '@/lib/mdx';
 import { translations } from '@/i18n';
@@ -28,6 +29,10 @@ export async function generateMetadata(props: Props) {
   };
 }
 
+const components = {
+  Mermaid: ({ chart }: { chart: string }) => <Mermaid chart={chart} />,
+};
+
 export default async function BlogPostPage(props: Props) {
   const params = await props.params;
   const lang = (params.lang && translations[params.lang as Lang]) ? params.lang as Lang : 'en';
@@ -52,7 +57,7 @@ export default async function BlogPostPage(props: Props) {
           </div>
         </header>
         <div className={styles.content}>
-          <MDXRemote source={post.content} />
+          <MDXRemote source={post.content} components={components} />
         </div>
       </article>
     </div>

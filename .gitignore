@@ -8,3 +8,4 @@ package-lock.json
 *.log
 .env*
 conversation.md
+favicon/
