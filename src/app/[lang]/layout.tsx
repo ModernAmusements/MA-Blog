@@ -129,7 +129,7 @@ export default async function RootLayout({
           <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 3rem', minHeight: 'calc(100vh - 200px)' }}>
             {children}
           </main>
-          <Footer lang={lang} />
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

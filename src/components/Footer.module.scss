@@ -5,11 +5,21 @@
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
-  align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+
+  p {
+    margin: 0;
+  }
 }
 
 .social {
@@ -25,10 +35,14 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 855px) {
   .footer {
     flex-direction: column;
-    text-align: center;
+    padding: 2rem;
+  }
+
+  .info {
+    align-items: flex-start;
   }
 }
 
