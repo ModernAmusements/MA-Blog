@@ -31,6 +31,20 @@ export async function generateMetadata(props: Props) {
 
 const components = {
   Mermaid: ({ chart }: { chart: string }) => <Mermaid chart={chart} />,
+  pre: ({ children }: { children?: React.ReactNode }) => {
+    if (!children) return <pre>{children}</pre>;
+    const child = children as React.ReactElement<any>;
+    const codeContent = child?.props?.children?.toString() || '';
+    
+    const mermaidKeywords = ['graph TD', 'graph LR', 'flowchart', 'sequenceDiagram', 'classDiagram', 'stateDiagram', 'erDiagram', 'pie', 'gantt', 'subgraph', 'direction'];
+    const startsWithMermaid = mermaidKeywords.some(kw => codeContent.trim().startsWith(kw));
+    
+    if (startsWithMermaid) {
+      return <Mermaid chart={codeContent} />;
+    }
+    
+    return <pre>{children}</pre>;
+  },
 };
 
 export default async function BlogPostPage(props: Props) {
