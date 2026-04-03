@@ -3,6 +3,7 @@ import styles from './page.module.scss';
 import { getBlogPosts, getProjectPosts } from '@/lib/mdx';
 import { translations } from '@/i18n';
 import type { Lang } from '@/i18n';
+import { TerminalFrame } from '@/components/TerminalFrame';
 
 interface Props {
   params: Promise<{ lang: string }>;
@@ -28,43 +29,47 @@ export default async function Home(props: Props) {
       </section>
 
       {projects.length > 0 && (
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2>{t.featuredProjects}</h2>
-            <Link href={`/${lang}/projects`}>{t.viewAll} →</Link>
-          </div>
-          <div className={styles.projectGrid}>
-            {projects.map((project) => (
-              <Link key={project.slug} href={`/${lang}/projects/${project.slug}`} className={styles.projectCard}>
-                <h3>{project.title}</h3>
-                <p>{project.description}</p>
-                <div className={styles.tags}>
-                  {project.tags.map((tag) => (
-                    <span key={tag}>{tag}</span>
-                  ))}
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
+        <TerminalFrame title={t.featuredProjects}>
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2><span className={styles.prompt}>~ &gt;</span> [{t.featuredProjects}]</h2>
+              <Link href={`/${lang}/projects`}>{t.viewAll} →</Link>
+            </div>
+            <div className={styles.projectGrid}>
+              {projects.map((project) => (
+                <Link key={project.slug} href={`/${lang}/projects/${project.slug}`} className={styles.projectCard}>
+                  <h3>{project.title}</h3>
+                  <p>{project.description}</p>
+                  <div className={styles.tags}>
+                    {project.tags.map((tag) => (
+                      <span key={tag}>{tag}</span>
+                    ))}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </TerminalFrame>
       )}
 
       {posts.length > 0 && (
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2>{t.latestPosts}</h2>
-            <Link href={`/${lang}/blog`}>{t.viewAll} →</Link>
-          </div>
-          <div className={styles.postList}>
-            {posts.map((post) => (
-              <Link key={post.slug} href={`/${lang}/blog/${post.slug}`} className={styles.postItem}>
-                <span className={styles.date}>{String(post.date)}</span>
-                <h3>{post.title}</h3>
-                <p>{post.description}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
+        <TerminalFrame title={t.latestPosts}>
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2><span className={styles.prompt}>~ &gt;</span> [{t.latestPosts}]</h2>
+              <Link href={`/${lang}/blog`}>{t.viewAll} →</Link>
+            </div>
+            <div className={styles.postList}>
+              {posts.map((post) => (
+                <Link key={post.slug} href={`/${lang}/blog/${post.slug}`} className={styles.postItem}>
+                  <span className={styles.date}>{String(post.date)}</span>
+                  <h3>{post.title}</h3>
+                  <p>{post.description}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </TerminalFrame>
       )}
     </div>
   );

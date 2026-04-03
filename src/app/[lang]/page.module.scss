@@ -2,6 +2,12 @@
   padding-top: 1rem;
 }
 
+.prompt {
+  color: var(--accent);
+  font-weight: 700;
+  margin-right: 0.5rem;
+}
+
 .hero {
   padding: 3rem 0;
   border-bottom: 1px solid var(--border);
@@ -11,9 +17,18 @@
   flex-direction: column;
   align-items: center;
 
+  .prompt {
+    font-size: 1.5rem;
+    align-self: flex-start;
+    margin-bottom: 0.5rem;
+  }
+
   h1 {
     font-size: 2.5rem;
     margin-bottom: 1rem;
+    text-align: left;
+    display: flex;
+    align-items: baseline;
   }
 }
 
@@ -64,9 +79,15 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  gap: 0.5rem;
+
+  .prompt {
+    flex-shrink: 0;
+  }
 
   h2 {
     font-size: 1.5rem;
+    flex: 1;
   }
 
   a {
