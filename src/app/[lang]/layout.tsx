@@ -126,7 +126,7 @@ export default async function RootLayout({
         <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
           <Analytics />
           <Header lang={lang} />
-          <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem 3rem', minHeight: 'calc(100vh - 200px)' }}>
+          <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem', minHeight: 'calc(100vh - 200px)' }}>
             {children}
           </main>
           <Footer />

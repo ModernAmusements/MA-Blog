@@ -4,6 +4,7 @@ import { getBlogPosts, getProjectPosts } from '@/lib/mdx';
 import { translations } from '@/i18n';
 import type { Lang } from '@/i18n';
 import { TerminalFrame } from '@/components/TerminalFrame';
+import { TUIHero } from '@/components/TUIHero';
 
 interface Props {
   params: Promise<{ lang: string }>;
@@ -19,14 +20,7 @@ export default async function Home(props: Props) {
 
   return (
     <div className={styles.home}>
-      <section className={styles.hero}>
-        <h1>{t.hero.title}</h1>
-        <p className={styles.bio}>{t.hero.bio}</p>
-        <div className={styles.cta}>
-          <Link href={`/${lang}/projects`} className={styles.primary}>{t.hero.viewProjects}</Link>
-          <Link href={`/${lang}/contact`} className={styles.secondary}>{t.hero.getInTouch}</Link>
-        </div>
-      </section>
+      <TUIHero />
 
       {projects.length > 0 && (
         <TerminalFrame title={t.featuredProjects}>
