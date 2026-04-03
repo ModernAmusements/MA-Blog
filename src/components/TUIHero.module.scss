@@ -1,0 +1,140 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 60vh;
+  padding: 10px 20px;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+.header, .footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.footer {
+  border-bottom: none;
+  border-top: 1px solid var(--border);
+}
+
+.content {
+  flex-grow: 1;
+  padding: 20px 0;
+}
+
+.fileList {
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  > ul > li {
+    padding: 2px 0;
+  }
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: var(--foreground);
+  padding: 2px 0;
+  padding-left: 8px;
+
+  &:hover {
+    background: var(--code-bg);
+  }
+}
+
+.itemRow.active {
+  background-color: var(--code-bg);
+  color: var(--accent);
+
+  &::before {
+    content: '→';
+    margin-right: 8px;
+    color: var(--accent);
+    font-weight: bold;
+  }
+}
+
+.icon {
+  margin-right: 8px;
+  font-size: 1.1em;
+}
+
+.name {
+  flex: 1;
+}
+
+.meta {
+  color: var(--muted);
+  padding-right: 40px;
+}
+
+.controlsRight span {
+  margin-left: 15px;
+}
+
+.subList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  padding-left: 32px;
+  border-left: 1px solid var(--border);
+
+  li {
+    padding: 2px 0;
+  }
+}
+
+.subLink {
+  display: flex;
+  align-items: center;
+  color: var(--foreground);
+  text-decoration: none;
+  padding: 2px 0;
+  padding-left: 16px;
+
+  &:hover {
+    background: var(--code-bg);
+    color: var(--accent);
+  }
+}
+
+.subItem {
+  padding-left: 8px;
+}
+
+.statusLeft {
+  color: var(--accent);
+}
+
+@media (max-width: 855px) {
+  .container {
+    min-height: auto;
+    padding: 10px;
+  }
+
+  .meta {
+    padding-right: 10px;
+  }
+
+  .controlsRight {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .controlsRight span {
+    margin-left: 0;
+  }
+}
