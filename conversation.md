@@ -141,6 +141,52 @@
 - Add Google Search Console verification
 - Replace placeholder domain with real domain
 
+## Enhanced 2026-Conflict Project Documentation (April 1, 2026)
+
+### What We Did
+1. Found DEVELOPMENT_LOG.md file with comprehensive project documentation
+2. Read the full development log containing:
+   - 38 commits over 7 days (Feb 3-9, 2026)
+   - Multiple mermaid diagrams (gantt, flowchart, stateDiagram-v2, sequenceDiagram)
+   - Detailed commit-by-commit breakdown
+   - Challenge-solution sections
+
+### Additions Made to 2026-conflict.mdx
+1. **Development Timeline** - Gantt chart showing all 4 phases
+2. **Commit History Table** - Summary of commits per day
+3. **Phase 1: Foundation & MVP** - 4 steps (HTML Structure, Geographic Data, Map Integration, Movement Animation)
+4. **Phase 2: Map & Visualization Features** - 6 steps (Faction Icons, Flags, File Org, Vite, SCSS, Side Panel)
+5. **Phase 3: Timeline and Interaction** - 2 steps (Inline Style Migration, SCSS Consolidation)
+6. **Phase 4: Performance Optimization** - Layer management, caching, clustering logic
+7. **Phase 5: Modernization** - Event detection, z-index management, final ruleset
+8. **Challenges and Solutions** - 5 challenges with detailed solutions
+9. **Problem-Solution Flowchart** - Visual diagram of all problems and solutions
+10. **Deployment Section** - Vercel config, build script, deployment flow
+11. **Deployment Checklist** - Table with all deployment items
+12. **Final Architecture** - Complete system architecture diagram
+13. **Data Flow Diagram** - User action to marker interaction flow
+14. **Key Learnings** - 4 categories (Technical, Design, Process, Architecture)
+15. **File Statistics** - Table with file counts and line totals
+
+### Structure Improvements
+- Added clear horizontal rules (---) between major sections
+- Created proper heading hierarchy (## > ### > ####)
+- Added tables for technology stack, faction colors, commit history
+- Numbered steps within each development phase (Step 1, Step 2, etc.)
+- Added before/after code comparisons
+- Separated problem/solution into distinct sections
+
+### Build Verification
+- Ran `npm run build` - passed successfully
+- No TypeScript errors
+- All 22 pages generated
+
+### Deployment
+- Committed with message: "Add comprehensive development documentation to 2026-Conflict project"
+- Pushed to GitHub
+- Vercel auto-deploy triggered
+- Live at: https://modern-amusements.vercel.app/en/projects/2026-conflict
+
 ## New Project Added: 2026-Conflict (April 1, 2026)
 
 ### Project Details
@@ -190,3 +236,78 @@
 - Set up newsletter (ConvertKit/Beehiiv)
 - Add Google Search Console verification
 - Replace placeholder domain with real domain
+
+## Enhanced 2026-Conflict Project Documentation (April 1, 2026)
+
+### What We Did
+1. Found DEVELOPMENT_LOG.md file with comprehensive project documentation
+2. Read the full development log containing:
+   - 38 commits over 7 days (Feb 3-9, 2026)
+   - Multiple mermaid diagrams (gantt, flowchart, stateDiagram-v2, sequenceDiagram)
+   - Detailed commit-by-commit breakdown
+   - Challenge-solution sections
+
+### Additions Made to 2026-conflict.mdx
+1. **Development Timeline** - Gantt chart showing all 4 phases
+2. **Commit History Table** - Summary of commits per day
+3. **Phase 1: Foundation & MVP** - 4 steps (HTML Structure, Geographic Data, Map Integration, Movement Animation)
+4. **Phase 2: Map & Visualization Features** - 6 steps (Faction Icons, Flags, File Org, Vite, SCSS, Side Panel)
+5. **Phase 3: Timeline and Interaction** - 2 steps (Inline Style Migration, SCSS Consolidation)
+6. **Phase 4: Performance Optimization** - Layer management, caching, clustering logic
+7. **Phase 5: Modernization** - Event detection, z-index management, final ruleset
+8. **Challenges and Solutions** - 5 challenges with detailed solutions
+9. **Problem-Solution Flowchart** - Visual diagram of all problems and solutions
+10. **Deployment Section** - Vercel config, build script, deployment flow
+11. **Deployment Checklist** - Table with all deployment items
+12. **Final Architecture** - Complete system architecture diagram
+13. **Data Flow Diagram** - User action to marker interaction flow
+14. **Key Learnings** - 4 categories (Technical, Design, Process, Architecture)
+15. **File Statistics** - Table with file counts and line totals
+
+### Structure Improvements
+- Added clear horizontal rules (---) between major sections
+- Created proper heading hierarchy (## > ### > ####)
+- Added tables for technology stack, faction colors, commit history
+- Numbered steps within each development phase (Step 1, Step 2, etc.)
+- Added before/after code comparisons
+- Separated problem/solution into distinct sections
+
+### Build Verification
+- Ran `npm run build` - passed successfully
+- No TypeScript errors
+- All 22 pages generated
+
+### Deployment
+- Committed with message: "Add comprehensive development documentation to 2026-Conflict project"
+- Pushed to GitHub
+- Vercel auto-deploy triggered
+- Live at: https://modern-amusements.vercel.app/en/projects/2026-conflict
+## What We Learned Today (April 3, 2026)
+
+### UI/UX Changes
+1. **Mobile Navigation**: Added burger menu at 855px breakpoint with slide-in menu
+2. **Logo**: Added SVG logo with text, text scales differently on mobile
+3. **Color Theme**: Changed accent from blue to neon orange (#ff6600) for both light/dark modes
+
+### Code Quality
+1. **useCallback**: Used to memoize functions that depend on state to prevent unnecessary re-renders
+2. **Component Extraction**: Created NavLink component to reduce duplication
+3. **DRY Principles**: Extracted nav items to array and mapped over them
+4. **i18n**: Added German translations for new elements ('Menu' → 'Menü')
+
+### Terminal-Style Design
+1. **TUI Hero Component**: Created entirely new terminal-inspired hero section
+2. **Grid Layout**: Used CSS grid with 1fr 1fr for hero + file browser split
+3. **Keyboard Navigation**: Implemented arrow key navigation, Enter to open, Space to expand
+4. **Expandable Directories**: Sub-items expand inline with visual hierarchy (indentation + left border)
+5. **SF Symbols**: Integrated actual SVG icons (folder, file, person, paperplane) with CSS filter for primary color
+6. **Custom Hooks**: Used useState for active index and expanded directories
+
+### Mermaid Diagrams
+1. **Detection Bug**: Discovered that checking 'includes' for mermaid keywords was too broad - caught non-mermaid code blocks
+2. **Fix**: Changed to 'startsWith' to only render mermaid for code blocks that actually start with mermaid syntax
+3. **Applied to both**: Fixed both projects and blog post MDX rendering
+
+### Git Workflow
+- Multiple commits throughout the day documenting incremental changes
+- Push after each batch of related changes
