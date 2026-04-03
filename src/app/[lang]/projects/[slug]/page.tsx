@@ -41,9 +41,9 @@ const components = {
     const codeContent = child?.props?.children?.toString() || '';
     
     const mermaidKeywords = ['graph TD', 'graph LR', 'flowchart', 'sequenceDiagram', 'classDiagram', 'stateDiagram', 'erDiagram', 'pie', 'gantt', 'subgraph', 'direction'];
-    const isMermaid = mermaidKeywords.some(kw => codeContent.includes(kw));
+    const startsWithMermaid = mermaidKeywords.some(kw => codeContent.trim().startsWith(kw));
     
-    if (isMermaid) {
+    if (startsWithMermaid) {
       return <Mermaid chart={codeContent} />;
     }
     

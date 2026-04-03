@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './TUIHero.module.scss';
 
 interface TUINavItem {
@@ -24,6 +25,39 @@ const navItems: TUINavItem[] = [
   { label: 'about', path: '/en/about', type: 'file', size: '512B' },
   { label: 'contact', path: '/en/contact', type: 'file', size: '256B' },
 ];
+
+const FolderIcon = () => (
+  <Image src="/images/icons/sf-symbols/folder.svg" alt="folder" width={16} height={14} className={styles.sfIcon} />
+);
+
+const OpenFolderIcon = () => (
+  <Image src="/images/icons/sf-symbols/folder.svg" alt="open folder" width={16} height={14} className={styles.sfIcon} />
+);
+
+const FileIcon = () => (
+  <Image src="/images/icons/sf-symbols/text.document.svg" alt="file" width={13} height={16} className={styles.sfIcon} />
+);
+
+const PersonIcon = () => (
+  <Image src="/images/icons/sf-symbols/person.crop.circle.svg" alt="person" width={16} height={16} className={styles.sfIcon} />
+);
+
+const PaperplaneIcon = () => (
+  <Image src="/images/icons/sf-symbols/paperplane.svg" alt="paperplane" width={16} height={16} className={styles.sfIcon} />
+);
+
+const getIcon = (item: TUINavItem, isExpanded: boolean) => {
+  if (item.type === 'dir') {
+    return isExpanded ? <OpenFolderIcon /> : <FolderIcon />;
+  }
+  if (item.path.includes('/about')) {
+    return <PersonIcon />;
+  }
+  if (item.path.includes('/contact')) {
+    return <PaperplaneIcon />;
+  }
+  return <FileIcon />;
+};
 
 export function TUIHero() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -70,6 +104,15 @@ export function TUIHero() {
       </header>
       
       <main className={styles.content}>
+        <div className={styles.heroPane}>
+          <h1>Welcome to My Portfolio</h1>
+          <p>Full-stack developer specializing in algorithms, performance optimization, and clean code.</p>
+          <div className={styles.cta}>
+            <Link href="/en/projects" className={styles.primary}>View Projects</Link>
+            <Link href="/en/contact" className={styles.secondary}>Get in Touch</Link>
+          </div>
+        </div>
+        
         <div className={styles.fileList}>
           <ul>
             {navItems.map((item, index) => (
@@ -80,7 +123,7 @@ export function TUIHero() {
                   onKeyDown={(e) => handleKeyDown(e, index)}
                   tabIndex={0}
                 >
-                  <span className={styles.icon}>{item.type === 'dir' ? (expandedDirs.has(index) ? '📂' : '📁') : '📄'}</span>
+                  <span className={styles.icon}>{getIcon(item, expandedDirs.has(index))}</span>
                   <span className={styles.name}>{item.label}</span>
                   <span className={styles.meta}>{item.type === 'dir' ? '[DIR]' : item.size}</span>
                 </div>
@@ -89,7 +132,7 @@ export function TUIHero() {
                     {item.subItems.map((sub) => (
                       <li key={sub.path} className={styles.subItem}>
                         <Link href={sub.path} className={styles.subLink}>
-                          <span className={styles.icon}>📄</span>
+                          <span className={styles.icon}><FileIcon /></span>
                           <span className={styles.name}>{sub.label}</span>
                           <span className={styles.meta}>{sub.size}</span>
                         </Link>
