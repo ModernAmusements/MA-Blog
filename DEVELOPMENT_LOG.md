@@ -1,4 +1,4 @@
-# 2026-Conflict Project - Development Log
+# Israel-Hamas-Conflict.md Project - Development Log
 
 > **Document Version**: 1.0  
 > **Project**: Israel-Hamas Conflict Timeline Visualization  
@@ -23,7 +23,7 @@
 
 ## 1. Project Overview
 
-This document provides a comprehensive, chronological account of the development of the 2026-Conflict project - an interactive timeline visualization of the Israel-Hamas conflict using Leaflet.js, SCSS, and vanilla JavaScript.
+This document provides a comprehensive, chronological account of the development of the Israel-Hamas-Conflict.md project - an interactive timeline visualization of the Israel-Hamas conflict using Leaflet.js, SCSS, and vanilla JavaScript.
 
 ### Technology Stack
 
@@ -51,7 +51,7 @@ This document provides a comprehensive, chronological account of the development
 
 ```mermaid
 gantt
-    title 2026-Conflict Development Timeline
+    title Israel-Hamas-Conflict.md Development Timeline
     dateFormat  YYYY-MM-DD
     axisFormat  %b %d
     
@@ -1412,4 +1412,4 @@ flowchart TD
 
 > **Document End**
 > 
-> This development log was created to document the journey of building the 2026-Conflict project from MVP to production deployment. All problems, solutions, and lessons learned are captured here for future reference.
+> This development log was created to document the journey of building the Israel-Hamas-Conflict.md project from MVP to production deployment. All problems, solutions, and lessons learned are captured here for future reference.

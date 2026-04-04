@@ -37,6 +37,19 @@
   padding-right: 20px;
   border-right: 1px solid var(--border);
 
+  .subHeader {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+
+    .separator {
+      color: var(--border);
+    }
+  }
+
   h1 {
     font-size: 36px;
     margin-bottom: 16px;
@@ -79,6 +92,7 @@
   text-decoration: none;
   border-radius: 4px;
   font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -102,10 +116,23 @@
 .secondary {
   border: 1px solid var(--border);
   color: var(--foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
 
   &:hover {
     border-color: var(--foreground);
   }
+
+  img {
+    width: 16px;
+    height: 16px;
+    filter: var(--icon-filter-secondary, none);
+  }
+}
+
+[data-theme='light'] .secondary img {
+  filter: invert(48%) sepia(98%) saturate(2340%) hue-rotate(2deg) brightness(101%) contrast(101%);
 }
 
 .fileList {
@@ -158,9 +185,31 @@
   vertical-align: middle;
   width: 16px;
   height: 16px;
+  filter: invert(48%) sepia(98%) saturate(2340%) hue-rotate(2deg) brightness(101%) contrast(101%);
 }
 
 [data-theme='dark'] .sfIcon {
+  filter: none;
+}
+
+.secondary {
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  &:hover {
+    border-color: var(--foreground);
+  }
+
+  img {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+[data-theme='dark'] .secondary img {
   filter: invert(48%) sepia(98%) saturate(2340%) hue-rotate(2deg) brightness(101%) contrast(101%);
 }
 

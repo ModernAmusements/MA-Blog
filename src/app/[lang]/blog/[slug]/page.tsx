@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { Mermaid } from '@/components/Mermaid';
+import { CollapsibleTOC } from '@/components/CollapsibleTOC';
 import styles from '../page.module.scss';
 import { getBlogPost, getBlogPosts } from '@/lib/mdx';
 import { translations } from '@/i18n';
@@ -31,13 +32,22 @@ export async function generateMetadata(props: Props) {
 
 function extractHeadings(content: string) {
   const headingRegex = /^(#{2,4})\s+(.+)$/gm;
-  const headings: { level: number; text: string; id: string }[] = [];
+  const headings: { level: number; text: string; id: string; thema: number; subIndex: number }[] = [];
   let match;
+  let themaIndex = 0;
   while ((match = headingRegex.exec(content)) !== null) {
     const level = match[1].length;
     const text = match[2].trim();
     const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    headings.push({ level, text, id });
+    
+    if (level === 2) {
+      themaIndex++;
+      headings.push({ level, text, id, thema: themaIndex, subIndex: 0 });
+    } else if (level === 3 || level === 4) {
+      const lastH2 = headings.filter(h => h.level === 2).pop();
+      const subIndex = headings.filter(h => h.thema === lastH2?.thema && h.level > 2).length + 1;
+      headings.push({ level, text, id, thema: lastH2?.thema || 0, subIndex });
+    }
   }
   return headings;
 }
@@ -54,26 +64,10 @@ const components = {
     const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     return <h3 id={id} className={styles.heading3}><a href={`#${id}`} className={styles.anchor}>#</a>{children}</h3>;
   },
+  p: ({ children }: { children?: React.ReactNode }) => <p>{children}</p>,
   img: ({ src, alt }: { src?: string; alt?: string }) => (
-    <figure className={styles.figure}>
-      <img src={src} alt={alt} />
-      {alt && <figcaption>{alt}</figcaption>}
-    </figure>
+    <img src={src} alt={alt} className={styles.contentImage} />
   ),
-  pre: ({ children }: { children?: React.ReactNode }) => {
-    if (!children) return <pre>{children}</pre>;
-    const child = children as React.ReactElement<any>;
-    const codeContent = child?.props?.children?.toString() || '';
-    
-    const mermaidKeywords = ['graph TD', 'graph LR', 'flowchart', 'sequenceDiagram', 'classDiagram', 'stateDiagram', 'erDiagram', 'pie', 'gantt', 'subgraph', 'direction'];
-    const startsWithMermaid = mermaidKeywords.some(kw => codeContent.trim().startsWith(kw));
-    
-    if (startsWithMermaid) {
-      return <Mermaid chart={codeContent} />;
-    }
-    
-    return <pre>{children}</pre>;
-  },
 };
 
 export default async function BlogPostPage(props: Props) {
@@ -102,16 +96,7 @@ export default async function BlogPostPage(props: Props) {
           </div>
         </header>
         {headings.length > 0 && (
-          <nav className={styles.toc}>
-            <h4>Contents</h4>
-            <ul>
-              {headings.map((heading, i) => (
-                <li key={i} className={styles[`tocLevel${heading.level}`]}>
-                  <a href={`#${heading.id}`}>{heading.text}</a>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <CollapsibleTOC headings={headings} />
         )}
         <div className={styles.content}>
           <MDXRemote source={post.content} components={components} />

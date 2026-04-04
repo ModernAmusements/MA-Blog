@@ -123,7 +123,7 @@ export default async function RootLayout({
         <link rel="alternate" hrefLang="de" href={`${BASE_URL}/de`} />
       </head>
       <body suppressHydrationWarning>
-        <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="data-theme" defaultTheme="light" enableSystem>
           <Analytics />
           <Header lang={lang} />
           <main className="main-content" style={{ maxWidth: '1400px', margin: '0 auto', minHeight: 'calc(100vh - 200px)' }}>

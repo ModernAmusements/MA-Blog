@@ -29,7 +29,8 @@
 - Added hero section with "Explore My Work" pane
 - Added preview images for projects (thumbnail from MDX)
 - Added TOC and anchor links to blog/project pages
-- Added image captions support
+- Added collapsible TOC with Wikipedia-style numbering (4, 4.1, 4.1.1)
+- TOC has chevron for expand/collapse functionality
 - Styled blog/project content with TUI aesthetics
 - Added footer info to burger menu
 - Fixed various styling issues (border-radius removal, flex layouts)

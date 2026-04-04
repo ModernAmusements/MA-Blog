@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import styles from './TUIHero.module.scss';
 
@@ -16,11 +17,9 @@ interface TUINavItem {
 const navItems: TUINavItem[] = [
   { label: 'about', path: '/en/about', type: 'file', size: '1.2K' },
   { label: 'projects', path: '/en/projects', type: 'dir', subItems: [
-    { label: '2026-conflict.md', path: '/en/projects/2026-conflict', type: 'file', size: '8.5K' },
-    { label: 'portfolio.md', path: '/en/projects/portfolio', type: 'file', size: '3.2K' },
+    { label: 'Israel-Hamas-Conflict.md', path: '/en/projects/Israel-Hamas-Conflict', type: 'file', size: '8.5K' },
   ]},
   { label: 'blog', path: '/en/blog', type: 'dir', subItems: [
-    { label: 'hello-world.md', path: '/en/blog/hello-world', type: 'file', size: '1.2K' },
     { label: 'cli-tool.md', path: '/en/blog/cli-tool', type: 'file', size: '2.4K' },
   ]},
   { label: 'contact', path: '/en/contact', type: 'file', size: '256B' },
@@ -62,6 +61,7 @@ const getIcon = (item: TUINavItem, isExpanded: boolean) => {
 export function TUIHero() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [expandedDirs, setExpandedDirs] = useState<Set<number>>(new Set([1, 2]));
+  const router = useRouter();
 
   const scrollToProjects = () => {
     document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
@@ -89,7 +89,7 @@ export function TUIHero() {
       if (item.type === 'dir') {
         toggleExpand(index);
       } else {
-        window.location.href = item.path;
+        router.push(item.path);
       }
     } else if (e.key === ' ') {
       e.preventDefault();
@@ -109,13 +109,19 @@ export function TUIHero() {
       
       <main className={styles.content}>
         <div className={styles.heroPane}>
+          <div className={styles.subHeader}>
+            <span>C++ • Swift • Python • TS</span>
+            <span className={styles.separator}>|</span>
+          </div>
           <h1><span className={styles.prompt}>~ &gt;</span> Welcome to My Portfolio</h1>
           <p>Full-stack developer specializing in algorithms, performance optimization, and clean code.</p>
           <div className={styles.cta}>
             <button onClick={scrollToProjects} className={styles.primary}>
               View Projects <span className={styles.arrow}>↓</span>
             </button>
-            <Link href="/en/contact" className={styles.secondary}>Get in Touch</Link>
+            <Link href="/en/contact" className={styles.secondary}>
+              Get in Touch <PaperplaneIcon />
+            </Link>
           </div>
         </div>
         
@@ -127,7 +133,10 @@ export function TUIHero() {
                 <li key={item.path}>
                   <div 
                     className={`${styles.itemRow} ${index === activeIndex ? styles.active : ''}`}
-                    onClick={() => { setActiveIndex(index); item.type === 'dir' && toggleExpand(index); }}
+                    onClick={() => { 
+                      setActiveIndex(index); 
+                      if (item.type === 'dir') toggleExpand(index);
+                    }}
                     onKeyDown={(e) => handleKeyDown(e, index)}
                     tabIndex={0}
                   >

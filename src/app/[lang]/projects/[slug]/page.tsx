@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { Mermaid } from '@/components/Mermaid';
 import Image from 'next/image';
+import { CollapsibleTOC } from '@/components/CollapsibleTOC';
 import styles from '../page.module.scss';
 import { getProject, getProjectPosts } from '@/lib/mdx';
 import { translations } from '@/i18n';
@@ -32,13 +33,22 @@ export async function generateMetadata(props: Props) {
 
 function extractHeadings(content: string) {
   const headingRegex = /^(#{2,4})\s+(.+)$/gm;
-  const headings: { level: number; text: string; id: string }[] = [];
+  const headings: { level: number; text: string; id: string; thema: number; subIndex: number }[] = [];
   let match;
+  let themaIndex = 0;
   while ((match = headingRegex.exec(content)) !== null) {
     const level = match[1].length;
     const text = match[2].trim();
     const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    headings.push({ level, text, id });
+    
+    if (level === 2) {
+      themaIndex++;
+      headings.push({ level, text, id, thema: themaIndex, subIndex: 0 });
+    } else if (level === 3 || level === 4) {
+      const lastH2 = headings.filter(h => h.level === 2).pop();
+      const subIndex = headings.filter(h => h.thema === lastH2?.thema && h.level > 2).length + 1;
+      headings.push({ level, text, id, thema: lastH2?.thema || 0, subIndex });
+    }
   }
   return headings;
 }
@@ -58,17 +68,17 @@ const components = {
     const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     return <h3 id={id} className={styles.heading3}><a href={`#${id}`} className={styles.anchor}>#</a>{children}</h3>;
   },
+  p: ({ children }: { children?: React.ReactNode }) => {
+    return <p>{children}</p>;
+  },
   img: (props: any) => (
-    <figure className={styles.figure}>
-      <Image 
-        src={props.src} 
-        alt={props.alt || ''} 
-        width={800} 
-        height={450} 
-        style={{ borderRadius: '4px', maxWidth: '100%', height: 'auto' }}
-      />
-      {props.alt && <figcaption>{props.alt}</figcaption>}
-    </figure>
+    <Image 
+      src={props.src} 
+      alt={props.alt || ''} 
+      width={800} 
+      height={450} 
+      className={styles.contentImage}
+    />
   ),
   pre: ({ children }: { children?: React.ReactNode }) => {
     if (!children) return <pre>{children}</pre>;
@@ -120,16 +130,7 @@ export default async function ProjectPage(props: Props) {
           </div>
         </header>
         {headings.length > 0 && (
-          <nav className={styles.toc}>
-            <h4>Contents</h4>
-            <ul>
-              {headings.map((heading, i) => (
-                <li key={i} className={styles[`tocLevel${heading.level}`]}>
-                  <a href={`#${heading.id}`}>{heading.text}</a>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <CollapsibleTOC headings={headings} />
         )}
         <div className={styles.content}>
           <MDXRemote source={project.content} components={components} />
