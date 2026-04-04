@@ -105,7 +105,7 @@ export function TUIHero() {
       
       <main className={styles.content}>
         <div className={styles.heroPane}>
-          <h1>Welcome to My Portfolio</h1>
+          <h1><span className={styles.prompt}>~ &gt;</span> Welcome to My Portfolio</h1>
           <p>Full-stack developer specializing in algorithms, performance optimization, and clean code.</p>
           <div className={styles.cta}>
             <Link href="/en/projects" className={styles.primary}>View Projects</Link>

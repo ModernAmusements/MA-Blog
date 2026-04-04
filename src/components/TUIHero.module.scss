@@ -41,6 +41,12 @@
     font-size: 36px;
     margin-bottom: 16px;
     color: var(--foreground);
+
+    .prompt {
+      color: var(--accent);
+      font-weight: 700;
+      margin-right: 0.5rem;
+    }
   }
 
   p {
