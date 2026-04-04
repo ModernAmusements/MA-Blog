@@ -25,7 +25,7 @@ export default async function Home(props: Props) {
 
       {projects.length > 0 && (
         <TerminalFrame title={t.featuredProjects}>
-          <div className={styles.sectionHeader}>
+          <div id="projects" className={styles.sectionHeader}>
             <h2><span className={styles.prompt}>~ &gt;</span> [{t.featuredProjects}]</h2>
             <Link href={`/${lang}/projects`}>{t.viewAll} →</Link>
           </div>

@@ -63,6 +63,10 @@ export function TUIHero() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [expandedDirs, setExpandedDirs] = useState<Set<number>>(new Set([1, 2]));
 
+  const scrollToProjects = () => {
+    document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const toggleExpand = (index: number) => {
     const newExpanded = new Set(expandedDirs);
     if (newExpanded.has(index)) {
@@ -108,7 +112,9 @@ export function TUIHero() {
           <h1><span className={styles.prompt}>~ &gt;</span> Welcome to My Portfolio</h1>
           <p>Full-stack developer specializing in algorithms, performance optimization, and clean code.</p>
           <div className={styles.cta}>
-            <Link href="/en/projects" className={styles.primary}>View Projects</Link>
+            <button onClick={scrollToProjects} className={styles.primary}>
+              View Projects <span className={styles.arrow}>↓</span>
+            </button>
             <Link href="/en/contact" className={styles.secondary}>Get in Touch</Link>
           </div>
         </div>
