@@ -122,11 +122,11 @@ export default async function RootLayout({
         <link rel="alternate" hrefLang="en" href={`${BASE_URL}/en`} />
         <link rel="alternate" hrefLang="de" href={`${BASE_URL}/de`} />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
           <Analytics />
           <Header lang={lang} />
-          <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem', minHeight: 'calc(100vh - 200px)' }}>
+          <main className="main-content" style={{ maxWidth: '1400px', margin: '0 auto', minHeight: 'calc(100vh - 200px)' }}>
             {children}
           </main>
           <Footer />

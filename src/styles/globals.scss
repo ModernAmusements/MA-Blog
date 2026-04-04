@@ -131,3 +131,13 @@ hr {
   background: var(--accent);
   color: white;
 }
+
+.main-content {
+  padding: 2rem;
+}
+
+@media (max-width: 855px) {
+  .main-content {
+    padding: 1rem;
+  }
+}

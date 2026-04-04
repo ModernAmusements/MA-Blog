@@ -81,6 +81,17 @@ export function Header({ lang = 'en' }: HeaderProps) {
                 <NavLink key={item.path} to={`/${lang}${item.path}`} label={t[item.key as keyof typeof t]} />
               ))}
             </nav>
+            <div className={styles.menuFooter}>
+              <p>ModernAmusements Development</p>
+              <p>Shady Nathan Tawfik</p>
+              <p>C++ • Swift • Python • TS</p>
+              <p>Algorithms | Performance</p>
+              <div className={styles.menuSocial}>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter</a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+              </div>
+            </div>
           </div>
         </div>
       </nav>

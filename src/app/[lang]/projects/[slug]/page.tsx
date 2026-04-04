@@ -30,11 +30,46 @@ export async function generateMetadata(props: Props) {
   };
 }
 
+function extractHeadings(content: string) {
+  const headingRegex = /^(#{2,4})\s+(.+)$/gm;
+  const headings: { level: number; text: string; id: string }[] = [];
+  let match;
+  while ((match = headingRegex.exec(content)) !== null) {
+    const level = match[1].length;
+    const text = match[2].trim();
+    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    headings.push({ level, text, id });
+  }
+  return headings;
+}
+
 const components = {
   Mermaid: ({ chart, children }: { chart?: string; children?: React.ReactNode }) => {
     const chartContent = chart || (typeof children === 'string' ? children : '');
     return <Mermaid chart={chartContent} />;
   },
+  h2: ({ children }: { children?: React.ReactNode }) => {
+    const text = children?.toString() || '';
+    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return <h2 id={id} className={styles.heading2}><a href={`#${id}`} className={styles.anchor}>#</a>{children}</h2>;
+  },
+  h3: ({ children }: { children?: React.ReactNode }) => {
+    const text = children?.toString() || '';
+    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return <h3 id={id} className={styles.heading3}><a href={`#${id}`} className={styles.anchor}>#</a>{children}</h3>;
+  },
+  img: (props: any) => (
+    <figure className={styles.figure}>
+      <Image 
+        src={props.src} 
+        alt={props.alt || ''} 
+        width={800} 
+        height={450} 
+        style={{ borderRadius: '4px', maxWidth: '100%', height: 'auto' }}
+      />
+      {props.alt && <figcaption>{props.alt}</figcaption>}
+    </figure>
+  ),
   pre: ({ children }: { children?: React.ReactNode }) => {
     if (!children) return <pre>{children}</pre>;
     const child = children as React.ReactElement<any>;
@@ -49,15 +84,6 @@ const components = {
     
     return <pre>{children}</pre>;
   },
-  img: (props: any) => (
-    <Image 
-      src={props.src} 
-      alt={props.alt || ''} 
-      width={800} 
-      height={450} 
-      style={{ borderRadius: '8px', margin: '1rem 0', maxWidth: '100%', height: 'auto' }}
-    />
-  ),
 };
 
 export default async function ProjectPage(props: Props) {
@@ -69,12 +95,14 @@ export default async function ProjectPage(props: Props) {
   const project = getProject(params.slug);
   if (!project) notFound();
 
+  const headings = extractHeadings(project.content);
+
   return (
     <div className={styles.postPage}>
       <Link href={`/${lang}/projects`} className={styles.back}>← {t.back}</Link>
       <article>
         <header className={styles.header}>
-          <span className={styles.date}>{String(project.date)}</span>
+          <span className={styles.date}>{new Date(project.date).toLocaleDateString()}</span>
           <h1>{project.title}</h1>
           <p className={styles.description}>{project.description}</p>
           <div className={styles.tags}>
@@ -91,6 +119,18 @@ export default async function ProjectPage(props: Props) {
             )}
           </div>
         </header>
+        {headings.length > 0 && (
+          <nav className={styles.toc}>
+            <h4>Contents</h4>
+            <ul>
+              {headings.map((heading, i) => (
+                <li key={i} className={styles[`tocLevel${heading.level}`]}>
+                  <a href={`#${heading.id}`}>{heading.text}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
         <div className={styles.content}>
           <MDXRemote source={project.content} components={components} />
         </div>

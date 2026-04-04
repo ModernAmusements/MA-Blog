@@ -10,6 +10,7 @@ export interface Post {
   description: string;
   date: string;
   tags: string[];
+  image?: string;
   content: string;
 }
 
@@ -19,6 +20,8 @@ export interface Project {
   description: string;
   date: string;
   tags: string[];
+  image?: string;
+  thumbnail?: string;
   liveUrl?: string;
   repoUrl?: string;
   content: string;
@@ -43,11 +46,18 @@ export function getBlogPosts(): Post[] {
         description: data.description || '',
         date: data.date || '',
         tags: data.tags || [],
+        image: data.image,
         content,
       };
     })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   return posts;
+}
+
+function getFirstImageFromContent(content: string): string | undefined {
+  const imgRegex = /!\[.*?\]\((.*?)\)/;
+  const match = content.match(imgRegex);
+  return match ? match[1] : undefined;
 }
 
 export function getProjectPosts(): Project[] {
@@ -64,6 +74,8 @@ export function getProjectPosts(): Project[] {
         description: data.description || '',
         date: data.date || '',
         tags: data.tags || [],
+        image: data.image,
+        thumbnail: data.image || getFirstImageFromContent(content),
         liveUrl: data.liveUrl,
         repoUrl: data.repoUrl,
         content,
@@ -81,11 +93,11 @@ export function getBlogPost(slug: string): Post | null {
       if (!fs.existsSync(mdPath)) return null;
       const fileContent = fs.readFileSync(mdPath, 'utf8');
       const { data, content } = matter(fileContent);
-      return { slug, title: data.title, description: data.description, date: data.date, tags: data.tags, content };
+      return { slug, title: data.title, description: data.description, date: data.date, tags: data.tags, image: data.image, content };
     }
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const { data, content } = matter(fileContent);
-    return { slug, title: data.title, description: data.description, date: data.date, tags: data.tags, content };
+    return { slug, title: data.title, description: data.description, date: data.date, tags: data.tags, image: data.image, content };
   } catch {
     return null;
   }
@@ -99,11 +111,11 @@ export function getProject(slug: string): Project | null {
       if (!fs.existsSync(mdPath)) return null;
       const fileContent = fs.readFileSync(mdPath, 'utf8');
       const { data, content } = matter(fileContent);
-      return { slug, title: data.title, description: data.description, date: data.date, tags: data.tags, liveUrl: data.liveUrl, repoUrl: data.repoUrl, content };
+      return { slug, title: data.title, description: data.description, date: data.date, tags: data.tags, image: data.image, liveUrl: data.liveUrl, repoUrl: data.repoUrl, content };
     }
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const { data, content } = matter(fileContent);
-    return { slug, title: data.title, description: data.description, date: data.date, tags: data.tags, liveUrl: data.liveUrl, repoUrl: data.repoUrl, content };
+    return { slug, title: data.title, description: data.description, date: data.date, tags: data.tags, image: data.image, liveUrl: data.liveUrl, repoUrl: data.repoUrl, content };
   } catch {
     return null;
   }

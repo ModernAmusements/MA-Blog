@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './page.module.scss';
 import { getBlogPosts, getAllTags } from '@/lib/mdx';
 import { translations } from '@/i18n';
@@ -46,7 +47,12 @@ export default async function BlogPage(props: Props) {
       <div className={styles.posts}>
         {filteredPosts.map((post) => (
           <Link key={post.slug} href={`/${lang}/blog/${post.slug}`} className={styles.post}>
-            <span className={styles.date}>{String(post.date)}</span>
+            {post.image && (
+              <div className={styles.postImage}>
+                <Image src={post.image} alt={post.title} width={200} height={112} style={{ objectFit: 'cover' }} unoptimized />
+              </div>
+            )}
+            <span className={styles.date}>{new Date(post.date).toLocaleDateString()}</span>
             <h2>{post.title}</h2>
             <p>{post.description}</p>
             <div className={styles.postTags}>

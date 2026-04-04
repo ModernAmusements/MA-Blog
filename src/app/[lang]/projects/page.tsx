@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './page.module.scss';
 import { getProjectPosts, getAllTags } from '@/lib/mdx';
 import { translations } from '@/i18n';
@@ -47,18 +48,24 @@ export default async function ProjectsPage(props: Props) {
 
       <div className={styles.grid}>
         {filteredProjects.map((project) => (
-          <div key={project.slug} className={styles.card}>
-            <div className={styles.cardContent}>
-              <h2>{project.title}</h2>
-              <p>{project.description}</p>
-              <div className={styles.tags}>
-                {project.tags.map((tag) => (
-                  <span key={tag}>{tag}</span>
-                ))}
+          <Link key={project.slug} href={`/${lang}/projects/${project.slug}`} className={styles.card}>
+            <div className={styles.cardInner}>
+              {project.thumbnail && (
+                <div className={styles.cardImage}>
+                  <Image src={project.thumbnail} alt={project.title} width={200} height={112} style={{ objectFit: 'cover' }} unoptimized />
+                </div>
+              )}
+              <div className={styles.cardContent}>
+                <h2>{project.title}</h2>
+                <p>{project.description}</p>
+                <div className={styles.tags}>
+                  {project.tags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </div>
               </div>
             </div>
             <div className={styles.links}>
-              <Link href={`/${lang}/projects/${project.slug}`}>{t.viewDetails}</Link>
               {project.liveUrl && (
                 <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">{t.liveDemo} →</a>
               )}
@@ -66,7 +73,7 @@ export default async function ProjectsPage(props: Props) {
                 <a href={project.repoUrl} target="_blank" rel="noopener noreferrer">{t.github} →</a>
               )}
             </div>
-          </div>
+          </Link>
         ))}
         {filteredProjects.length === 0 && (
           <p className={styles.empty}>{t.noProjects}</p>

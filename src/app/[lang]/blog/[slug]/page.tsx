@@ -29,8 +29,37 @@ export async function generateMetadata(props: Props) {
   };
 }
 
+function extractHeadings(content: string) {
+  const headingRegex = /^(#{2,4})\s+(.+)$/gm;
+  const headings: { level: number; text: string; id: string }[] = [];
+  let match;
+  while ((match = headingRegex.exec(content)) !== null) {
+    const level = match[1].length;
+    const text = match[2].trim();
+    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    headings.push({ level, text, id });
+  }
+  return headings;
+}
+
 const components = {
   Mermaid: ({ chart }: { chart: string }) => <Mermaid chart={chart} />,
+  h2: ({ children }: { children?: React.ReactNode }) => {
+    const text = children?.toString() || '';
+    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return <h2 id={id} className={styles.heading2}><a href={`#${id}`} className={styles.anchor}>#</a>{children}</h2>;
+  },
+  h3: ({ children }: { children?: React.ReactNode }) => {
+    const text = children?.toString() || '';
+    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return <h3 id={id} className={styles.heading3}><a href={`#${id}`} className={styles.anchor}>#</a>{children}</h3>;
+  },
+  img: ({ src, alt }: { src?: string; alt?: string }) => (
+    <figure className={styles.figure}>
+      <img src={src} alt={alt} />
+      {alt && <figcaption>{alt}</figcaption>}
+    </figure>
+  ),
   pre: ({ children }: { children?: React.ReactNode }) => {
     if (!children) return <pre>{children}</pre>;
     const child = children as React.ReactElement<any>;
@@ -55,12 +84,14 @@ export default async function BlogPostPage(props: Props) {
   const post = getBlogPost(params.slug);
   if (!post) notFound();
 
+  const headings = extractHeadings(post.content);
+
   return (
     <div className={styles.postPage}>
       <Link href={`/${lang}/blog`} className={styles.back}>← {t.back}</Link>
       <article>
         <header className={styles.header}>
-          <span className={styles.date}>{String(post.date)}</span>
+          <span className={styles.date}>{new Date(post.date).toLocaleDateString()}</span>
           <h1>{post.title}</h1>
           <div className={styles.tags}>
             {post.tags.map((tag) => (
@@ -70,6 +101,18 @@ export default async function BlogPostPage(props: Props) {
             ))}
           </div>
         </header>
+        {headings.length > 0 && (
+          <nav className={styles.toc}>
+            <h4>Contents</h4>
+            <ul>
+              {headings.map((heading, i) => (
+                <li key={i} className={styles[`tocLevel${heading.level}`]}>
+                  <a href={`#${heading.id}`}>{heading.text}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
         <div className={styles.content}>
           <MDXRemote source={post.content} components={components} />
         </div>

@@ -7,6 +7,7 @@
   font-size: 14px;
   line-height: 1.4;
   box-sizing: border-box;
+  margin-bottom: 2rem;
 }
 
 .header, .footer {
@@ -27,21 +28,36 @@
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   padding: 20px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .heroPane {
   text-align: left;
+  padding-right: 20px;
+  border-right: 1px solid var(--border);
 
   h1 {
-    font-size: 24px;
+    font-size: 36px;
     margin-bottom: 16px;
     color: var(--foreground);
   }
 
   p {
+    font-size: 18px;
     color: var(--muted);
     margin-bottom: 24px;
     max-width: 400px;
+  }
+}
+
+.explorePane {
+  padding-left: 20px;
+
+  h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: var(--foreground);
   }
 }
 
@@ -95,6 +111,7 @@
   color: var(--foreground);
   padding: 2px 0;
   padding-left: 8px;
+  margin-bottom: 8px;
 
   &:hover {
     background: var(--code-bg);
@@ -121,7 +138,10 @@
 }
 
 .sfIcon {
-  filter: invert(48%) sepia(98%) saturate(2340%) hue-rotate(2deg) brightness(101%) contrast(101%);
+  display: inline-block;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
 }
 
 .name {
@@ -130,7 +150,6 @@
 
 .meta {
   color: var(--muted);
-  padding-right: 40px;
 }
 
 .controlsRight span {
@@ -140,7 +159,7 @@
 .subList {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin-left: 1.5rem !important;
   padding-left: 32px;
   border-left: 1px solid var(--border);
 
@@ -150,12 +169,11 @@
 }
 
 .subLink {
-  display: flex;
-  align-items: center;
   color: var(--foreground);
+  align-items: center;
+  padding: 2px 0 2px 10px;
   text-decoration: none;
-  padding: 2px 0;
-  padding-left: 16px;
+  display: flex;
 
   &:hover {
     background: var(--code-bg);
@@ -190,6 +208,10 @@
     p {
       max-width: 100%;
     }
+  }
+
+  .explorePane {
+    padding-left: 0;
   }
 
   .fileList {

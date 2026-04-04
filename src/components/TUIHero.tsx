@@ -14,36 +14,36 @@ interface TUINavItem {
 }
 
 const navItems: TUINavItem[] = [
-  { label: 'blog', path: '/en/blog', type: 'dir', subItems: [
-    { label: 'hello-world.md', path: '/en/blog/hello-world', type: 'file', size: '1.2K' },
-    { label: 'cli-tool.md', path: '/en/blog/cli-tool', type: 'file', size: '2.4K' },
-  ]},
+  { label: 'about', path: '/en/about', type: 'file', size: '1.2K' },
   { label: 'projects', path: '/en/projects', type: 'dir', subItems: [
     { label: '2026-conflict.md', path: '/en/projects/2026-conflict', type: 'file', size: '8.5K' },
     { label: 'portfolio.md', path: '/en/projects/portfolio', type: 'file', size: '3.2K' },
   ]},
-  { label: 'about', path: '/en/about', type: 'file', size: '512B' },
+  { label: 'blog', path: '/en/blog', type: 'dir', subItems: [
+    { label: 'hello-world.md', path: '/en/blog/hello-world', type: 'file', size: '1.2K' },
+    { label: 'cli-tool.md', path: '/en/blog/cli-tool', type: 'file', size: '2.4K' },
+  ]},
   { label: 'contact', path: '/en/contact', type: 'file', size: '256B' },
 ];
 
 const FolderIcon = () => (
-  <Image src="/images/icons/sf-symbols/folder.svg" alt="folder" width={16} height={14} className={styles.sfIcon} />
+  <Image src="/images/icons/sf-symbols/folder.svg" alt="folder" width={16} height={14} className={styles.sfIcon} unoptimized />
 );
 
 const OpenFolderIcon = () => (
-  <Image src="/images/icons/sf-symbols/folder.svg" alt="open folder" width={16} height={14} className={styles.sfIcon} />
+  <Image src="/images/icons/sf-symbols/folder.svg" alt="open folder" width={16} height={14} className={styles.sfIcon} unoptimized />
 );
 
 const FileIcon = () => (
-  <Image src="/images/icons/sf-symbols/text.document.svg" alt="file" width={13} height={16} className={styles.sfIcon} />
+  <Image src="/images/icons/sf-symbols/text.document.svg" alt="file" width={13} height={16} className={styles.sfIcon} unoptimized />
 );
 
 const PersonIcon = () => (
-  <Image src="/images/icons/sf-symbols/person.crop.circle.svg" alt="person" width={16} height={16} className={styles.sfIcon} />
+  <Image src="/images/icons/sf-symbols/person.crop.circle.svg" alt="person" width={16} height={16} className={styles.sfIcon} unoptimized />
 );
 
 const PaperplaneIcon = () => (
-  <Image src="/images/icons/sf-symbols/paperplane.svg" alt="paperplane" width={16} height={16} className={styles.sfIcon} />
+  <Image src="/images/icons/sf-symbols/paperplane.svg" alt="paperplane" width={16} height={16} className={styles.sfIcon} unoptimized />
 );
 
 const getIcon = (item: TUINavItem, isExpanded: boolean) => {
@@ -61,7 +61,7 @@ const getIcon = (item: TUINavItem, isExpanded: boolean) => {
 
 export function TUIHero() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [expandedDirs, setExpandedDirs] = useState<Set<number>>(new Set());
+  const [expandedDirs, setExpandedDirs] = useState<Set<number>>(new Set([1, 2]));
 
   const toggleExpand = (index: number) => {
     const newExpanded = new Set(expandedDirs);
@@ -113,36 +113,39 @@ export function TUIHero() {
           </div>
         </div>
         
-        <div className={styles.fileList}>
-          <ul>
-            {navItems.map((item, index) => (
-              <li key={item.path}>
-                <div 
-                  className={`${styles.itemRow} ${index === activeIndex ? styles.active : ''}`}
-                  onClick={() => { setActiveIndex(index); item.type === 'dir' && toggleExpand(index); }}
-                  onKeyDown={(e) => handleKeyDown(e, index)}
-                  tabIndex={0}
-                >
-                  <span className={styles.icon}>{getIcon(item, expandedDirs.has(index))}</span>
-                  <span className={styles.name}>{item.label}</span>
-                  <span className={styles.meta}>{item.type === 'dir' ? '[DIR]' : item.size}</span>
-                </div>
-                {item.subItems && expandedDirs.has(index) && (
-                  <ul className={styles.subList}>
-                    {item.subItems.map((sub) => (
-                      <li key={sub.path} className={styles.subItem}>
-                        <Link href={sub.path} className={styles.subLink}>
-                          <span className={styles.icon}><FileIcon /></span>
-                          <span className={styles.name}>{sub.label}</span>
-                          <span className={styles.meta}>{sub.size}</span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ul>
+        <div className={styles.explorePane}>
+          <h2>Explore My Work</h2>
+          <div className={styles.fileList}>
+            <ul>
+              {navItems.map((item, index) => (
+                <li key={item.path}>
+                  <div 
+                    className={`${styles.itemRow} ${index === activeIndex ? styles.active : ''}`}
+                    onClick={() => { setActiveIndex(index); item.type === 'dir' && toggleExpand(index); }}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    tabIndex={0}
+                  >
+                    <span className={styles.icon}>{getIcon(item, expandedDirs.has(index))}</span>
+                    <span className={styles.name}>{item.label}</span>
+                    <span className={styles.meta}>{item.type === 'dir' ? '[DIR]' : item.size}</span>
+                  </div>
+                  {item.subItems && expandedDirs.has(index) && (
+                    <ul className={styles.subList}>
+                      {item.subItems.map((sub) => (
+                        <li key={sub.path} className={styles.subItem}>
+                          <Link href={sub.path} className={styles.subLink}>
+                            <span className={styles.icon}><FileIcon /></span>
+                            <span className={styles.name}>{sub.label}</span>
+                            <span className={styles.meta}>{sub.size}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </main>
       
