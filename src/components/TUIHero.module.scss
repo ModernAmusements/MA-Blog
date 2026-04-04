@@ -144,6 +144,10 @@
   height: 16px;
 }
 
+[data-theme='dark'] .sfIcon {
+  filter: invert(48%) sepia(98%) saturate(2340%) hue-rotate(2deg) brightness(101%) contrast(101%);
+}
+
 .name {
   flex: 1;
 }
