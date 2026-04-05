@@ -9,3 +9,9 @@ package-lock.json
 .env*
 conversation.md
 favicon/
+AGENTS.md
+CLAUDE.md
+ai-ruleset.md
+PROJECT_TYPOGRAPHY.md
+KNOWLEDGE.md
+DEVELOPMENT_LOG.md

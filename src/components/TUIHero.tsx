@@ -62,67 +62,70 @@ const getIcon = (item: TUINavItem, isExpanded: boolean) => {
 
 export function TUIHero({ navItems, lang }: TUIHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [expandedDirs, setExpandedDirs] = useState<Set<number>>(new Set([0, 1, 2, 3]));
+  const [expandedDirs, setExpandedDirs] = useState<Set<number>>(new Set());
   const router = useRouter();
 
-  const scrollToProjects = () => {
-    document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const toggleExpand = (index: number) => {
-    const newExpanded = new Set(expandedDirs);
-    if (newExpanded.has(index)) {
-      newExpanded.delete(index);
-    } else {
-      newExpanded.add(index);
-    }
-    setExpandedDirs(newExpanded);
+    setExpandedDirs(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
-    if (e.key === 'ArrowDown') {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      setActiveIndex(Math.min(activeIndex + 1, navItems.length - 1));
+      const item = navItems[index];
+      setActiveIndex(index);
+      if (item.type === 'dir' && item.path) {
+        toggleExpand(index);
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(prev => (prev + 1) % navItems.length);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setActiveIndex(Math.max(activeIndex - 1, 0));
-    } else if (e.key === 'Enter') {
-      const item = navItems[index];
-      if (item.type === 'dir') {
-        toggleExpand(index);
-      } else {
-        router.push(item.path);
-      }
-    } else if (e.key === ' ') {
-      e.preventDefault();
-      const item = navItems[index];
-      if (item.type === 'dir') {
-        toggleExpand(index);
-      }
+      setActiveIndex(prev => (prev - 1 + navItems.length) % navItems.length);
+    }
+  };
+
+  const scrollToProjects = () => {
+    const projectsSection = document.getElementById('projects');
+    if (projectsSection) {
+      projectsSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <span>Files</span>
-        <span>Sort: Name</span>
+        <span>~ / portfolio</span>
+        <span className={styles.statusLeft}>Online</span>
       </header>
       
       <main className={styles.content}>
         <div className={styles.heroPane}>
           <div className={styles.subHeader}>
             <span>C++ • Swift • Python • TS</span>
-            <span className={styles.separator}>|</span>
           </div>
           <h1><span className={styles.prompt}>~ &gt;</span> Welcome to My Portfolio</h1>
           <p>Full-stack developer specializing in algorithms, performance optimization, and clean code.</p>
+          <ul className={styles.heroList}>
+            <li>ModernAmusements Development</li>
+            <li>Shady Nathan Tawfik</li>
+            <li>Algorithms | Performance</li>
+          </ul>
           <div className={styles.cta}>
             <button onClick={scrollToProjects} className={styles.primary}>
               View Projects <span className={styles.arrow}>↓</span>
             </button>
             <Link href={`/${lang}/contact`} className={styles.secondary}>
-              Get in Touch <PaperplaneIcon />
+              Get in Touch <span style={{ color: 'var(--accent)', fontWeight: 700 }}>→</span>
             </Link>
           </div>
         </div>
@@ -132,12 +135,12 @@ export function TUIHero({ navItems, lang }: TUIHeroProps) {
           <div className={styles.fileList}>
             <ul>
               {navItems.map((item, index) => (
-                <li key={item.path}>
+                <li key={item.path || `dir-${index}`}>
                   <div 
                     className={`${styles.itemRow} ${index === activeIndex ? styles.active : ''}`}
                     onClick={() => { 
                       setActiveIndex(index); 
-                      if (item.type === 'dir') toggleExpand(index);
+                      if (item.type === 'dir' && item.path) toggleExpand(index);
                     }}
                     onKeyDown={(e) => handleKeyDown(e, index)}
                     tabIndex={0}
@@ -151,13 +154,21 @@ export function TUIHero({ navItems, lang }: TUIHeroProps) {
                   </div>
                   {item.subItems && expandedDirs.has(index) && (
                     <ul className={styles.subList}>
-                      {item.subItems.map((sub) => (
-                        <li key={sub.path} className={styles.subItem}>
-                          <Link href={sub.path} className={styles.subLink}>
-                            <span className={styles.icon}><FileIcon /></span>
-                            <span className={styles.name}>{sub.label}</span>
-                            <span className={styles.meta}>{sub.size}</span>
-                          </Link>
+                      {item.subItems.map((sub, subIndex) => (
+                        <li key={sub.path || `disabled-${subIndex}`} className={styles.subItem}>
+                          {sub.path ? (
+                            <Link href={sub.path} className={styles.subLink}>
+                              <span className={styles.icon}><FileIcon /></span>
+                              <span className={styles.name}>{sub.label}</span>
+                              <span className={styles.meta}>{sub.size}</span>
+                            </Link>
+                          ) : (
+                            <span className={styles.subLink}>
+                              <span className={styles.icon}><FileIcon /></span>
+                              <span className={styles.name}>{sub.label}</span>
+                              <span className={styles.meta}>{sub.size}</span>
+                            </span>
+                          )}
                         </li>
                       ))}
                     </ul>
@@ -174,7 +185,6 @@ export function TUIHero({ navItems, lang }: TUIHeroProps) {
         <div className={styles.controlsRight}>
           <span>[↑↓] Navigate</span>
           <span>[Enter] Open</span>
-          <span>[Space] Expand</span>
         </div>
       </footer>
     </div>

@@ -14,11 +14,11 @@
   color: var(--accent);
   font-weight: 600;
   font-size: 0.75rem;
-  min-width: 45px;
+  text-align: right;
 }
 
 .barContainer {
-  width: 100px;
+  width: 300px;
   height: 8px;
   background: var(--code-bg);
   border-radius: 2px;
@@ -28,27 +28,41 @@
 .bar {
   height: 100%;
   border-radius: 2px;
-  transition: width 5s ease-out;
-  background: linear-gradient(90deg, 
-    #238636 0%, 
-    #3fb950 25%, 
-    #f0e68c 50%, 
-    #d29922 75%, 
-    #f85149 100%
-  );
+  transition: none;
+  background: #ff6600;
+  width: 0%;
+  animation: fillProgress 5s linear forwards;
+}
+
+@keyframes fillProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 .bar.full {
-  background: var(--accent) !important;
+  background: #ff6600 !important;
 }
 
 .value {
   color: var(--foreground);
   font-size: 0.7rem;
-  min-width: 90px;
-  max-width: 90px;
+  text-align: left;
+}
+
+.label {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.75rem;
+  min-width: 45px;
   text-align: right;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+@media (max-width: 855px) {
+  .barContainer {
+    width: 80px;
+  }
 }

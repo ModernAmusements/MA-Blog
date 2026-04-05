@@ -82,7 +82,10 @@ const components = {
       codeContent = String(children);
     }
     
-    const trimmed = codeContent.trim();
+    let trimmed = codeContent.trim();
+    trimmed = trimmed.replace(/^```mermaid\s*/g, '').replace(/```$/g, '');
+    trimmed = trimmed.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+    
     const isMermaid = trimmed.startsWith('mermaid') || 
       trimmed.startsWith('graph ') || 
       trimmed.startsWith('flowchart') ||
@@ -97,7 +100,6 @@ const components = {
     if (isMermaid) {
       let cleanChart = trimmed.replace(/^mermaid\n*---[\s\S]*?---\n*/gm, '');
       cleanChart = cleanChart.replace(/<br\s*\/?>/gi, ' ');
-      cleanChart = cleanChart.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
       return <Mermaid chart={cleanChart} />;
     }
     

@@ -60,7 +60,6 @@
   font-size: 0.8rem;
   padding: 0.25rem 0.6rem;
   background: var(--code-bg);
-  border-radius: 4px;
   color: var(--muted);
 }
 
@@ -281,7 +280,7 @@
     list-style: none;
   }
 
-  ul li::before {
+  ul > li::before {
     content: '-';
     color: var(--accent);
     margin-right: 0.75rem;
@@ -389,6 +388,40 @@
 @media (max-width: 855px) {
   .toc {
     display: none;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .header .description {
+    font-size: 1rem;
+  }
+
+  .content {
+    h2, h3, h4 {
+      margin-top: 2rem;
+    }
+
+    .heading2 {
+      font-size: 1.35rem;
+    }
+
+    .heading3 {
+      font-size: 1.15rem;
+    }
+
+    .heading4 {
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+    }
+  }
+
+  .links {
+    flex-wrap: wrap;
   }
 }
 

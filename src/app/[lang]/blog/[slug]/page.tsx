@@ -78,22 +78,24 @@ const components = {
       codeContent = String(children);
     }
     
-    const trimmed = codeContent.trim();
-    const isMermaid = trimmed.startsWith('mermaid') || 
-      trimmed.startsWith('graph ') || 
-      trimmed.startsWith('flowchart') ||
-      trimmed.startsWith('sequenceDiagram') ||
-      trimmed.startsWith('classDiagram') ||
-      trimmed.startsWith('stateDiagram') ||
-      trimmed.startsWith('erDiagram') ||
-      trimmed.startsWith('pie') ||
-      trimmed.startsWith('gantt') ||
-      trimmed.startsWith('subgraph');
+    let trimmed = codeContent.trim();
     
-    if (isMermaid) {
+    const isMermaidBlock = trimmed.startsWith('```mermaid') || 
+      trimmed.startsWith('``` chart') ||
+      trimmed.includes('flowchart') ||
+      trimmed.includes('sequenceDiagram') ||
+      trimmed.includes('classDiagram') ||
+      trimmed.includes('stateDiagram') ||
+      trimmed.includes('gantt') ||
+      trimmed.includes('pie ') ||
+      trimmed.startsWith('graph ');
+    
+    if (isMermaidBlock) {
+      trimmed = trimmed.replace(/^```mermaid\s*\n?/, '').replace(/^```\s*\n?/, '').replace(/\n?```$/, '');
+      trimmed = trimmed.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+      
       let cleanChart = trimmed.replace(/^mermaid\n*---[\s\S]*?---\n*/gm, '');
       cleanChart = cleanChart.replace(/<br\s*\/?>/gi, ' ');
-      cleanChart = cleanChart.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
       return <Mermaid chart={cleanChart} />;
     }
     
@@ -140,7 +142,6 @@ export default async function BlogPostPage(props: Props) {
         </Link>
       <article>
         <header className={styles.header}>
-          <span className={styles.date}>{new Date(post.date).toLocaleDateString()}</span>
           <h1>{post.title}</h1>
           <div className={styles.tags}>
             {post.tags.map((tag) => (

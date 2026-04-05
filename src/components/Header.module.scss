@@ -24,6 +24,10 @@
   font-size: 1.25rem;
   color: var(--foreground);
   text-decoration: none;
+
+  &:hover {
+    color: var(--accent);
+  }
 }
 
 .logoSvg {
@@ -80,7 +84,7 @@
 }
 
 .hamburger {
-  display: flex;
+  display: none;
   flex-direction: column;
   justify-content: space-between;
   width: 24px;
@@ -158,7 +162,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
+  padding: 1rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -248,5 +252,27 @@
 
   .logoSvg {
     width: 40px;
+  }
+
+  .navContent {
+    display: none;
+  }
+
+  .systemMonitor {
+    display: flex;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
+
+@media (min-width: 856px) {
+  .navContent {
+    display: flex;
+  }
+
+  .systemMonitor {
+    display: none;
   }
 }

@@ -11,12 +11,12 @@ interface HeaderProps {
   lang?: string;
 }
 
-const navItems = [
+const navItems: { path: string; key: string; disabled?: boolean }[] = [
   { path: '/blog', key: 'blog' },
   { path: '/projects', key: 'projects' },
-  { path: '/about', key: 'about' },
-  { path: '/contact', key: 'contact' },
-] as const;
+  { path: '/about', key: 'about', disabled: true },
+  { path: '/contact', key: 'contact', disabled: true },
+];
 
 export function Header({ lang = 'en' }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -59,15 +59,21 @@ export function Header({ lang = 'en' }: HeaderProps) {
         </Link>
         
         <div className={styles.rightSection}>
-          <div className={styles.navContent}>
-            {isHomepage ? <SystemMonitor /> : (
+          {!isHomepage && (
+            <div className={styles.navContent}>
               <div className={styles.navLinks}>
-                {navItems.map((item) => (
-                  <NavLink key={item.path} to={`/${lang}${item.path}`} label={t[item.key as keyof typeof t]} />
+                {navItems.map((item, index) => (
+                  <NavLink key={item.disabled ? `disabled-${index}` : item.path} to={`/${lang}${item.path}`} label={t[item.key as keyof typeof t]} />
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
+          
+          {isHomepage && (
+            <div className={`${styles.navContent} ${styles.systemMonitor}`}>
+              <SystemMonitor />
+            </div>
+          )}
           
           <ThemeToggle />
           
@@ -91,9 +97,6 @@ export function Header({ lang = 'en' }: HeaderProps) {
           <button className={styles.closeBtn} onClick={() => setMenuOpen(false)}>×</button>
         </div>
         <nav className={styles.menuItems}>
-          <div className={styles.menuMonitor}>
-            <SystemMonitor />
-          </div>
           {navItems.map((item) => (
             <NavLink key={item.path} to={`/${lang}${item.path}`} label={t[item.key as keyof typeof t]} />
           ))}

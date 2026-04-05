@@ -26,27 +26,27 @@ function buildNavItems(lang: string): TUINavItem[] {
   const posts = getBlogPosts();
   
   const projectSubItems = projects.map((p) => ({
-    label: `${p.slug}.md`,
+    label: p.title,
     path: `/${lang}/projects/${p.slug}`,
     type: 'file' as const,
     size: formatFileSize(p.content.length * 2),
   }));
   
   const blogSubItems = posts.map((p) => ({
-    label: `${p.slug}.md`,
+    label: p.title,
     path: `/${lang}/blog/${p.slug}`,
     type: 'file' as const,
     size: formatFileSize(p.content.length * 2),
   }));
   
   return [
-    { label: 'about', path: `/${lang}/about`, type: 'dir' as const, subItems: [
-      { label: 'about.md', path: `/${lang}/about`, type: 'file' as const, size: '1.2K' },
+    { label: 'about', path: '', type: 'dir' as const, subItems: [
+      { label: 'about.md', path: '', type: 'file' as const, size: '1.2K' },
     ]},
     { label: 'projects', path: `/${lang}/projects`, type: 'dir' as const, subItems: projectSubItems },
     { label: 'blog', path: `/${lang}/blog`, type: 'dir' as const, subItems: blogSubItems },
-    { label: 'contact', path: `/${lang}/contact`, type: 'dir' as const, subItems: [
-      { label: 'contact.md', path: `/${lang}/contact`, type: 'file' as const, size: '256B' },
+    { label: 'contact', path: '', type: 'dir' as const, subItems: [
+      { label: 'contact.md', path: '', type: 'file' as const, size: '256B' },
     ]},
   ];
 }
@@ -68,10 +68,33 @@ export default async function Home(props: Props) {
     <div className={styles.home}>
       <TUIHero navItems={navItems} lang={lang} />
 
-      {projects.length > 0 && (
+      {posts.length > 0 && (
         <TerminalFrame title={t.featuredProjects}>
-          <div id="projects" className={styles.sectionHeader}>
+          <div className={styles.sectionHeader}>
             <h2><span className={styles.prompt}>~ &gt;</span> [{t.featuredProjects}]</h2>
+            <Link href={`/${lang}/blog`}>{t.viewAll} →</Link>
+          </div>
+          <div className={styles.section}>
+            {posts.map((post) => (
+              <Link key={post.slug} href={`/${lang}/blog/${post.slug}`} className={styles.projectCard}>
+                {post.image && (
+                  <div className={styles.cardImage}>
+                    <Image src={post.image} alt={post.title} width={400} height={225} style={{ objectFit: 'cover' }} unoptimized />
+                  </div>
+                )}
+                <span className={styles.date}>{new Date(post.date).toLocaleDateString()}</span>
+                <h3>{post.title}</h3>
+                <p>{post.description}</p>
+              </Link>
+            ))}
+          </div>
+        </TerminalFrame>
+      )}
+
+      {projects.length > 0 && (
+        <TerminalFrame title={t.latestPosts}>
+          <div id="projects" className={styles.sectionHeader}>
+            <h2><span className={styles.prompt}>~ &gt;</span> [{t.latestPosts}]</h2>
             <Link href={`/${lang}/projects`}>{t.viewAll} →</Link>
           </div>
           <div className={styles.section}>
@@ -93,29 +116,6 @@ export default async function Home(props: Props) {
                     </div>
                   </div>
                 </div>
-              </Link>
-            ))}
-          </div>
-        </TerminalFrame>
-      )}
-
-      {posts.length > 0 && (
-        <TerminalFrame title={t.latestPosts}>
-          <div className={styles.sectionHeader}>
-            <h2><span className={styles.prompt}>~ &gt;</span> [{t.latestPosts}]</h2>
-            <Link href={`/${lang}/blog`}>{t.viewAll} →</Link>
-          </div>
-          <div className={styles.section}>
-            {posts.map((post) => (
-              <Link key={post.slug} href={`/${lang}/blog/${post.slug}`} className={styles.projectCard}>
-                {post.image && (
-                  <div className={styles.cardImage}>
-                    <Image src={post.image} alt={post.title} width={400} height={225} style={{ objectFit: 'cover' }} unoptimized />
-                  </div>
-                )}
-                <span className={styles.date}>{new Date(post.date).toLocaleDateString()}</span>
-                <h3>{post.title}</h3>
-                <p>{post.description}</p>
               </Link>
             ))}
           </div>

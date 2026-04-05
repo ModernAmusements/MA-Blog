@@ -63,6 +63,7 @@ const STATIC_VALUE = { value: 50, text: '50%' };
 export function SystemMonitor() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [animKey, setAnimKey] = useState(0);
 
   const currentStat = stats[currentIndex];
   const { value, text } = mounted ? currentStat.getValue() : STATIC_VALUE;
@@ -74,22 +75,22 @@ export function SystemMonitor() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % stats.length);
-    }, 6000);
+      setAnimKey((prev) => prev + 1);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const barWidth = value;
   const isFull = value >= 100;
 
   return (
     <div className={styles.content}>
       <div className={styles.stat}>
-        <span className={styles.label}>{currentStat.label}</span>
-        <div className={styles.barContainer}>
-          <div className={`${styles.bar} ${isFull ? styles.full : ''}`} style={{ width: `${barWidth}%` }} />
-        </div>
         <span className={styles.value}>{text}</span>
+        <div className={styles.barContainer}>
+          <div key={animKey} className={`${styles.bar} ${isFull ? styles.full : ''}`} />
+        </div>
+        <span className={styles.label}>{currentStat.label}</span>
       </div>
     </div>
   );
