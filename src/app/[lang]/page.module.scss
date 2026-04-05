@@ -112,11 +112,9 @@
 }
 
 .projectCard {
-  border: 1px solid var(--border);
   transition: border-color 0.2s;
-  overflow: hidden;
   display: block;
-  padding: 1rem;
+  overflow: hidden;
 
   &:hover {
     border-color: var(--accent);
@@ -234,5 +232,9 @@
   .cta a {
     padding: 0.6rem 1rem;
     font-size: 0.9rem;
+  }
+
+  .cardImage {
+    display: none;
   }
 }

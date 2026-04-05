@@ -164,13 +164,23 @@
 .itemRow.active {
   background-color: var(--code-bg);
   color: var(--accent);
+}
 
-  &::before {
-    content: '→';
-    margin-right: 8px;
-    color: var(--accent);
-    font-weight: bold;
-  }
+.chevronContainer {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+}
+
+.chevronDown {
+  transform: rotate(90deg);
 }
 
 .icon {

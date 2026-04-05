@@ -4,6 +4,7 @@ import { MDXRemote } from 'next-mdx-remote/rsc';
 import { Mermaid } from '@/components/Mermaid';
 import Image from 'next/image';
 import { CollapsibleTOC } from '@/components/CollapsibleTOC';
+import { CodeBlock } from '@/components/CodeBlock';
 import styles from '../page.module.scss';
 import { getProject, getProjectPosts } from '@/lib/mdx';
 import { translations } from '@/i18n';
@@ -58,6 +59,50 @@ const components = {
     const chartContent = chart || (typeof children === 'string' ? children : '');
     return <Mermaid chart={chartContent} />;
   },
+  CodeBlock: ({ children, className }: { children?: string; className?: string }) => <CodeBlock className={className}>{children}</CodeBlock>,
+  code: ({ children, className }: { children?: React.ReactNode; className?: string }) => {
+    const code = String(children).trim();
+    const hasMultipleLines = code.split('\n').length > 1;
+    const hasLanguage = className && className !== 'text';
+    
+    if (hasMultipleLines || hasLanguage) {
+      return <CodeBlock className={className || 'text'}>{code}</CodeBlock>;
+    }
+    
+    return <code className={className}>{children}</code>;
+  },
+  pre: ({ children }: { children?: React.ReactNode }) => {
+    if (!children) return <pre>{children}</pre>;
+    
+    let codeContent = '';
+    try {
+      const child = children as React.ReactElement<any>;
+      codeContent = child?.props?.children?.toString() || '';
+    } catch {
+      codeContent = String(children);
+    }
+    
+    const trimmed = codeContent.trim();
+    const isMermaid = trimmed.startsWith('mermaid') || 
+      trimmed.startsWith('graph ') || 
+      trimmed.startsWith('flowchart') ||
+      trimmed.startsWith('sequenceDiagram') ||
+      trimmed.startsWith('classDiagram') ||
+      trimmed.startsWith('stateDiagram') ||
+      trimmed.startsWith('erDiagram') ||
+      trimmed.startsWith('pie') ||
+      trimmed.startsWith('gantt') ||
+      trimmed.startsWith('subgraph');
+    
+    if (isMermaid) {
+      let cleanChart = trimmed.replace(/^mermaid\n*---[\s\S]*?---\n*/gm, '');
+      cleanChart = cleanChart.replace(/<br\s*\/?>/gi, ' ');
+      cleanChart = cleanChart.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+      return <Mermaid chart={cleanChart} />;
+    }
+    
+    return <CodeBlock className="text">{codeContent}</CodeBlock>;
+  },
   h2: ({ children }: { children?: React.ReactNode }) => {
     const text = children?.toString() || '';
     const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -68,6 +113,11 @@ const components = {
     const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     return <h3 id={id} className={styles.heading3}><a href={`#${id}`} className={styles.anchor}>#</a>{children}</h3>;
   },
+  h4: ({ children }: { children?: React.ReactNode }) => {
+    const text = children?.toString() || '';
+    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return <h4 id={id} className={styles.heading4}><a href={`#${id}`} className={styles.anchor}>#</a>{children}</h4>;
+  },
   p: ({ children }: { children?: React.ReactNode }) => {
     return <p>{children}</p>;
   },
@@ -76,24 +126,10 @@ const components = {
       src={props.src} 
       alt={props.alt || ''} 
       width={800} 
-      height={450} 
+      height={450}
       className={styles.contentImage}
     />
   ),
-  pre: ({ children }: { children?: React.ReactNode }) => {
-    if (!children) return <pre>{children}</pre>;
-    const child = children as React.ReactElement<any>;
-    const codeContent = child?.props?.children?.toString() || '';
-    
-    const mermaidKeywords = ['graph TD', 'graph LR', 'flowchart', 'sequenceDiagram', 'classDiagram', 'stateDiagram', 'erDiagram', 'pie', 'gantt', 'subgraph', 'direction'];
-    const startsWithMermaid = mermaidKeywords.some(kw => codeContent.trim().startsWith(kw));
-    
-    if (startsWithMermaid) {
-      return <Mermaid chart={codeContent} />;
-    }
-    
-    return <pre>{children}</pre>;
-  },
 };
 
 export default async function ProjectPage(props: Props) {
@@ -109,10 +145,14 @@ export default async function ProjectPage(props: Props) {
 
   return (
     <div className={styles.postPage}>
-      <Link href={`/${lang}/projects`} className={styles.back}>← {t.back}</Link>
+      <Link href={`/${lang}/projects`} className={styles.back}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          {t.back}
+        </Link>
       <article>
         <header className={styles.header}>
-          <span className={styles.date}>{new Date(project.date).toLocaleDateString()}</span>
           <h1>{project.title}</h1>
           <p className={styles.description}>{project.description}</p>
           <div className={styles.tags}>
@@ -135,6 +175,18 @@ export default async function ProjectPage(props: Props) {
         <div className={styles.content}>
           <MDXRemote source={project.content} components={components} />
         </div>
+        <footer className={styles.metaFooter}>
+          <div>
+            <span className={styles.metaLabel}>Created:</span>
+            <br />
+            <span className={styles.metaDate}>{new Date(project.date).toLocaleDateString()}</span>
+          </div>
+          <div>
+            <span className={styles.metaLabel}>Last Updated:</span>
+            <br />
+            <span className={styles.metaDate}>{new Date().toLocaleDateString()}</span>
+          </div>
+        </footer>
       </article>
     </div>
   );

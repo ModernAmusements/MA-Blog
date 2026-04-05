@@ -1,0 +1,54 @@
+.content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.label {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.75rem;
+  min-width: 45px;
+}
+
+.barContainer {
+  width: 100px;
+  height: 8px;
+  background: var(--code-bg);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 5s ease-out;
+  background: linear-gradient(90deg, 
+    #238636 0%, 
+    #3fb950 25%, 
+    #f0e68c 50%, 
+    #d29922 75%, 
+    #f85149 100%
+  );
+}
+
+.bar.full {
+  background: var(--accent) !important;
+}
+
+.value {
+  color: var(--foreground);
+  font-size: 0.7rem;
+  min-width: 90px;
+  max-width: 90px;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

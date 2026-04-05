@@ -48,13 +48,8 @@ export default async function ProjectsPage(props: Props) {
 
       <div className={styles.grid}>
         {filteredProjects.map((project) => (
-          <Link key={project.slug} href={`/${lang}/projects/${project.slug}`} className={styles.card}>
-            <div className={styles.cardInner}>
-              {project.thumbnail && (
-                <div className={styles.cardImage}>
-                  <Image src={project.thumbnail} alt={project.title} width={200} height={112} style={{ objectFit: 'cover' }} unoptimized />
-                </div>
-              )}
+          <div key={project.slug} className={styles.card}>
+            <Link href={`/${lang}/projects/${project.slug}`} className={styles.cardInner}>
               <div className={styles.cardContent}>
                 <h2>{project.title}</h2>
                 <p>{project.description}</p>
@@ -64,7 +59,7 @@ export default async function ProjectsPage(props: Props) {
                   ))}
                 </div>
               </div>
-            </div>
+            </Link>
             <div className={styles.links}>
               {project.liveUrl && (
                 <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">{t.liveDemo} →</a>
@@ -73,7 +68,7 @@ export default async function ProjectsPage(props: Props) {
                 <a href={project.repoUrl} target="_blank" rel="noopener noreferrer">{t.github} →</a>
               )}
             </div>
-          </Link>
+          </div>
         ))}
         {filteredProjects.length === 0 && (
           <p className={styles.empty}>{t.noProjects}</p>

@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from 'next';
-import { ThemeProvider } from 'next-themes';
-import { Analytics } from '@vercel/analytics/next';
-import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { languages, defaultLang } from '@/i18n';
 import '@/styles/globals.scss';
+import { ClientProviders } from '@/components/ClientProviders';
+import { Header } from '@/components/Header';
 
 const BASE_URL = 'https://modern-amusements.vercel.app';
 
@@ -116,21 +115,22 @@ export default async function RootLayout({
   return (
     <html lang={lang} suppressHydrationWarning>
       <head>
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="apple-touch-icon" href="/favicon.svg" />
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" type="image/svg+xml" href="/images/favicon/favicon.svg" />
+        <link rel="icon" type="image/png" sizes="96x96" href="/images/favicon/favicon-96x96.png" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon/favicon.ico" />
+        <link rel="apple-touch-icon" href="/images/favicon/apple-touch-icon.png" />
+        <link rel="manifest" href="/images/favicon/site.webmanifest" />
         <link rel="alternate" hrefLang="en" href={`${BASE_URL}/en`} />
         <link rel="alternate" hrefLang="de" href={`${BASE_URL}/de`} />
       </head>
       <body suppressHydrationWarning>
-        <ThemeProvider attribute="data-theme" defaultTheme="light" enableSystem>
-          <Analytics />
+        <ClientProviders>
           <Header lang={lang} />
           <main className="main-content" style={{ maxWidth: '1400px', margin: '0 auto', minHeight: 'calc(100vh - 200px)' }}>
             {children}
           </main>
           <Footer />
-        </ThemeProvider>
+        </ClientProviders>
       </body>
     </html>
   );

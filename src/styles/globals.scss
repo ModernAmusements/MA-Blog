@@ -5,6 +5,45 @@ $border: #e5e5e5;
 $accent: #f97316;
 $code-bg: #f4f4f4;
 
+.shiki-block {
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+
+  pre {
+    margin: 0;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  &.shiki,
+  &.shiki span {
+    color: var(--shiki-light) !important;
+    background-color: var(--shiki-light-bg) !important;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &.shiki,
+    &.shiki span {
+      color: var(--shiki-dark) !important;
+      background-color: var(--shiki-dark-bg) !important;
+    }
+  }
+
+  [data-theme='dark'] &,
+  [data-theme='dark'] &.shiki,
+  [data-theme='dark'] &.shiki span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -16,7 +55,14 @@ $code-bg: #f4f4f4;
   }
 }
 
+:root {
+  --shiki-light-bg: #f4f4f4;
+  --shiki-dark-bg: #171717;
+}
+
 [data-theme='light'] {
+  --shiki-light-bg: #f4f4f4;
+  --shiki-dark-bg: #171717;
   --background: #fafafa;
   --foreground: #1a1a1a;
   --muted: #666;

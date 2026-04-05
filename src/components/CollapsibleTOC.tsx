@@ -30,21 +30,28 @@ export function CollapsibleTOC({ headings }: TOCProps) {
       <ul>
         {themas.map((thema) => {
           const subHeadings = headings.filter(h => h.thema === thema.thema && h.level > 2);
+          const hasSubHeadings = subHeadings.length > 0;
           const isExpanded = expanded[thema.thema] ?? false;
 
           return (
             <li key={thema.thema} className={styles.tocLevel2}>
               <div className={styles.tocItem}>
-                <button 
-                  onClick={() => toggle(thema.thema)}
-                  className={styles.tocToggle}
-                  aria-expanded={isExpanded}
-                >
-                  <span className={`${styles.chevron} ${isExpanded ? styles.chevronOpen : ''}`}>›</span>
-                  <span className={styles.tocNumber}>{thema.thema}.</span> {thema.text}
-                </button>
+                {hasSubHeadings ? (
+                  <button 
+                    onClick={() => toggle(thema.thema)}
+                    className={styles.tocToggle}
+                    aria-expanded={isExpanded}
+                  >
+                    <span className={`${styles.chevron} ${isExpanded ? styles.chevronOpen : ''}`}>›</span>
+                    <span className={styles.tocNumber}>{thema.thema}.</span> {thema.text}
+                  </button>
+                ) : (
+                  <a href={`#${thema.id}`} className={styles.tocLink}>
+                    <span className={styles.tocNumber}>{thema.thema}.</span> {thema.text}
+                  </a>
+                )}
               </div>
-              {subHeadings.length > 0 && (
+              {hasSubHeadings && (
                 <ul className={`${styles.tocSub} ${isExpanded ? styles.tocSubOpen : ''}`}>
                   {subHeadings.map((sub, idx) => (
                     <li key={idx} className={sub.level === 3 ? styles.tocLevel3 : styles.tocLevel4}>

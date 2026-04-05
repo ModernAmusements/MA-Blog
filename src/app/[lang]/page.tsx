@@ -7,6 +7,50 @@ import type { Lang } from '@/i18n';
 import { TerminalFrame } from '@/components/TerminalFrame';
 import { TUIHero } from '@/components/TUIHero';
 
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + 'B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'K';
+  return (bytes / (1024 * 1024)).toFixed(1) + 'M';
+}
+
+interface TUINavItem {
+  label: string;
+  path: string;
+  type: 'dir' | 'file';
+  size?: string;
+  subItems?: { label: string; path: string; type: 'dir' | 'file'; size?: string }[];
+}
+
+function buildNavItems(lang: string): TUINavItem[] {
+  const projects = getProjectPosts();
+  const posts = getBlogPosts();
+  
+  const projectSubItems = projects.map((p) => ({
+    label: `${p.slug}.md`,
+    path: `/${lang}/projects/${p.slug}`,
+    type: 'file' as const,
+    size: formatFileSize(p.content.length * 2),
+  }));
+  
+  const blogSubItems = posts.map((p) => ({
+    label: `${p.slug}.md`,
+    path: `/${lang}/blog/${p.slug}`,
+    type: 'file' as const,
+    size: formatFileSize(p.content.length * 2),
+  }));
+  
+  return [
+    { label: 'about', path: `/${lang}/about`, type: 'dir' as const, subItems: [
+      { label: 'about.md', path: `/${lang}/about`, type: 'file' as const, size: '1.2K' },
+    ]},
+    { label: 'projects', path: `/${lang}/projects`, type: 'dir' as const, subItems: projectSubItems },
+    { label: 'blog', path: `/${lang}/blog`, type: 'dir' as const, subItems: blogSubItems },
+    { label: 'contact', path: `/${lang}/contact`, type: 'dir' as const, subItems: [
+      { label: 'contact.md', path: `/${lang}/contact`, type: 'file' as const, size: '256B' },
+    ]},
+  ];
+}
+
 interface Props {
   params: Promise<{ lang: string }>;
 }
@@ -18,10 +62,11 @@ export default async function Home(props: Props) {
   
   const posts = getBlogPosts().slice(0, 3);
   const projects = getProjectPosts().slice(0, 2);
+  const navItems = buildNavItems(lang);
 
   return (
     <div className={styles.home}>
-      <TUIHero />
+      <TUIHero navItems={navItems} lang={lang} />
 
       {projects.length > 0 && (
         <TerminalFrame title={t.featuredProjects}>

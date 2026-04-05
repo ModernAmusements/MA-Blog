@@ -14,16 +14,10 @@ interface TUINavItem {
   subItems?: { label: string; path: string; type: 'dir' | 'file'; size?: string }[];
 }
 
-const navItems: TUINavItem[] = [
-  { label: 'about', path: '/en/about', type: 'file', size: '1.2K' },
-  { label: 'projects', path: '/en/projects', type: 'dir', subItems: [
-    { label: 'Israel-Hamas-Conflict.md', path: '/en/projects/Israel-Hamas-Conflict', type: 'file', size: '8.5K' },
-  ]},
-  { label: 'blog', path: '/en/blog', type: 'dir', subItems: [
-    { label: 'cli-tool.md', path: '/en/blog/cli-tool', type: 'file', size: '2.4K' },
-  ]},
-  { label: 'contact', path: '/en/contact', type: 'file', size: '256B' },
-];
+interface TUIHeroProps {
+  navItems: TUINavItem[];
+  lang: string;
+}
 
 const FolderIcon = () => (
   <Image src="/images/icons/sf-symbols/folder.svg" alt="folder" width={16} height={14} className={styles.sfIcon} unoptimized />
@@ -45,6 +39,14 @@ const PaperplaneIcon = () => (
   <Image src="/images/icons/sf-symbols/paperplane.svg" alt="paperplane" width={16} height={16} className={styles.sfIcon} unoptimized />
 );
 
+const ChevronIcon = ({ isExpanded }: { isExpanded: boolean }) => (
+  <span className={`${styles.chevron} ${isExpanded ? styles.chevronDown : ''}`}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </span>
+);
+
 const getIcon = (item: TUINavItem, isExpanded: boolean) => {
   if (item.type === 'dir') {
     return isExpanded ? <OpenFolderIcon /> : <FolderIcon />;
@@ -58,9 +60,9 @@ const getIcon = (item: TUINavItem, isExpanded: boolean) => {
   return <FileIcon />;
 };
 
-export function TUIHero() {
+export function TUIHero({ navItems, lang }: TUIHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [expandedDirs, setExpandedDirs] = useState<Set<number>>(new Set([1, 2]));
+  const [expandedDirs, setExpandedDirs] = useState<Set<number>>(new Set([0, 1, 2, 3]));
   const router = useRouter();
 
   const scrollToProjects = () => {
@@ -119,7 +121,7 @@ export function TUIHero() {
             <button onClick={scrollToProjects} className={styles.primary}>
               View Projects <span className={styles.arrow}>↓</span>
             </button>
-            <Link href="/en/contact" className={styles.secondary}>
+            <Link href={`/${lang}/contact`} className={styles.secondary}>
               Get in Touch <PaperplaneIcon />
             </Link>
           </div>
@@ -140,6 +142,9 @@ export function TUIHero() {
                     onKeyDown={(e) => handleKeyDown(e, index)}
                     tabIndex={0}
                   >
+                    <span className={styles.chevronContainer}>
+                      <ChevronIcon isExpanded={expandedDirs.has(index)} />
+                    </span>
                     <span className={styles.icon}>{getIcon(item, expandedDirs.has(index))}</span>
                     <span className={styles.name}>{item.label}</span>
                     <span className={styles.meta}>{item.type === 'dir' ? '[DIR]' : item.size}</span>
