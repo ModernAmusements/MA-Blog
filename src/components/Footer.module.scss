@@ -1,7 +1,7 @@
 .footer {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+  padding-top: 2rem;
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
@@ -48,11 +48,5 @@
 
   .social {
     padding: 1.5rem;
-  }
-}
-
-@media (min-width: 1400px) {
-  .footer {
-    padding: 2rem 3rem;
   }
 }

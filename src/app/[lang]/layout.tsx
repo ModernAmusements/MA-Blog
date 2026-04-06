@@ -126,7 +126,7 @@ export default async function RootLayout({
       <body suppressHydrationWarning>
         <ClientProviders>
           <Header lang={lang} />
-          <main className="main-content" style={{ margin: '0 auto', minHeight: 'calc(100vh - 200px)', width: '100%' }}>
+          <main className="main-content" style={{ margin: '0 auto', maxWidth: '1400px', minHeight: 'calc(100vh - 200px)', width: '100%' }}>
             {children}
           </main>
           <Footer />
