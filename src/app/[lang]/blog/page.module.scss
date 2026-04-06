@@ -67,7 +67,7 @@
 
   .postImage {
     flex-shrink: 0;
-    border-radius: 4px;
+   
     overflow: hidden;
     aspect-ratio: 16/9;
     width: 150px;
@@ -102,7 +102,7 @@
     font-size: 0.75rem;
     padding: 0.25rem 0.5rem;
     background: var(--code-bg);
-    border-radius: 4px;
+   
     color: var(--muted);
   }
 }

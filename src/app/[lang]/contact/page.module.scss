@@ -1,29 +1,51 @@
 .contact {
   padding-top: 1rem;
   padding-bottom: 3rem;
-  max-width: 600px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+.heroPane {
+  padding-right: 2rem;
+
+  .subHeader {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
 
   h1 {
-    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    margin-bottom: 1rem;
   }
-}
 
-@media (max-width: 1445px) {
-  .contact {
-    padding-left: 2rem;
-    padding-right: 2rem;
+  p {
+    color: var(--muted);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
   }
-}
 
-.description {
-  color: var(--muted);
-  margin-bottom: 2rem;
+  .info {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+  }
 }
 
 .form {
   margin-bottom: 3rem;
-  padding-bottom: 3rem;
-  border-bottom: 1px solid var(--border);
 }
 
 .field {
@@ -33,16 +55,18 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
+    color: var(--muted);
+    font-size: 0.9rem;
   }
 
   input, textarea {
     width: 100%;
     padding: 0.75rem;
     border: 1px solid var(--border);
-    border-radius: 6px;
     background: var(--background);
     color: var(--foreground);
     font-size: 1rem;
+    font-family: inherit;
     transition: border-color 0.2s;
 
     &:focus {
@@ -52,12 +76,14 @@
 
     &::placeholder {
       color: var(--muted);
+      opacity: 0.6;
     }
   }
 
   textarea {
     resize: vertical;
-    min-height: 120px;
+    min-height: 150px;
+    line-height: 1.6;
   }
 }
 
@@ -67,38 +93,20 @@
   margin-top: 0.5rem;
 }
 
-.submitButton {
-  padding: 0.75rem 1.5rem;
-  background: var(--foreground);
-  color: var(--background);
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: opacity 0.2s;
-
-  &:hover:not(:disabled) {
-    opacity: 0.9;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
 .success {
   margin-top: 1rem;
   color: #22c55e;
-}
-
-.error {
-  margin-top: 1rem;
-  color: #ef4444;
+  font-size: 1.1rem;
+  padding: 1rem;
+  border: 1px solid #22c55e;
+  background: rgba(34, 197, 94, 0.1);
 }
 
 .newsletter {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+
   h2 {
     font-size: 1.25rem;
     margin-bottom: 0.5rem;
@@ -112,16 +120,18 @@
   form {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
   input {
     flex: 1;
+    min-width: 200px;
     padding: 0.75rem;
     border: 1px solid var(--border);
-    border-radius: 6px;
     background: var(--background);
     color: var(--foreground);
     font-size: 1rem;
+    font-family: inherit;
 
     &:focus {
       outline: none;
@@ -130,23 +140,19 @@
 
     &::placeholder {
       color: var(--muted);
+      opacity: 0.6;
     }
   }
+}
 
-  .subscribeButton {
-    padding: 0.75rem 1.5rem;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.2s;
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
 
-    &:hover {
-      opacity: 0.9;
-    }
+  .heroPane {
+    padding-right: 0;
   }
 }
 

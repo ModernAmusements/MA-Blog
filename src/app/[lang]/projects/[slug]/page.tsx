@@ -25,11 +25,47 @@ export async function generateStaticParams() {
 
 export async function generateMetadata(props: Props) {
   const params = await props.params;
+  const lang = params.lang === 'de' ? 'de' : 'en';
   const project = getProjectByLang(params.slug, params.lang);
-  if (!project) return { title: 'Project Not Found' };
+  if (!project) {
+    return {
+      title: 'Project Not Found',
+      description: '',
+      excerpt: '',
+    };
+  }
+  
+  const baseUrl = 'https://modern-amusements.vercel.app';
+  
   return {
     title: project.title,
     description: project.description,
+    excerpt: project.description,
+    openGraph: {
+      type: 'website',
+      locale: lang === 'de' ? 'de_DE' : 'en_US',
+      url: `${baseUrl}/${lang}/projects/${params.slug}`,
+      siteName: 'ModernAmusement Development',
+      title: project.title,
+      description: project.description,
+      publishedTime: project.date,
+      tags: project.tags,
+      images: [
+        {
+          url: `${baseUrl}/og-image.svg`,
+          width: 1200,
+          height: 630,
+          alt: project.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: project.title,
+      description: project.description,
+      creator: '@modernamusements',
+      images: [`${baseUrl}/og-image.svg`],
+    },
   };
 }
 

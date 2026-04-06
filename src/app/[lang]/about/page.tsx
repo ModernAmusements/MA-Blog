@@ -1,9 +1,45 @@
+import type { Metadata } from 'next';
 import styles from './page.module.scss';
 import { translations } from '@/i18n';
 import type { Lang } from '@/i18n';
 
 interface Props {
   params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
+  const lang = params.lang === 'de' ? 'de' : 'en';
+  const t = translations[lang].about;
+  const baseUrl = 'https://modern-amusements.vercel.app';
+  
+  return {
+    title: t.title,
+    description: t.content[0],
+    openGraph: {
+      type: 'website',
+      locale: lang === 'de' ? 'de_DE' : 'en_US',
+      url: `${baseUrl}/${lang}/about`,
+      siteName: 'ModernAmusement Development',
+      title: t.title,
+      description: t.content[0],
+      images: [
+        {
+          url: `${baseUrl}/og-image.svg`,
+          width: 1200,
+          height: 630,
+          alt: 'About ModernAmusement Development',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t.title,
+      description: t.content[0],
+      creator: '@modernamusements',
+      images: [`${baseUrl}/og-image.svg`],
+    },
+  };
 }
 
 export default async function AboutPage(props: Props) {

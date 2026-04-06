@@ -24,11 +24,45 @@ export async function generateStaticParams() {
 
 export async function generateMetadata(props: Props) {
   const params = await props.params;
+  const lang = params.lang === 'de' ? 'de' : 'en';
   const post = getBlogPostByLang(params.slug, params.lang);
-  if (!post) return { title: 'Post Not Found' };
+  if (!post) {
+    return {
+      title: 'Post Not Found',
+    };
+  }
+  
+  const baseUrl = 'https://modern-amusements.vercel.app';
+  
   return {
     title: post.title,
     description: post.description,
+    openGraph: {
+      type: 'article',
+      locale: lang === 'de' ? 'de_DE' : 'en_US',
+      url: `${baseUrl}/${lang}/blog/${params.slug}`,
+      siteName: 'ModernAmusement Development',
+      title: post.title,
+      description: post.description,
+      publishedTime: post.date,
+      tags: post.tags,
+      authors: ['Shady Nathan Tawfik'],
+      images: [
+        {
+          url: `${baseUrl}/og-image.svg`,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.description,
+      creator: '@modernamusements',
+      images: [`${baseUrl}/og-image.svg`],
+    },
   };
 }
 

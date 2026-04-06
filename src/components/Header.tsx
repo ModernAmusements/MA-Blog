@@ -15,7 +15,7 @@ const navItems: { path: string; key: string; disabled?: boolean }[] = [
   { path: '/blog', key: 'blog' },
   { path: '/projects', key: 'projects' },
   { path: '/about', key: 'about', disabled: true },
-  { path: '/contact', key: 'contact', disabled: true },
+  { path: '/contact', key: 'contact' },
 ];
 
 export function Header({ lang = 'en' }: HeaderProps) {
