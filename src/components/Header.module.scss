@@ -1,10 +1,19 @@
 .header {
-  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 0;
   position: sticky;
   top: 0;
   background: var(--background);
   z-index: 100;
   border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 1445px) {
+  .header {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }
 
 .nav {
@@ -81,6 +90,12 @@
 
 .active {
   color: var(--accent);
+}
+
+.disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .hamburger {
@@ -273,6 +288,6 @@
   }
 
   .systemMonitor {
-    display: none;
+    display: flex;
   }
 }

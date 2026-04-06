@@ -11,6 +11,13 @@
   font-size: 0.9rem;
 }
 
+@media (max-width: 1445px) {
+  .footer {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
 .info {
   display: flex;
   flex-direction: column;

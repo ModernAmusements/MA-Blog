@@ -186,6 +186,13 @@ hr {
 .main-content {
 }
 
+@media (max-width: 1445px) {
+  .main-content {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
 @media (max-width: 855px) {
   .main-content {
     padding: 1rem;

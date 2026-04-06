@@ -39,10 +39,12 @@ export function Header({ lang = 'en' }: HeaderProps) {
     setMenuOpen(false);
   }, [pathname]);
 
-  const NavLink = ({ to, label }: { to: string; label: string }) => (
-    <Link href={to} className={isActive(to.replace(`/${lang}`, '')) ? styles.active : ''}>
-      {label}
-    </Link>
+  const NavLink = ({ to, label, disabled }: { to: string; label: string; disabled?: boolean }) => (
+    disabled ? 
+      <span className={styles.disabled}>{label}</span> :
+      <Link href={to} className={isActive(to.replace(`/${lang}`, '')) ? styles.active : ''}>
+        {label}
+      </Link>
   );
 
   return (
@@ -63,7 +65,12 @@ export function Header({ lang = 'en' }: HeaderProps) {
             <div className={styles.navContent}>
               <div className={styles.navLinks}>
                 {navItems.map((item, index) => (
-                  <NavLink key={item.disabled ? `disabled-${index}` : item.path} to={`/${lang}${item.path}`} label={t[item.key as keyof typeof t]} />
+                  <NavLink 
+                    key={item.disabled ? `disabled-${index}` : item.path} 
+                    to={`/${lang}${item.path}`} 
+                    label={t[item.key as keyof typeof t]}
+                    disabled={item.disabled}
+                  />
                 ))}
               </div>
             </div>
@@ -98,7 +105,12 @@ export function Header({ lang = 'en' }: HeaderProps) {
         </div>
         <nav className={styles.menuItems}>
           {navItems.map((item) => (
-            <NavLink key={item.path} to={`/${lang}${item.path}`} label={t[item.key as keyof typeof t]} />
+            <NavLink 
+              key={item.path} 
+              to={`/${lang}${item.path}`} 
+              label={t[item.key as keyof typeof t]}
+              disabled={item.disabled}
+            />
           ))}
         </nav>
         <div className={styles.menuFooter}>

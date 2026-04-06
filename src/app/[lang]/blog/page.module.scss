@@ -48,7 +48,7 @@
   padding-bottom: 2rem;
   border-bottom: 1px solid var(--border);
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
 
   &:last-child {
     border-bottom: none;
