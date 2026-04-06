@@ -5,7 +5,7 @@ import { Mermaid } from '@/components/Mermaid';
 import { CollapsibleTOC } from '@/components/CollapsibleTOC';
 import { CodeBlock } from '@/components/CodeBlock';
 import styles from '../page.module.scss';
-import { getBlogPost, getBlogPosts } from '@/lib/mdx';
+import { getBlogPost, getBlogPostByLang, getBlogPosts } from '@/lib/mdx';
 import { translations } from '@/i18n';
 import type { Lang } from '@/i18n';
 
@@ -15,15 +15,16 @@ interface Props {
 
 export async function generateStaticParams() {
   const posts = getBlogPosts();
-  return posts.flatMap((post) => [
+  const enPosts = posts.filter(p => !p.slug.endsWith('.de'));
+  return enPosts.flatMap((post) => [
     { lang: 'en', slug: post.slug },
-    { lang: 'de', slug: post.slug },
+    { lang: 'de', slug: `${post.slug}.de` },
   ]);
 }
 
 export async function generateMetadata(props: Props) {
   const params = await props.params;
-  const post = getBlogPost(params.slug);
+  const post = getBlogPostByLang(params.slug, params.lang);
   if (!post) return { title: 'Post Not Found' };
   return {
     title: post.title,
@@ -127,19 +128,13 @@ export default async function BlogPostPage(props: Props) {
   const lang = (params.lang && translations[params.lang as Lang]) ? params.lang as Lang : 'en';
   const t = translations[lang].common;
   
-  const post = getBlogPost(params.slug);
+  const post = getBlogPostByLang(params.slug, params.lang);
   if (!post) notFound();
 
   const headings = extractHeadings(post.content);
 
   return (
     <div className={styles.postPage}>
-      <Link href={`/${lang}/blog`} className={styles.back}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-          {t.back}
-        </Link>
       <article>
         <header className={styles.header}>
           <h1>{post.title}</h1>

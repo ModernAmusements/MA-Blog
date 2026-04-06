@@ -7,6 +7,13 @@
   }
 }
 
+@media (max-width: 1445px) {
+  .projects {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
 .description {
   color: var(--muted);
   margin-bottom: 2rem;

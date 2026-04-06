@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { CollapsibleTOC } from '@/components/CollapsibleTOC';
 import { CodeBlock } from '@/components/CodeBlock';
 import styles from '../page.module.scss';
-import { getProject, getProjectPosts } from '@/lib/mdx';
+import { getProjectByLang, getProjectPosts } from '@/lib/mdx';
 import { translations } from '@/i18n';
 import type { Lang } from '@/i18n';
 
@@ -16,15 +16,16 @@ interface Props {
 
 export async function generateStaticParams() {
   const projects = getProjectPosts();
-  return projects.flatMap((p) => [
+  const enProjects = projects.filter(p => !p.slug.endsWith('.de'));
+  return enProjects.flatMap((p) => [
     { lang: 'en', slug: p.slug },
-    { lang: 'de', slug: p.slug },
+    { lang: 'de', slug: `${p.slug}.de` },
   ]);
 }
 
 export async function generateMetadata(props: Props) {
   const params = await props.params;
-  const project = getProject(params.slug);
+  const project = getProjectByLang(params.slug, params.lang);
   if (!project) return { title: 'Project Not Found' };
   return {
     title: project.title,
@@ -140,19 +141,13 @@ export default async function ProjectPage(props: Props) {
   const t = translations[lang].common;
   const tProjects = translations[lang].projects;
   
-  const project = getProject(params.slug);
+  const project = getProjectByLang(params.slug, params.lang);
   if (!project) notFound();
 
   const headings = extractHeadings(project.content);
 
   return (
     <div className={styles.postPage}>
-      <Link href={`/${lang}/projects`} className={styles.back}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-          {t.back}
-        </Link>
       <article>
         <header className={styles.header}>
           <h1>{project.title}</h1>

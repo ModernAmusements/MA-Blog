@@ -103,6 +103,25 @@ export function getBlogPost(slug: string): Post | null {
   }
 }
 
+export function getBlogPostByLang(slug: string, lang: string): Post | null {
+  if (lang === 'de') {
+    const deSlug = slug.endsWith('.de') ? slug : `${slug}.de`;
+    const filePath = path.join(contentDir, 'blog', `${deSlug}.mdx`);
+    if (!fs.existsSync(filePath)) {
+      const mdPath = path.join(contentDir, 'blog', `${deSlug}.md`);
+      if (!fs.existsSync(mdPath)) return null;
+      const fileContent = fs.readFileSync(mdPath, 'utf8');
+      const { data, content } = matter(fileContent);
+      return { slug: deSlug, title: data.title, description: data.description, date: data.date, tags: data.tags, image: data.image, content };
+    }
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const { data, content } = matter(fileContent);
+    return { slug: deSlug, title: data.title, description: data.description, date: data.date, tags: data.tags, image: data.image, content };
+  }
+  const enSlug = slug.replace('.de', '');
+  return getBlogPost(enSlug);
+}
+
 export function getProject(slug: string): Project | null {
   try {
     const filePath = path.join(contentDir, 'projects', `${slug}.mdx`);
@@ -119,6 +138,25 @@ export function getProject(slug: string): Project | null {
   } catch {
     return null;
   }
+}
+
+export function getProjectByLang(slug: string, lang: string): Project | null {
+  if (lang === 'de') {
+    const deSlug = slug.endsWith('.de') ? slug : `${slug}.de`;
+    const filePath = path.join(contentDir, 'projects', `${deSlug}.mdx`);
+    if (!fs.existsSync(filePath)) {
+      const mdPath = path.join(contentDir, 'projects', `${deSlug}.md`);
+      if (!fs.existsSync(mdPath)) return null;
+      const fileContent = fs.readFileSync(mdPath, 'utf8');
+      const { data, content } = matter(fileContent);
+      return { slug: deSlug, title: data.title, description: data.description, date: data.date, tags: data.tags, image: data.image, liveUrl: data.liveUrl, repoUrl: data.repoUrl, content };
+    }
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const { data, content } = matter(fileContent);
+    return { slug: deSlug, title: data.title, description: data.description, date: data.date, tags: data.tags, image: data.image, liveUrl: data.liveUrl, repoUrl: data.repoUrl, content };
+  }
+  const enSlug = slug.replace('.de', '');
+  return getProject(enSlug);
 }
 
 export function getAllTags(posts: (Post | Project)[]): string[] {

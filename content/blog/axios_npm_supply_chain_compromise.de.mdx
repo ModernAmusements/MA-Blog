@@ -1,0 +1,66 @@
+---
+title: npm Supply Chain Attack - Axios Kompromittierung
+description: Analyse des Axios Supply Chain Angriffs durch Sapphire Sleet am 31. März 2026.
+date: 2026-04-03
+tags: ['security', 'npm', 'axios', 'supply-chain', 'north-korea']
+---
+
+# npm Supply Chain Angriff: Axios Kompromittierung
+
+Am 31. März 2026 wurden **zwei kompromittierte Versionen** der weit verbreiteten JavaScript HTTP-Bibliothek Axios auf npm veröffentlicht. Die betroffenen Versionen (`1.14.1` und `0.30.4`), Teil einer Bibliothek mit **über 70 Millionen wöglichen Downloads**, enthielten eine bösartige Abhängigkeit, die darauf ausgelegt war, Payloads von von Angreifern kontrollierter Command-and-Control (C2) Infrastruktur abzurufen. Microsoft Threat Intelligence schrieb diese Kampagne **Sapphire Sleet** zu, einem nordkoreanischen staatlich gesponserten Bedrohungsakteur.
+
+## Was ist passiert?
+
+Die kompromittierten Axios-Versionen enthielten eine versteckte Abhängigkeit, die heimlich eine Verbindung zu einem C2-Server herstellte. Diese Abhängigkeit:
+
+- Wurde automatisch als Teil der Axios-Paketinstallation heruntergeladen
+- Konnte sensible Umgebungsvariablen auslesen
+- Konnte Daten an einen Remote-Server exfiltrieren
+
+## Die Bedrohungsakteur: Sapphire Sleet
+
+Sapphire Sleet (auch bekannt als UNC4899 oder Jade Sleet) ist eine nordkoreanische APT-Gruppe, die sich auf Cyberspionage und finanzielle Gewinnung konzentriert. Sie haben سابق:
+
+- Angriffe auf Lieferketten in der Open-Source-Ökosystem
+- Kompromittierung von npm-Paketen
+- Einsatz von Social Engineering gegen Entwickler
+
+## Auswirkungen
+
+Die Auswirkungen dieses Angriffs waren erheblich:
+
+1. **Große Reichweite**: Axios ist eine der beliebtesten JavaScript-Bibliotheken
+2. **Stille Infektion**: Die bösartige Code war schwer zu erkennen
+3. **Datengefährdung**: Potentieller Diebstahl von API-Schlüsseln und Anmeldedaten
+
+## Schutzmaßnahmen
+
+So können Sie sich vor solchen Angriffen schützen:
+
+### 1. Prüfen Sie Abhängigkeiten
+
+```bash
+# Verwenden Sie npm audit
+npm audit
+
+# Oder yarn audit
+yarn audit
+```
+
+### 2. Lockfiles verwenden
+
+Stellen Sie sicher, dass Sie `package-lock.json` oder `yarn.lock` committen, um deterministische Builds zu gewährleisten.
+
+### 3. Zwei-Faktor-Authentifizierung
+
+Aktivieren Sie 2FA für Ihre npm- und GitHub-Konten.
+
+### 4. Halten Sie Pakete aktuell
+
+Überwachen Sie Sicherheitswarnungen für Ihre Abhängigkeiten und aktualisieren Sie regelmäßig.
+
+## Fazit
+
+Dieser Vorfall zeigt erneut, wie wichtig die Sicherheit der Software-Lieferkette ist. Als Entwickler müssen wir wachsam sein und bewährte Sicherheitspraktiken befolgen. Die Open-Source-Ökosystem ist ein gemeinsames Gut, das wir schützen müssen.
+
+Bleiben Sie sicher!

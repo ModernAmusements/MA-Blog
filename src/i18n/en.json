@@ -7,11 +7,15 @@
   },
   "home": {
     "hero": {
-      "title": "Hi, I'm a developer.",
-      "bio": "I build accessible, performant web applications and write about my experiences.",
+      "title": "Welcome to My Portfolio",
+      "subtitle": "Full-stack developer specializing in algorithms, performance optimization, and clean code.",
+      "name": "ModernAmusements Development",
+      "author": "Shady Nathan Tawfik",
+      "tags": "Algorithms | Performance",
       "viewProjects": "View Projects",
       "getInTouch": "Get in Touch"
     },
+    "exploreMyWork": "Explore My Work",
     "featuredProjects": "Featured Projects",
     "latestPosts": "Latest Posts",
     "viewAll": "View all"

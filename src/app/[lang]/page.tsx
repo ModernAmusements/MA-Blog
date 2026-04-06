@@ -23,7 +23,11 @@ interface TUINavItem {
 
 function buildNavItems(lang: string): TUINavItem[] {
   const projects = getProjectPosts();
-  const posts = getBlogPosts();
+  const allPosts = getBlogPosts();
+  
+  const filteredPosts = lang === 'de' 
+    ? allPosts.filter(p => p.slug.endsWith('.de'))
+    : allPosts.filter(p => !p.slug.endsWith('.de'));
   
   const projectSubItems = projects.map((p) => ({
     label: p.title,
@@ -32,7 +36,7 @@ function buildNavItems(lang: string): TUINavItem[] {
     size: formatFileSize(p.content.length * 2),
   }));
   
-  const blogSubItems = posts.map((p) => ({
+  const blogSubItems = filteredPosts.map((p) => ({
     label: p.title,
     path: `/${lang}/blog/${p.slug}`,
     type: 'file' as const,
@@ -60,13 +64,22 @@ export default async function Home(props: Props) {
   const lang = (params.lang && translations[params.lang as Lang]) ? params.lang as Lang : 'en';
   const t = translations[lang].home;
   
-  const posts = getBlogPosts().slice(0, 3);
-  const projects = getProjectPosts().slice(0, 2);
+  const allPosts = getBlogPosts();
+  const allProjects = getProjectPosts();
+  
+  const posts = lang === 'de'
+    ? allPosts.filter(p => p.slug.endsWith('.de')).slice(0, 3)
+    : allPosts.filter(p => !p.slug.endsWith('.de')).slice(0, 3);
+    
+  const projects = lang === 'de'
+    ? allProjects.filter(p => p.slug.endsWith('.de')).slice(0, 2)
+    : allProjects.filter(p => !p.slug.endsWith('.de')).slice(0, 2);
+    
   const navItems = buildNavItems(lang);
 
   return (
     <div className={styles.home}>
-      <TUIHero navItems={navItems} lang={lang} />
+      <TUIHero navItems={navItems} lang={lang} heroText={t.hero} exploreText={t.exploreMyWork} />
 
       {posts.length > 0 && (
         <TerminalFrame title={t.featuredProjects}>

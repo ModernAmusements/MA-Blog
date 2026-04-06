@@ -17,6 +17,16 @@ interface TUINavItem {
 interface TUIHeroProps {
   navItems: TUINavItem[];
   lang: string;
+  heroText?: {
+    title: string;
+    subtitle: string;
+    name: string;
+    author: string;
+    tags: string;
+    viewProjects: string;
+    getInTouch: string;
+  };
+  exploreText?: string;
 }
 
 const FolderIcon = () => (
@@ -60,7 +70,7 @@ const getIcon = (item: TUINavItem, isExpanded: boolean) => {
   return <FileIcon />;
 };
 
-export function TUIHero({ navItems, lang }: TUIHeroProps) {
+export function TUIHero({ navItems, lang, heroText, exploreText }: TUIHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [expandedDirs, setExpandedDirs] = useState<Set<number>>(new Set());
   const router = useRouter();
@@ -101,6 +111,16 @@ export function TUIHero({ navItems, lang }: TUIHeroProps) {
     }
   };
 
+  const t = heroText || {
+    title: 'Welcome to My Portfolio',
+    subtitle: 'Full-stack developer specializing in algorithms, performance optimization, and clean code.',
+    name: 'ModernAmusements Development',
+    author: 'Shady Nathan Tawfik',
+    tags: 'Algorithms | Performance',
+    viewProjects: 'View Projects',
+    getInTouch: 'Get in Touch'
+  };
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -113,25 +133,25 @@ export function TUIHero({ navItems, lang }: TUIHeroProps) {
           <div className={styles.subHeader}>
             <span>C++ • Swift • Python • TS</span>
           </div>
-          <h1><span className={styles.prompt}>~ &gt;</span> Welcome to My Portfolio</h1>
-          <p>Full-stack developer specializing in algorithms, performance optimization, and clean code.</p>
+          <h1><span className={styles.prompt}>~ &gt;</span> {t.title}</h1>
+          <p>{t.subtitle}</p>
           <ul className={styles.heroList}>
-            <li>ModernAmusements Development</li>
-            <li>Shady Nathan Tawfik</li>
-            <li>Algorithms | Performance</li>
+            <li>{t.name}</li>
+            <li>{t.author}</li>
+            <li>{t.tags}</li>
           </ul>
           <div className={styles.cta}>
             <button onClick={scrollToProjects} className={styles.primary}>
-              View Projects <span className={styles.arrow}>↓</span>
+              {t.viewProjects} <span className={styles.arrow}>↓</span>
             </button>
             <Link href={`/${lang}/contact`} className={styles.secondary}>
-              Get in Touch <span style={{ color: 'var(--accent)', fontWeight: 700 }}>→</span>
+              {t.getInTouch} <span style={{ color: 'var(--accent)', fontWeight: 700 }}>→</span>
             </Link>
           </div>
         </div>
         
         <div className={styles.explorePane}>
-          <h2>Explore My Work</h2>
+          <h2>{exploreText || 'Explore My Work'}</h2>
           <div className={styles.fileList}>
             <ul>
               {navItems.map((item, index) => (

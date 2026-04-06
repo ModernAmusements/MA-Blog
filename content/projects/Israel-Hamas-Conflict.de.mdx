@@ -1,0 +1,297 @@
+---
+title: Interaktive Zeitleisten-Visualisierung des Israel-Hamas-Konflikts
+description: Interaktive Zeitleisten-Visualisierung des Israel-Hamas-Konflikts (1900-2025) mit Leaflet.js und Vanilla JavaScript.
+date: 2026-04-01
+tags: ['javascript', 'leaflet', 'mapping', 'timeline', 'vite', 'scss']
+liveUrl: https://israel-hamas-conflict.vercel.app
+repoUrl: https://github.com/ModernAmusements/Conflict-Visulizer
+---
+
+# Israel-Hamas Konflikt Zeitleiste
+
+## Projektübersicht
+
+**Israel-Hamas-Conflict.md** ist eine interaktive Webanwendung, die die Zeitleiste des **Israel-Hamas-Konflikts von 1900 bis 2025** visualisiert. Erstellt mit **Vanilla JavaScript**, **Leaflet.js** und **SCSS**, bietet dieses Projekt eine immersive Möglichkeit, historische Ereignisse, militärische Bewegungen und Gebietsveränderungen durch eine interaktive Kartenoberfläche zu erkunden.
+
+Die Motivation hinter diesem Projekt stammt aus dem Wunsch, **komplexe historische Daten zugänglich und verständlich** zu machen. Anstatt statische Listen oder Tabellen von Ereignissen zu präsentieren, platziert diese Visualisierung jedes Ereignis in einen geografischen Kontext, sodass Benutzer die räumlichen Beziehungen zwischen Konflikten, Militäroperationen und Gebietsverschiebungen über mehr als ein Jahrhundert hinweg sehen können.
+
+---
+
+## Technische Grundlage
+
+### Technologie-Stack
+
+Das Projekt wurde unter Verwendung eines sorgfältig ausgewählten Technologie-Stacks erstellt, der **Performance**, **Wartbarkeit** und **Einfachheit** priorisiert:
+
+| Komponente | Technologie |
+|-----------|------------|
+| Frontend Framework | Vanilla JavaScript (ES6+) |
+| Mapping-Bibliothek | Leaflet.js 1.9.4 |
+| CSS-Präprozessor | SCSS (Sass) |
+| Build-Tool | Vite 7.3.1 |
+| Hosting | Vercel |
+| Datenquelle | CSV (Hamas-Angriffe Datenbank) |
+
+**Kerntechnologien:**
+- **Vanilla JavaScript (ES6+)** - Keine Frameworks, reine DOM-Manipulation
+- **Leaflet.js** - Leichtgewichtige Mapping-Bibliothek für interaktive Karten
+- **SCSS** - Modulare Styling mit Design-Tokens
+- **Vite** - Modernes Build-Tool mit Hot Module Replacement
+- **HTML5** - Semantisches Markup
+
+![Full Page View](/images/projects/conflict-full-page-01.png)
+
+### Design-Philosophie
+
+Die Anwendung folgt einem **Swiss Design**-Ansatz, der **Sauberkeit**, **Lesbarkeit** und **Funktionalität** betont. Die Oberfläche verwendet ein Schwarz-Weiß-Farbschema mit **NATO-Standard-Militärsymbolik** für die Ereignisdarstellung. Diese ästhetische Wahl stellt sicher, dass die Karte übersichtlich bleibt, während sie dennoch wichtige Informationen durch standardisierte Militärsymbole vermittelt.
+
+Die Entscheidung, **Vanilla JavaScript** anstelle eines Frameworks wie React zu verwenden, war **bewusst**. Das Projekt erforderte nicht die Komplexität einer komponentenbasierten Architektur, und Vanilla JS bot **bessere Performance** und **kleinere Bundle-Größen**. Jedes Script wird in einer bestimmten Reihenfolge geladen, um die richtigen Abhängigkeiten zwischen dem Symbolsystem, der Flaggen-Darstellung, dem Clustering und der Hauptanwendungslogik aufrechtzuerhalten.
+
+### Architektur-Entscheidungen
+
+Die Anwendung folgt einer **geschichteten Architektur**, die Bedenken effektiv trennt:
+
+**Schichtstruktur:**
+1. **Datenschicht** - CSV-Parsing und Ereignis-Normalisierung
+2. **Symboolschicht** - NATO-Militärsymbolik-Generierung
+3. **Visualisierungsschicht** - Leaflet-Karten-Rendering mit Markern
+4. **Interaktionsschicht** - Event-Listener und Zeitsteuerung
+5. **Präsentationsschicht** - SCSS-Styling und responsives Design
+
+Das **Clustering-System** war eine **kritische architektonische Entscheidung**. Mit potenziell Hunderten von Ereignissen in geografischer Nähe würde das Anzeigen jedes Markers einzeln eine unbrauchbare Karte erzeugen. Das Clustering-System **gruppiert nahegelegene Ereignisse**, zeigt ein Count-Badge für große Cluster und Spiral-Offset-Marker für kleinere Gruppen.
+
+---
+
+## Entwicklung Timeline
+
+### Übersicht
+
+Das Projekt wurde über **7 Tage** mit **38 Commits** entwickelt. Hier ist die vollständige Entwicklungstimeline:
+
+### Commit-Historie Zusammenfassung
+
+| Datum | Commits | Phase |
+|------|---------|-------|
+| 3. Feb | 7 | Phase 1: MVP |
+| 4. Feb | 2 | Phase 2: Features |
+| 5. Feb | 7 | Phase 2: Features |
+| 6. Feb | 9 | Phase 2: Features |
+| 7. Feb | 1 | Phase 2: Features |
+| 8. Feb | 2 | Phase 2: Features |
+| 9. Feb | 9 | Phase 3-4: Styling & Deployment |
+| **Gesamt** | **38** | **7 Tage** |
+
+---
+
+## Entwicklung Phasen
+
+### Phase Eins: Foundation und MVP
+
+**Dauer**: 3. Februar 2026 (Tag 1)  
+**Commits**: 7  
+**Ziel**: Basis-Zeitleiste mit Event-Liste und initialer Karte
+
+---
+
+#### Schritt 1: Basis HTML-Struktur
+
+Die erste Phase konzentrierte sich auf die Etablierung der **Datenpipeline** und **Kartengrundlage**. Die erste Herausforderung war die Konvertierung der Roh-CSV-Daten aus dem Hamas-Angriffs-Datensatz in ein für die Visualisierung geeignetes Format. Dies erforderte das Schreiben eines **robusten Parsers**, der verschiedene Datumsformate verarbeiten kann, einschließlich einzelner Jahre wie "1994" und Bereiche wie "2008-2009".
+
+**Implementiert:**
+- **Basis HTML-Struktur** mit Header und Intro-Sektion
+- **Zeitleisten-Steuerung** mit Era-Auswahl-Dropdown
+- **Event-Filterung** (Alle/Politisch/Militärisch/Sozial)
+- **Statische Liste** der Zeitleisten-Events
+- **Basis CSS-Styling**
+- **Event-Datenstruktur** mit Titel, Datum, Kategorie, Beschreibung, Era, Auswirkung
+
+---
+
+#### Schritt 2: Geografische Datenverarbeitung
+
+Eine **erhebliche Herausforderung** ergab sich mit geografischen Daten. Die CSV enthielt **Regionsnamen** anstelle von Koordinaten, was die Erstellung eines **umfassenden Location-Mapping-Systems** erforderte. Dieser Geocoding-Ansatz bildet Regionsnamen wie "West Bank", "Gaza Strip", "Tel Aviv" auf ihre **ungefähre Breiten- und Längengrad-Koordinaten** ab.
+
+---
+
+#### Schritt 3: Erste Map-Integration
+
+Die erste Integration der Leaflet.js-Karte umfasste:
+
+**Key Code - Map-Initialisierung:**
+```javascript
+const map = L.map('map', {
+    center: [31.7683, 35.2137],
+    zoom: 8,
+    minZoom: 4,
+    maxZoom: 12,
+    zoomControl: true,
+    attributionControl: true
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+}).addTo(map);
+```
+
+**Erfahrungen:**
+- CartoDB Light Tiles bieten sauberen Hintergrund
+- Koordinaten auf Israel/Palestine-Region zentriert
+
+---
+
+### Phase Zwei: Map & Visualisierungs-Features
+
+**Dauer**: 4.-8. Februar 2026 (Tage 2-6)  
+**Commits**: 16  
+**Ziel**: Erweiterte Kartenfeatures, Symbole, Clustering, Flaggen
+
+---
+
+#### Schritt 1: Fraktions-Symbol-System
+
+Mit korrekt fließenden Daten verlagerte sich der Fokus auf **Visualisierung**. Die Karte verwendet CartoDBs **Light Tile Layer**, der einen sauberen weißen Hintergrund bietet, der es Militärsymbolen ermöglicht, klar hervorzustehen. Das Koordinatensystem konzentriert sich auf Israel und Palästina mit einem Standardzentrum bei [31.5, 35.0] und Zoom-Stufe 7.
+
+**NATO-Symbolik-Implementierung:**
+
+Das **NATO-Symbolik-System** wurde implementiert, um Zugehörigkeit und militärische Klassifikation anzuzeigen:
+
+| Fraktion | Farbe | Beschreibung |
+|---------|-------|-------------|
+| Friendly (Israelisch) | Blau (#0066CC) | Israeli-Streitkräfte |
+| Hostile (Hamas) | Rot (#CC0000) | Hamas/Palästinensische bewaffnete Gruppen |
+| Neutral | Grün (#00AA00) | Regional/Internationale Streitkräfte |
+| Unknown | Orange (#FFAA00) | Nicht zugeordnete Ereignisse |
+
+---
+
+#### Schritt 2: Flaggen-Komponenten-System
+
+Das Flaggen-Komponenten-System wurde in `js/components/flags.js` erstellt:
+
+---
+
+### Phase Drei: Zeitleiste und Interaktion
+
+**Dauer**: 6.-9. Februar 2026  
+**Commits**: 8  
+**Ziel**: Vollständige SCSS-Migration, Inline-Style-Entfernung, Dokumentation
+
+---
+
+#### Schritt 1: Inline-Style-Migration
+
+Die **Zeitleisten-Regler** wurde implementiert, um durch Jahre von **1900 bis 2025** zu navigieren. Benutzer können den Regler ziehen oder **Play/Pause-Schaltflächen** verwenden, um automatisch durch die Zeit zu animieren. Der Regler umfasst **Smart-Snapping**, das nur bei Jahren mit Ereignissen mit gültigen Koordinaten anhält, leere Kartenzustände verhindert.
+
+---
+
+### Phase Vier: Performance-Optimierung
+
+Mit dem Wachstum des Datensatzes wurde die **Performance** zum Thema. Mehrere Optimierungsstrategien wurden implementiert:
+
+**Layer-Management:**
+Bei jedem Karten-Update (Zoom-Änderung, Zeitleisten-Scrub) **müssen alle vorhandenen Layer gelöscht** werden, bevor neu gezeichnet wird. Dies verhindert Marker-Geistbilder und doppelte Einträge.
+
+**Caching-System:**
+Eine **PerformanceOptimizer-Klasse** wurde erstellt, um häufig zugegriffene Daten zu cachen:
+- **Symbol-Cache**: Generierte NATO-Symbole
+- **Cluster-Cache**: Gruppiert Ereignisse nach geografischer Nähe
+- **Debounce-Timer**: Verhindert übermäßige Karten-Updates während schneller Interaktion
+
+---
+
+### Phase Fünf: Modernisierung
+
+Die jüngste Arbeit konzentrierte sich auf **Code-Modernisierung** und **Design-System-Verbesserungen**:
+
+---
+
+## Herausforderungen und Lösungen
+
+### Herausforderung Eins: Marker-Überlappung
+
+**Problem:** Dichte Cluster von Ereignissen erzeugten überlappende Marker, die schwer anzuklicken waren.
+
+**Lösung:** Ein **hierarchisches Spiral-Offset-System** wurde implementiert. Die Ereignisse verteilen sich jetzt basierend auf **Prioritätsbewertung** (Opfer, Impact-Level, Aktualität). Der Basis-Abstand wurde von 0.008° auf **0.025°** erhöht (~2.5km bei Zoom 7), und **Zoom-bewusste Skalierung** passt den Abstand basierend auf dem aktuellen Zoom-Level an.
+
+---
+
+### Herausforderung Zwei: Leere Zeitleisten-Jahre
+
+**Problem:** Der Regler würde auf Jahre ohne Koordinatendaten snappen und leere Karten anzeigen.
+
+**Lösung:** Eine `getYearsWithCoordinates()` Funktion wurde erstellt, um die Zeitleiste zu **filtern**. Der Regler stoppt jetzt nur bei Jahren, die tatsächlich Ereignisse mit **gültigen geografischen Koordinaten** haben.
+
+---
+
+### Herausforderung Drei: Legend Space
+
+**Problem:** Die Karten-Legende nahm **wertvollen Bildschirmplatz** ein, besonders auf kleineren Geräten.
+
+**Lösung:** Ein **Toggle-System** wurde implementiert mit zwei Schaltflächen:
+1. Eine **schwebende Toggle-Schaltfläche** zum Anzeigen/Ausblenden der Legende
+2. Eine **Schließen-Schaltfläche** innerhalb der Legende selbst
+
+---
+
+## Aktueller Zustand
+
+Das Projekt befindet sich nun in einem **stabilen, produktionsreifen Zustand** mit diesen Features:
+
+### Kernfunktionalität
+- **Interaktive Leaflet-Karte** mit NATO-Symbolik
+- **Zeitleisten-Regler** mit Jahresnavigation (1900-2025)
+- **Event-Clustering** für dichte Bereiche
+- **Seitenleiste** mit neuesten 15 Ereignissen
+- **Popups** mit detaillierten Event-Informationen
+
+### Technische Features
+- **Responsives Design** (Desktop, Tablet, Mobile)
+- **Performance-Optimierung** mit Caching
+- **Dark/Light Theme** Support
+- **PWA-ready** Struktur
+
+### Daten
+- **66+ historische Ereignisse**
+- **50+ geocodierte Standorte**
+- **Militärische Bewegungs-Visualisierung**
+- **Gebietskontroll-Zonen**
+
+Das Projekt baut erfolgreich mit **Vite** und wird auf **Vercel** deployed.
+
+---
+
+## Wichtige Erkenntnisse
+
+### Technische Erkenntnisse
+
+| Thema | Lektion |
+|-------|--------|
+| **Build Tools** | Vite bindet externe Script-Tags nicht automatisch ein - manuelles Kopieren erforderlich |
+| **SCSS Migration** | CSS Custom Properties essentiell für dynamische Werte in migrierten Styles |
+| **Map Performance** | Marker-Clustering kritisch für 100+ Marker |
+| **Script-Ladereihenfolge** | Basis-Klassen → abhängige Komponenten → Haupt-Script |
+
+### Design-Erkenntnisse
+
+| Thema | Lektion |
+|-------|--------|
+| **Swiss Design** | Sauberer, minimaler Ansatz funktioniert gut für Datenvisualisierung |
+| **Farb-Kodierung** | NATO-tyle Fraktionsfarben bieten sofortige Wiedererkennung |
+| **Icon-System** | Form + Farbe besser als Farbe allein für schnelle Identifikation |
+| **Responsive** | Mobile-first starten, dann für Desktop erweitern |
+
+---
+
+## Zukünftige Erweiterungen
+
+Mehrere Bereiche bleiben für potenzielle Verbesserungen:
+
+1. **Datenerweiterung** - Hinzufügen weiterer Ereignisse aus zusätzlichen Quellen
+2. **Animation** - Sanfte Übergänge zwischen Zeitleisten-Jahren
+3. **Filterung** - Kategorienbasierte Event-Filterung
+4. **Mobile-Optimierung** - Touch-Gesten-Verbesserungen
+5. **Barrierefreiheit** - Screen-Reader-Support und Tastaturnavigation
+
+Die Architektur unterstützt diese Erweiterungen und behält die Performance-Eigenschaften bei, die die aktuelle Implementierung responsiv und zuverlässig machen.

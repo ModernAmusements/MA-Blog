@@ -16,7 +16,11 @@ export default async function BlogPage(props: Props) {
   const lang = (params.lang && translations[params.lang as Lang]) ? params.lang as Lang : 'en';
   const t = translations[lang].blog;
   
-  const posts = getBlogPosts();
+  const allPosts = getBlogPosts();
+  const posts = lang === 'de'
+    ? allPosts.filter(p => p.slug.endsWith('.de'))
+    : allPosts.filter(p => !p.slug.endsWith('.de'));
+    
   const allTags = getAllTags(posts);
   const selectedTag = searchParams.tag;
 

@@ -1,0 +1,58 @@
+---
+title: CLI Tool mit Node.js erstellen
+description: Eine Anleitung zum Erstellen Ihres ersten Command-Line Interface Tools.
+date: 2026-03-25
+tags: ['nodejs', 'cli', 'tutorial']
+---
+
+Command-line Tools sind unglaublich nützlich für die Automatisierung von Aufgaben und die Verbesserung Ihres Workflows. In diesem Beitrag zeige ich Ihnen, wie Sie ein einfaches CLI-Tool erstellen.
+
+## Erste Schritte
+
+Richten Sie zunächst ein neues Node.js-Projekt ein:
+
+```bash
+mkdir my-cli
+cd my-cli
+npm init -y
+```
+
+## CLI-Einstiegspunkt erstellen
+
+Erstellen Sie eine Datei namens `cli.js` im Stammverzeichnis:
+
+```javascript
+#!/usr/bin/env node
+
+console.log('Hallo von meiner CLI!');
+```
+
+Machen Sie es ausführbar:
+
+```bash
+chmod +x cli.js
+```
+
+## Argumente parsen
+
+Verwenden Sie eine Bibliothek wie `commander` für robustes Argument-Parsing:
+
+```javascript
+const { program } = require('commander');
+
+program
+  .name('my-cli')
+  .description('Ein Beispiel-CLI-Tool')
+  .version('1.0.0');
+
+program.parse();
+```
+
+## Auf npm veröffentlichen
+
+1. Aktualisieren Sie `package.json` mit dem richtigen `bin`-Feld
+2. Führen Sie `npm publish` aus
+
+## Fazit
+
+CLI-Tools zu erstellen ist eine großartige Möglichkeit, Node.js zu lernen und wiederverwendbare Utilities zu erstellen. Beginnen Sie einfach und iterieren Sie!

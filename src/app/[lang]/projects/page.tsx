@@ -16,7 +16,11 @@ export default async function ProjectsPage(props: Props) {
   const lang = (params.lang && translations[params.lang as Lang]) ? params.lang as Lang : 'en';
   const t = translations[lang].projects;
   
-  const projects = getProjectPosts();
+  const allProjects = getProjectPosts();
+  const projects = lang === 'de'
+    ? allProjects.filter(p => p.slug.endsWith('.de'))
+    : allProjects.filter(p => !p.slug.endsWith('.de'));
+    
   const allTags = getAllTags(projects);
   const selectedTag = searchParams.tag;
 
