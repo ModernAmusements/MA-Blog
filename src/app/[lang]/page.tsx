@@ -22,8 +22,12 @@ interface TUINavItem {
 }
 
 function buildNavItems(lang: string): TUINavItem[] {
-  const projects = getProjectPosts();
+  const allProjects = getProjectPosts();
   const allPosts = getBlogPosts();
+  
+  const projects = lang === 'de'
+    ? allProjects.filter(p => p.slug.endsWith('.de'))
+    : allProjects.filter(p => !p.slug.endsWith('.de'));
   
   const filteredPosts = lang === 'de' 
     ? allPosts.filter(p => p.slug.endsWith('.de'))
