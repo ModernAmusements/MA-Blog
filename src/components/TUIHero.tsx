@@ -27,6 +27,7 @@ interface TUIHeroProps {
     getInTouch: string;
   };
   exploreText?: string;
+  initialExpanded?: Set<number>;
 }
 
 const FolderIcon = () => (
@@ -70,9 +71,9 @@ const getIcon = (item: TUINavItem, isExpanded: boolean) => {
   return <FileIcon />;
 };
 
-export function TUIHero({ navItems, lang, heroText, exploreText }: TUIHeroProps) {
+export function TUIHero({ navItems, lang, heroText, exploreText, initialExpanded }: TUIHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [expandedDirs, setExpandedDirs] = useState<Set<number>>(new Set());
+  const [expandedDirs, setExpandedDirs] = useState<Set<number>>(initialExpanded || new Set());
   const router = useRouter();
 
   const toggleExpand = (index: number) => {

@@ -1,6 +1,6 @@
 # Development Conversation Log
 
-> **Last Updated**: April 7, 2026
+> **Last Updated**: April 9, 2026
 > **Project**: ModernAmusements Portfolio (Next.js)
 > **URL**: https://modern-amusements.vercel.app
 
@@ -20,10 +20,29 @@
 
 ---
 
-## Recent Work (April 7, 2026)
+## Recent Work (April 9, 2026)
 
-### New Blog Post
+### Pokemon TCG Card Extractor
+- New blog post: `pokemon-tcg-card-extractor` (EN + DE) with mermaid diagrams
+- New project: `pokemon-tcg-card-extractor` (EN + DE) with 7 screenshots
+- Fixed Mermaid diagram parsing errors (curly braces, quotes, pipe characters)
+- Blog folder now opens by default in TUI menu
+
+### Mermaid Diagram Fixes
+- Removed curly braces `{}` from node labels
+- Removed quotes `"` from edge labels
+- Replaced pipe characters `|` in decision nodes with simple text
+- Changed `pokewiki_{set}.json` to `pokewiki SET json`
+- All nodes now use brackets: `A[Label]` not `A Label`
+
+### Agent Rules
+- Added Mermaid diagram rules to AGENTS.md
+- Added build and check workflow to AGENTS.md
+
+### Blog & Fixes
 - `ai_energy_os` (EN + DE) - AI as operating system of global energy with mermaid diagrams
+- Fixed TOC duplicate numbering (removed manual numbers from headings)
+- Fixed projects showing in both EN/DE in TUI menu
 
 ### Layout Consistency
 - Added `max-width: 1400px` and `margin: 0 auto` to header/main/footer
@@ -53,6 +72,11 @@
 - `cli-tool` (EN + DE)
 - `linkedin-browser-surveillance` (EN + DE)
 - `ai_energy_os` (EN + DE)
+- `pokemon-tcg-card-extractor` (EN + DE)
+
+### Projects
+- `Israel-Hamas-Conflict` (EN + DE)
+- `pokemon-tcg-card-extractor` (EN + DE)
 
 ---
 

@@ -25,6 +25,8 @@
 - next-themes needs `suppressHydrationWarning`
 
 ## Recent Changes (Apr 2026)
+- New blog post: ai_energy_os (EN + DE) with mermaid diagrams
+- Fixed projects showing in both languages in TUI menu
 - Standardized padding across all pages
 - Added hero section with "Explore My Work" pane
 - Added preview images for projects (thumbnail from MDX)

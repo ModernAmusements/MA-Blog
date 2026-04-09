@@ -81,9 +81,12 @@ export default async function Home(props: Props) {
     
   const navItems = buildNavItems(lang);
 
+  const blogIndex = navItems.findIndex(item => item.path === `/${lang}/blog`);
+  const initialExpanded = blogIndex > -1 ? new Set<number>([blogIndex]) : new Set<number>();
+
   return (
     <div className={styles.home}>
-      <TUIHero navItems={navItems} lang={lang} heroText={t.hero} exploreText={t.exploreMyWork} />
+      <TUIHero navItems={navItems} lang={lang} heroText={t.hero} exploreText={t.exploreMyWork} initialExpanded={initialExpanded} />
 
       {posts.length > 0 && (
         <TerminalFrame title={t.featuredProjects}>
