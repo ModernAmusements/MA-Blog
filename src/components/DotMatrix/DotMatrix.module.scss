@@ -26,8 +26,10 @@
       
       &:hover {
         background: var(--dot-on-color, #f97316);
-        box-shadow: 0 0 calc(var(--dot-size, 6px) * 1.2) var(--dot-on-color, #f97316);
-        transform: scale(1.2);
+        box-shadow: 
+          0 0 calc(var(--dot-size, 6px) * 1.5) var(--dot-on-color, #f97316),
+          0 0 calc(var(--dot-size, 6px) * 3) rgba(249, 115, 22, 0.5);
+        transform: scale(1.3);
       }
     }
     
