@@ -12,6 +12,7 @@ interface DotProps {
   interactive?: boolean;
   animation?: 'pulse' | 'scan' | 'trail' | 'wave' | 'static';
   onHover?: (x: number, y: number, isHovering: boolean) => void;
+  forceColor?: 'orange' | 'black';
 }
 
 export function Dot({
@@ -23,6 +24,7 @@ export function Dot({
   interactive = false,
   animation = 'static',
   onHover,
+  forceColor,
 }: DotProps) {
   const [isLit, setIsLit] = useState(lit);
   const [localBrightness, setLocalBrightness] = useState(brightness);
@@ -48,6 +50,8 @@ export function Dot({
     styles[animation],
     isLit || lit ? styles.lit : '',
     interactive ? styles.interactive : '',
+    forceColor === 'black' ? styles.forceBlack : '',
+    forceColor === 'orange' ? styles.forceOrange : '',
   ]
     .filter(Boolean)
     .join(' ');

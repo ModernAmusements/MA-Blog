@@ -53,6 +53,9 @@ function buildNavItems(lang: string): TUINavItem[] {
     ]},
     { label: 'projects', path: `/${lang}/projects`, type: 'dir' as const, subItems: projectSubItems },
     { label: 'blog', path: `/${lang}/blog`, type: 'dir' as const, subItems: blogSubItems },
+    { label: 'dotmatrix', path: `/${lang}/dotmatrix`, type: 'dir' as const, subItems: [
+      { label: 'editor.md', path: `/${lang}/dotmatrix`, type: 'file' as const, size: '512B' },
+    ]},
     { label: 'contact', path: `/${lang}/contact`, type: 'dir' as const, subItems: [
       { label: 'contact.md', path: `/${lang}/contact`, type: 'file' as const, size: '256B' },
     ]},

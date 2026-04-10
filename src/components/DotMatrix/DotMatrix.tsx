@@ -17,6 +17,8 @@ export interface DotMatrixConfig {
   decorative?: 'arrow-left' | 'arrow-right' | 'wave' | 'grid' | 'heart';
   speed?: number;
   blackBorder?: boolean;
+  borderColor?: 'black' | 'orange';
+  imageGrid?: boolean[][];
 }
 
 interface DotContextValue {
@@ -42,10 +44,10 @@ interface DotMatrixProps {
 }
 
 const defaultConfig: DotMatrixConfig = {
-  cols: 12,
-  rows: 7,
+  cols: 15,
+  rows: 15,
   dotSize: 4,
-  gap: 2,
+  gap: 1,
   color: 'orange',
   blackBorder: false,
   animation: 'static',
@@ -63,7 +65,9 @@ export function DotMatrix({
   const dotMatrix = useMemo(() => {
     let dots: boolean[][] = [];
     
-    if (mergedConfig.decorative) {
+    if (mergedConfig.imageGrid) {
+      dots = mergedConfig.imageGrid;
+    } else if (mergedConfig.decorative) {
       dots = getDecorativePattern(mergedConfig.decorative);
     } else if (mergedConfig.message) {
       dots = messageToDots(mergedConfig.message);
@@ -80,7 +84,7 @@ export function DotMatrix({
     }
     
     return paddedDots;
-  }, [mergedConfig.rows, mergedConfig.cols, mergedConfig.message, mergedConfig.decorative]);
+  }, [mergedConfig.rows, mergedConfig.cols, mergedConfig.message, mergedConfig.decorative, mergedConfig.imageGrid]);
 
   const handleHover = useCallback((x: number, y: number, isHovering: boolean) => {
     setHoveredDot(isHovering ? { x, y } : null);
@@ -159,6 +163,7 @@ export function DotMatrix({
             const innerX = x - 2;
             const innerY = y - 2;
             const isLit = isOuterBorder || (isInnerBorder && (x % 2 === 0 || y % 2 === 0)) || (isInner && (litDots.has(`${innerX}-${innerY}`) || dotMatrix[innerY]?.[innerX]));
+            const isBorder = isOuterBorder || isInnerBorder;
             
             return (
               <Dot
@@ -170,6 +175,7 @@ export function DotMatrix({
                 interactive={mergedConfig.interactive}
                 animation={isInner ? mergedConfig.animation : 'static'}
                 onHover={handleHover}
+                forceColor={isBorder ? (mergedConfig.borderColor || 'black') : undefined}
               />
             );
           })
@@ -183,14 +189,14 @@ export function DotMatrix({
             const isInner = y > 0 && y <= mergedConfig.rows && x > 0 && x <= mergedConfig.cols;
             const innerX = x - 1;
             const innerY = y - 1;
-            const isLit = isBorder ? true : (litDots.has(`${innerX}-${innerY}`) || dotMatrix[innerY]?.[innerX]);
+            const isLit = isInner && (litDots.has(`${innerX}-${innerY}`) || dotMatrix[innerY]?.[innerX]);
             
             return (
               <Dot
                 key={`${x}-${y}`}
                 x={x}
                 y={y}
-                lit={isInner ? isLit : isBorder && (x % 2 === 0 || y % 2 === 0)}
+                lit={isLit}
                 delay={(x + y) * 0.02}
                 interactive={mergedConfig.interactive}
                 animation={isInner ? mergedConfig.animation : 'static'}
@@ -283,15 +289,16 @@ export function DotMatrixTrail({
 
 export function DotMatrixDecor({
   decorative = 'arrow-right',
-  dotSize = 4,
+  dotSize = 6,
 }: Partial<DotMatrixConfig>) {
   return (
     <DotMatrix
       config={{
-        cols: 7,
-        rows: 7,
+        cols: 15,
+        rows: 15,
         dotSize,
-        color: 'black',
+        gap: 1,
+        color: 'orange',
         animation: 'static',
         decorative,
         interactive: true,

@@ -1,8 +1,20 @@
-// 5x7 dot matrix patterns for A-Z, 0-9, and common symbols
-// Each pattern is a 7x5 array where true = dot lit
+// 15x21 dot matrix patterns (3x scaled from 5x7)
+// Each pattern is 21 rows, 15 columns where true = dot lit
 
-export const ASCII_PATTERNS: Record<string, boolean[][]> = {
-  // Letters A-Z (5x7 grid)
+function scalePattern(pattern: boolean[][], scaleX: number, scaleY: number): boolean[][] {
+  const result: boolean[][] = [];
+  for (let y = 0; y < pattern.length * scaleY; y++) {
+    result[y] = [];
+    for (let x = 0; x < pattern[0].length * scaleX; x++) {
+      const srcY = Math.floor(y / scaleY);
+      const srcX = Math.floor(x / scaleX);
+      result[y][x] = pattern[srcY]?.[srcX] ?? false;
+    }
+  }
+  return result;
+}
+
+const basePatterns: Record<string, boolean[][]> = {
   A: [
     [false, true, true, true, false],
     [true, false, false, false, true],
@@ -237,7 +249,6 @@ export const ASCII_PATTERNS: Record<string, boolean[][]> = {
     [true, false, false, false, false],
     [true, true, true, true, true],
   ],
-  // Numbers 0-9
   0: [
     [false, true, true, true, false],
     [true, false, false, false, true],
@@ -328,8 +339,7 @@ export const ASCII_PATTERNS: Record<string, boolean[][]> = {
     [false, false, false, false, true],
     [false, true, true, true, false],
   ],
-  // Symbols
-  ' ': [ // space
+  ' ': [
     [false, false, false, false, false],
     [false, false, false, false, false],
     [false, false, false, false, false],
@@ -374,102 +384,119 @@ export const ASCII_PATTERNS: Record<string, boolean[][]> = {
     [false, false, false, false, false],
     [false, true, false, false, false],
   ],
-  '@': [
-    [false, true, true, true, false],
-    [true, false, false, false, true],
-    [true, false, true, true, true],
-    [true, true, false, false, true],
-    [true, false, false, false, true],
-    [true, false, false, false, true],
-    [false, true, true, true, false],
-  ],
-  '#': [
-    [false, true, false, true, false],
-    [false, true, false, true, false],
-    [true, true, true, true, true],
-    [false, true, false, true, false],
-    [true, true, true, true, true],
-    [false, true, false, true, false],
-    [false, true, false, true, false],
-  ],
 };
+
+export const ASCII_PATTERNS: Record<string, boolean[][]> = {};
+
+for (const [char, pattern] of Object.entries(basePatterns)) {
+  ASCII_PATTERNS[char] = scalePattern(pattern, 3, 3);
+}
 
 export const DEFAULT_MESSAGE = 'HELLO';
 
-// Convert message string to 2D dot matrix
 export function messageToDots(message: string): boolean[][] {
   const upperMessage = message.toUpperCase();
   const allDots: boolean[][] = [];
-  
+
+  for (let row = 0; row < 21; row++) {
+    allDots[row] = [];
+  }
+
   for (const char of upperMessage) {
     const pattern = ASCII_PATTERNS[char] || ASCII_PATTERNS[' '] || [];
     for (let row = 0; row < pattern.length; row++) {
-      if (!allDots[row]) {
-        allDots[row] = [];
-      }
-      allDots[row].push(...(pattern[row] || [false, false, false, false, false]));
-      // Add 1 column space between letters
-      allDots[row].push(false);
+      allDots[row].push(...(pattern[row] || Array(15).fill(false)));
+      allDots[row].push(false, false, false);
     }
   }
-  
+
   return allDots;
 }
 
-// Get decorative pattern (arrows, shapes)
+// 15x15 dot matrix patterns
+
+// Arrow right (>) - based on byte array format
+const ARROW_RIGHT: boolean[][] = [
+  [false,false,false,false,false,false,true,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,true,true,false,false,false,false,false,false,false,false],
+  [false,false,false,false,true,true,false,false,false,false,false,false,false,false,false],
+  [false,false,false,true,true,false,false,false,false,false,false,false,false,false,false],
+  [false,false,true,true,false,false,false,false,false,false,false,false,false,false,false],
+  [false,true,true,false,false,false,false,false,false,false,false,false,false,false,false],
+  [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false],
+  [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],
+  [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],
+  [false,true,true,false,false,false,false,false,false,false,false,false,false,false,false],
+  [false,false,true,true,false,false,false,false,false,false,false,false,false,false,false],
+  [false,false,false,true,true,false,false,false,false,false,false,false,false,false,false],
+  [false,false,false,false,true,true,false,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,true,true,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,false,true,false,false,false,false,false,false,false,false],
+];
+
+// Arrow left (<) - mirror of above
+const ARROW_LEFT: boolean[][] = [
+  [false,false,false,false,false,false,false,true,false,false,false,false,false,false,false],
+  [false,false,false,false,false,false,true,true,false,false,false,false,false,false,false],
+  [false,false,false,false,false,true,true,false,false,false,false,false,false,false,false],
+  [false,false,false,false,true,true,false,false,false,false,false,false,false,false,false],
+  [false,false,false,true,true,false,false,false,false,false,false,false,false,false,false],
+  [false,false,true,true,false,false,false,false,false,false,false,false,false,false,false],
+  [false,true,true,false,false,false,false,false,false,false,false,false,false,false,false],
+  [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],
+  [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],
+  [false,true,true,false,false,false,false,false,false,false,false,false,false,false,false],
+  [false,false,true,true,false,false,false,false,false,false,false,false,false,false,false],
+  [false,false,false,true,true,false,false,false,false,false,false,false,false,false,false],
+  [false,false,false,false,true,true,false,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,true,true,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,false,true,false,false,false,false,false,false,false,false],
+];
+
+// Wave - zigzag pattern
+const WAVE: boolean[][] = Array(15).fill(null).map((_, y) => 
+  Array(15).fill(false).map((_, x) => {
+    if (y === 7) return true;
+    return (x + y) % 3 === 0;
+  })
+);
+
+// Grid - border frame
+const GRID: boolean[][] = Array(15).fill(null).map((_, y) => 
+  Array(15).fill(false).map((_, x) => {
+    if (y === 0 || y === 14) return true;
+    if (x === 0 || x === 14) return true;
+    return false;
+  })
+);
+
+// Heart
+const HEART: boolean[][] = [
+  [false,false,false,true,true,true,true,false,false,false,false,false,false,false,false],
+  [false,false,true,true,true,true,true,true,false,false,false,false,false,false,false],
+  [false,true,true,true,true,true,true,true,true,false,false,false,false,false,false],
+  [true,true,true,true,true,true,true,true,true,true,false,false,false,false,false],
+  [false,true,true,true,true,true,true,true,true,false,false,false,false,false,false],
+  [false,false,true,true,true,true,true,true,false,false,false,false,false,false,false],
+  [false,false,false,true,true,true,true,false,false,false,false,false,false,false,false],
+  [false,false,false,false,true,true,false,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],
+  [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],
+];
+
 export function getDecorativePattern(type: 'arrow-left' | 'arrow-right' | 'wave' | 'grid' | 'heart'): boolean[][] {
-  switch (type) {
-    case 'arrow-left':
-      return [
-        [true, false, false, false, false, false, false],
-        [true, true, false, false, false, false, false],
-        [true, true, true, false, false, false, false],
-        [true, true, true, true, true, true, true],
-        [true, true, true, false, false, false, false],
-        [true, true, false, false, false, false, false],
-        [true, false, false, false, false, false, false],
-      ];
-    case 'arrow-right':
-      return [
-        [false, false, false, false, false, false, true],
-        [false, false, false, false, false, true, true],
-        [false, false, false, false, true, true, true],
-        [true, true, true, true, true, true, true],
-        [false, false, false, false, true, true, true],
-        [false, false, false, false, false, true, true],
-        [false, false, false, false, false, false, true],
-      ];
-    case 'wave':
-      return [
-        [false, false, true, false, false, false, true],
-        [false, true, false, true, false, true, false],
-        [true, false, false, false, true, false, false],
-        [false, false, false, false, false, false, false],
-        [true, false, false, false, true, false, false],
-        [false, true, false, true, false, true, false],
-        [false, false, true, false, false, false, true],
-      ];
-    case 'grid':
-      return [
-        [true, false, true, false, true, false, true],
-        [false, false, false, false, false, false, false],
-        [true, false, true, false, true, false, true],
-        [false, false, false, false, false, false, false],
-        [true, false, true, false, true, false, true],
-        [false, false, false, false, false, false, false],
-        [true, false, true, false, true, false, true],
-      ];
-    case 'heart':
-      return [
-        [false, true, false, false, false, true, false],
-        [true, true, true, false, true, true, true],
-        [true, true, true, true, true, true, true],
-        [true, true, true, true, true, true, true],
-        [false, true, true, true, true, true, false],
-        [false, false, true, true, true, false, false],
-        [false, false, false, true, false, false, false],
-      ];
-    default:
-      return Array(7).fill(null).map(() => Array(7).fill(false));
-  }
+  const patterns: Record<string, boolean[][]> = {
+    'arrow-right': ARROW_RIGHT,
+    'arrow-left': ARROW_LEFT,
+    'wave': WAVE,
+    'grid': GRID,
+    'heart': HEART,
+  };
+
+  return patterns[type] || Array(15).fill(null).map(() => Array(15).fill(false));
 }

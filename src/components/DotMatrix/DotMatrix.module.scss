@@ -15,8 +15,12 @@
       transform 0.15s ease;
     cursor: default;
     
+    @media (prefers-color-scheme: light) {
+      background: #e6e6e6 !important;
+    }
+    
     &.lit {
-      background: var(--dot-on-color, #f97316);
+      background: var(--dot-on-color, #f97316) !important;
       box-shadow: 0 0 calc(var(--dot-size, 6px) * 0.8) var(--dot-on-color, #f97316);
     }
     
@@ -132,27 +136,37 @@
 // Color variants
 .colorOrange {
   --dot-on-color: #f97316;
-  --dot-off-color: #1a1a1a;
+  --dot-off-color: #333;
 }
 
 .colorWhite {
   --dot-on-color: #ffffff;
-  --dot-off-color: #1a1a1a;
+  --dot-off-color: #888;
 }
 
 .colorGreen {
   --dot-on-color: #22c55e;
-  --dot-off-color: #1a1a1a;
+  --dot-off-color: #333;
 }
 
 .colorRed {
   --dot-on-color: #ef4444;
-  --dot-off-color: #1a1a1a;
+  --dot-off-color: #333;
 }
 
 .colorBlack {
   --dot-on-color: #1a1a1a;
-  --dot-off-color: #050505;
+  --dot-off-color: #333;
+}
+
+.forceBlack.lit {
+  background: #1a1a1a !important;
+  box-shadow: none !important;
+}
+
+.forceOrange.lit {
+  background: #f97316 !important;
+  box-shadow: 0 0 calc(var(--dot-size, 6px) * 0.8) #f97316 !important;
 }
 
 // Interactive wrapper

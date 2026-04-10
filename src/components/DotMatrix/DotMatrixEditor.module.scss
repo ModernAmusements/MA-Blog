@@ -1,0 +1,98 @@
+.editor {
+  --dot-bg-dark: #333;
+  --dot-bg-light: #f1f1f1;
+  --dot-hover-dark: #555;
+  --dot-hover-light: #d1d1d1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  
+  &[data-light-mode="true"] {
+    --dot-bg-dark: #f1f1f1;
+    --dot-hover-dark: #d1d1d1;
+  }
+}
+
+.toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: flex-end;
+  
+  label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--foreground);
+    font-weight: 500;
+    
+    select {
+      background: transparent;
+      border: 1px solid var(--foreground);
+      opacity: 0.7;
+      padding: 8px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--foreground);
+      border-radius: 0;
+      min-width: 100px;
+      
+      &:focus {
+        outline: none;
+        border-color: #f97316;
+        opacity: 1;
+      }
+    }
+  }
+  
+  button {
+    padding: 8px 12px;
+    border-radius: 0;
+    border: 1px solid var(--foreground);
+    background: transparent;
+    color: var(--foreground);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.7;
+    
+    &:hover {
+      background: #f97316;
+      color: var(--background);
+      opacity: 1;
+      border-color: #f97316;
+    }
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--dot-size));
+  grid-template-rows: repeat(var(--rows), var(--dot-size));
+  gap: var(--dot-gap);
+  padding: 16px;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.dot {
+  width: var(--dot-size);
+  height: var(--dot-size);
+  background: var(--dot-bg-dark);
+  border-radius: 50%;
+  transition: background 0.1s ease, box-shadow 0.1s ease;
+  
+  &:hover {
+    background: var(--dot-hover-dark) !important;
+  }
+  
+  &.lit {
+    background: #f97316 !important;
+    box-shadow: 0 0 calc(var(--dot-size) * 0.8) #f97316;
+  }
+}
