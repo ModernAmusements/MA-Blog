@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#0a0a0a"/>
-  <text x="600" y="280" font-family="monospace" font-size="80" font-weight="bold" fill="#f97316" text-anchor="middle">ModernAmusement</text>
-  <text x="600" y="360" font-family="monospace" font-size="40" fill="#ededed" text-anchor="middle">Fullstack Developer</text>
-  <text x="600" y="420" font-family="monospace" font-size="24" fill="#888" text-anchor="middle">Swift • Python • React • Next.js</text>
-  <rect x="500" y="480" width="200" height="4" fill="#f97316"/>
-</svg>
