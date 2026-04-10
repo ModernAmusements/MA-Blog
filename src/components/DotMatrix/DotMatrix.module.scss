@@ -3,7 +3,19 @@
   gap: var(--dot-gap, 4px);
   padding: var(--matrix-padding, 16px);
   background: var(--matrix-bg, transparent);
-  border-radius: var(--matrix-radius, 0);
+  
+  --border-color: #222;
+  
+  @media (prefers-color-scheme: light) {
+    --border-color: #ccc;
+  }
+  
+  :global(.light) &,
+  &.lightMode {
+    --border-color: #ccc;
+  }
+  
+  border: 1px solid var(--border-color);
   
   .dot {
     width: var(--dot-size, 6px);
