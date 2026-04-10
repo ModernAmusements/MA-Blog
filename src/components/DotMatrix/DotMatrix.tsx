@@ -66,11 +66,9 @@ export function DotMatrix({
     } else if (mergedConfig.message) {
       dots = messageToDots(mergedConfig.message);
     } else {
-      // Default message
       dots = messageToDots(DEFAULT_MESSAGE);
     }
     
-    // Pad to configured size
     const paddedDots: boolean[][] = [];
     for (let y = 0; y < mergedConfig.rows; y++) {
       paddedDots[y] = [];
@@ -129,8 +127,8 @@ export function DotMatrix({
   }[mergedConfig.color] || styles.colorOrange;
 
   const gridStyle = {
-    gridTemplateColumns: `repeat(${mergedConfig.cols}, ${mergedConfig.dotSize}px)`,
-    gridTemplateRows: `repeat(${mergedConfig.rows}, ${mergedConfig.dotSize}px)`,
+    gridTemplateColumns: `repeat(${mergedConfig.cols + 2}, ${mergedConfig.dotSize}px)`,
+    gridTemplateRows: `repeat(${mergedConfig.rows + 2}, ${mergedConfig.dotSize}px)`,
     '--dot-size': `${mergedConfig.dotSize}px`,
     '--dot-gap': `${mergedConfig.gap}px`,
   } as React.CSSProperties;
@@ -142,26 +140,31 @@ export function DotMatrix({
         style={gridStyle}
         onMouseLeave={() => setHoveredDot(null)}
       >
-        {mergedConfig.rows * mergedConfig.cols > 0 &&
-          Array.from({ length: mergedConfig.rows }).map((_, y) =>
-            Array.from({ length: mergedConfig.cols }).map((_, x) => {
-              const isLit = litDots.has(`${x}-${y}`) || dotMatrix[y]?.[x];
-              const delay = (x + y) * 0.02;
-              
-              return (
-                <Dot
-                  key={`${x}-${y}`}
-                  x={x}
-                  y={y}
-                  lit={isLit}
-                  delay={delay}
-                  interactive={mergedConfig.interactive}
-                  animation={mergedConfig.animation}
-                  onHover={handleHover}
-                />
-              );
-            })
-          )}
+        {/* Border dots */}
+        {Array.from({ length: mergedConfig.rows + 2 }).map((_, y) =>
+          Array.from({ length: mergedConfig.cols + 2 }).map((_, x) => {
+            const isBorder = 
+              y === 0 || y === mergedConfig.rows + 1 || 
+              x === 0 || x === mergedConfig.cols + 1;
+            const isInner = y > 0 && y <= mergedConfig.rows && x > 0 && x <= mergedConfig.cols;
+            const innerX = x - 1;
+            const innerY = y - 1;
+            const isLit = isBorder ? true : (litDots.has(`${innerX}-${innerY}`) || dotMatrix[innerY]?.[innerX]);
+            
+            return (
+              <Dot
+                key={`${x}-${y}`}
+                x={x}
+                y={y}
+                lit={isInner ? isLit : isBorder && (x % 2 === 0 || y % 2 === 0)}
+                delay={(x + y) * 0.02}
+                interactive={mergedConfig.interactive}
+                animation={isInner ? mergedConfig.animation : 'static'}
+                onHover={handleHover}
+              />
+            );
+          })
+        )}
       </div>
     </DotMatrixContext.Provider>
   );
