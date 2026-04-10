@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { DotMatrix, DotMatrixDecor } from '@/components/DotMatrix';
 import styles from './dotmatrix.module.scss';
 
-const sizes = [4, 6, 8] as const;
-const colors = ['orange', 'white', 'green', 'red'] as const;
+const sizes = [2, 4, 6, 8, 10] as const;
+const colors = ['orange', 'white', 'green', 'red', 'black'] as const;
 const animations = ['static', 'pulse', 'scan', 'trail', 'wave'] as const;
 
 const decorativePresets = [
@@ -18,8 +18,8 @@ const decorativePresets = [
 
 export default function DotMatrixPlayground() {
   const [customMessage, setCustomMessage] = useState('HELLO');
-  const [dotSize, setDotSize] = useState(6);
-  const [color, setColor] = useState<'orange' | 'white' | 'green' | 'red'>('orange');
+  const [dotSize, setDotSize] = useState(4);
+  const [color, setColor] = useState<'orange' | 'white' | 'green' | 'red' | 'black'>('black');
   const [animation, setAnimation] = useState<'static' | 'pulse' | 'scan' | 'trail' | 'wave'>('static');
   const [interactive, setInteractive] = useState(true);
   const [cols, setCols] = useState(20);

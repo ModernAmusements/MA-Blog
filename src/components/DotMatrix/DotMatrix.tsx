@@ -8,9 +8,9 @@ import { messageToDots, getDecorativePattern, DEFAULT_MESSAGE } from './ascii';
 export interface DotMatrixConfig {
   cols: number;
   rows: number;
-  dotSize: 4 | 6 | 8 | 10 | 12;
+  dotSize: 2 | 4 | 6 | 8 | 10 | 12;
   gap: number;
-  color: 'orange' | 'white' | 'green' | 'red';
+  color: 'orange' | 'white' | 'green' | 'red' | 'black';
   animation: 'pulse' | 'scan' | 'trail' | 'wave' | 'static';
   interactive: boolean;
   message?: string;
@@ -44,10 +44,10 @@ interface DotMatrixProps {
 const defaultConfig: DotMatrixConfig = {
   cols: 12,
   rows: 7,
-  dotSize: 10,
-  gap: 4,
+  dotSize: 4,
+  gap: 3,
+  color: 'black',
   blackBorder: true,
-  color: 'orange',
   animation: 'static',
   interactive: false,
 };
@@ -116,6 +116,7 @@ export function DotMatrix({
   }, [dotMatrix, hoveredDot, mergedConfig.interactive, mergedConfig.animation, mergedConfig.cols, mergedConfig.rows]);
 
   const sizeClass = {
+    2: styles.sizeTiny,
     4: styles.sizeSmall,
     6: styles.sizeMedium,
     8: styles.sizeLarge,
@@ -128,6 +129,7 @@ export function DotMatrix({
     white: styles.colorWhite,
     green: styles.colorGreen,
     red: styles.colorRed,
+    black: styles.colorBlack,
   }[mergedConfig.color] || styles.colorOrange;
 
   const gridStyle = {
@@ -281,7 +283,7 @@ export function DotMatrixTrail({
 
 export function DotMatrixDecor({
   decorative = 'arrow-right',
-  dotSize = 8,
+  dotSize = 4,
 }: Partial<DotMatrixConfig>) {
   return (
     <DotMatrix
@@ -289,6 +291,7 @@ export function DotMatrixDecor({
         cols: 7,
         rows: 7,
         dotSize,
+        color: 'black',
         animation: 'static',
         decorative,
         interactive: true,

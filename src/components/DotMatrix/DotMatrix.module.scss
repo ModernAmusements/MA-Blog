@@ -109,19 +109,24 @@
 }
 
 // Sizing variants
-.sizeSmall {
+.sizeTiny {
   --dot-size: 4px;
+  --dot-gap: 2px;
+}
+
+.sizeSmall {
+  --dot-size: 6px;
   --dot-gap: 3px;
 }
 
 .sizeMedium {
   --dot-size: 8px;
-  --dot-gap: 6px;
+  --dot-gap: 4px;
 }
 
 .sizeLarge {
   --dot-size: 10px;
-  --dot-gap: 8px;
+  --dot-gap: 5px;
 }
 
 // Color variants
@@ -143,6 +148,11 @@
 .colorRed {
   --dot-on-color: #ef4444;
   --dot-off-color: #1a1a1a;
+}
+
+.colorBlack {
+  --dot-on-color: #1a1a1a;
+  --dot-off-color: #050505;
 }
 
 // Interactive wrapper
