@@ -49,7 +49,7 @@ export async function generateMetadata(props: Props) {
       authors: ['Shady Nathan Tawfik'],
       images: [
         {
-          url: `${baseUrl}/og-image.svg`,
+          url: post.image ? `${baseUrl}${post.image}` : `${baseUrl}/og-image.svg`,
           width: 1200,
           height: 630,
           alt: post.title,
@@ -61,7 +61,7 @@ export async function generateMetadata(props: Props) {
       title: post.title,
       description: post.description,
       creator: '@modernamusements',
-      images: [`${baseUrl}/og-image.svg`],
+      images: post.image ? [`${baseUrl}${post.image}`] : [`${baseUrl}/og-image.svg`],
     },
   };
 }
