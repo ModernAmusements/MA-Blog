@@ -25,35 +25,9 @@
   gap: 48px;
 }
 
-.presetGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 24px;
-}
-
-.presetButton {
-  background: #0a0a0a;
-  border: 1px solid #222;
-  border-radius: 8px;
-  padding: 24px;
-  cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  
-  &:hover {
-    border-color: #f97316;
-    box-shadow: 0 0 16px rgba(249, 115, 22, 0.2);
-  }
-  
-  &.active {
-    border-color: #f97316;
-    box-shadow: 0 0 24px rgba(249, 115, 22, 0.3);
-  }
-}
-
 .customSection {
   background: #0a0a0a;
   border: 1px solid #222;
-  border-radius: 8px;
   padding: 32px;
   
   h2 {
