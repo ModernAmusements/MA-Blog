@@ -45,11 +45,11 @@ const defaultConfig: DotMatrixConfig = {
   cols: 12,
   rows: 7,
   dotSize: 4,
-  gap: 3,
-  color: 'black',
-  blackBorder: true,
+  gap: 2,
+  color: 'orange',
+  blackBorder: false,
   animation: 'static',
-  interactive: false,
+  interactive: true,
 };
 
 export function DotMatrix({
