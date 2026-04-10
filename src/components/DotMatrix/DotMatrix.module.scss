@@ -4,19 +4,6 @@
   padding: var(--matrix-padding, 16px);
   background: var(--matrix-bg, transparent);
   
-  --border-color: #222;
-  
-  @media (prefers-color-scheme: light) {
-    --border-color: #ccc;
-  }
-  
-  :global(.light) &,
-  &.lightMode {
-    --border-color: #ccc;
-  }
-  
-  border: 1px solid var(--border-color);
-  
   .dot {
     width: var(--dot-size, 6px);
     height: var(--dot-size, 6px);
