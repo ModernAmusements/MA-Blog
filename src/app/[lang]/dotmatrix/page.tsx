@@ -1,12 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { DotMatrix } from '@/components/DotMatrix';
+import { DotMatrix, DotMatrixDecor } from '@/components/DotMatrix';
 import styles from './dotmatrix.module.scss';
 
 const sizes = [4, 6, 8] as const;
 const colors = ['orange', 'white', 'green', 'red'] as const;
 const animations = ['static', 'pulse', 'scan', 'trail', 'wave'] as const;
+
+const decorativePresets = [
+  { name: 'Arrow →', decorative: 'arrow-right' as const },
+  { name: 'Arrow ←', decorative: 'arrow-left' as const },
+  { name: 'Wave', decorative: 'wave' as const },
+  { name: 'Grid', decorative: 'grid' as const },
+  { name: 'Heart', decorative: 'heart' as const },
+];
 
 export default function DotMatrixPlayground() {
   const [customMessage, setCustomMessage] = useState('HELLO');
@@ -22,6 +30,17 @@ export default function DotMatrixPlayground() {
       <h1 className={styles.title}>Dot Matrix Playground</h1>
       <p className={styles.subtitle}>Test all dot matrix configurations</p>
 
+      {/* Decorative Examples */}
+      <div className={styles.presetGrid}>
+        {decorativePresets.map((preset) => (
+          <div key={preset.name} className={styles.presetExample}>
+            <span className={styles.presetLabel}>{preset.name}</span>
+            <DotMatrixDecor decorative={preset.decorative} dotSize={8} />
+          </div>
+        ))}
+      </div>
+
+      {/* Custom Config */}
       <div className={styles.customSection}>
         <h2>Custom Config</h2>
         

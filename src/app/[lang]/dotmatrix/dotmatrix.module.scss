@@ -19,23 +19,25 @@
   margin-bottom: 48px;
 }
 
-.preview {
+.presetGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.presetExample {
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
 }
 
-.presetGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 24px;
-}
-
-.presetButton {
-  background: transparent;
-  border: none;
-  padding: 24px;
-  cursor: pointer;
+.presetLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #666;
 }
 
 .customSection {
