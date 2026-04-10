@@ -1,6 +1,6 @@
 # Development Conversation Log
 
-> **Last Updated**: April 9, 2026
+> **Last Updated**: April 10, 2026
 > **Project**: ModernAmusements Portfolio (Next.js)
 > **URL**: https://modern-amusements.vercel.app
 
@@ -73,6 +73,7 @@
 - `linkedin-browser-surveillance` (EN + DE)
 - `ai_energy_os` (EN + DE)
 - `pokemon-tcg-card-extractor` (EN + DE)
+- `mantax` (EN + DE) - Ethical facial recognition with demo video
 
 ### Projects
 - `Israel-Hamas-Conflict` (EN + DE)

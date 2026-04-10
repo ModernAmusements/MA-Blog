@@ -1,0 +1,753 @@
+---
+title: "MANTAX bauen: Ein ethisches Gesichtserkennungssystem für NGOs"
+description: Ein technischer Tiefeneinblick in MANTAX, ein ethisches Gesichtserkennungssystem für NGO-Anwendungsfälle mit lokaler Verarbeitung, Dual-Modell-Embeddings und Konfidenzbändern.
+date: 2026-04-10
+tags: ['python', 'computer-vision', 'flask', 'gesichtserkennung', 'onnx', 'electron']
+---
+
+## Einleitung
+
+Dies ist ein technischer Tiefeneinblick in MANTAX, ein ethisches Gesichtserkennungssystem für NGO-Anwendungsfälle. In diesem Blogpost erkunden wir die vollständige Architektur, Datenflüsse und Implementierungsdetails—alles, was ein Entwickler wissen muss, um zu verstehen, wie dieses System funktioniert.
+
+---
+
+## Systemarchitektur-Überblick
+
+MANTAX folgt einer Drei-Schichten-Architektur mit klarer Trennung zwischen Präsentation, Geschäftslogik und maschinellem Lernen.
+
+```mermaid
+graph TB
+    subgraph "Schicht 1: Präsentationsschicht"
+        E["Electron Desktop App<br/>oder Browser"]
+        HTML["index.html"]
+        JS["app.js (3.429 Zeilen)<br/>98 Funktionen"]
+    end
+    
+    subgraph "Schicht 2: API-Schicht"
+        FLASK["Flask API Server<br/>api_server.py (2.131 Zeilen)<br/>31 Endpunkte"]
+    end
+    
+    subgraph "Schicht 3: ML-Pipeline"
+        DETECT["Gesichtserkennung<br/>src/detection/__init__.py"]
+        EMBED["Embedding-Extraktion<br/>src/embedding/__init__.py"]
+        ARCFACE["ArcFace ONNX<br/>arcface_extractor.py"]
+        FACENET["FaceNet PyTorch<br/>(128-dim)"]
+    end
+    
+    E --> FLASK
+    HTML --> JS
+    JS --> FLASK
+    FLASK --> DETECT
+    FLASK --> EMBED
+    EMBED --> ARCFACE
+    EMBED --> FACENET
+```
+
+### Technologie-Stack
+
+| Schicht | Technologie | Zweck |
+|---------|-------------|-------|
+| Frontend | Electron + Vanilla JS | Desktop-App mit Custom Titlebar |
+| Styling | SCSS → CSS | macOS Tahoe Liquid Glass Design |
+| Backend | Flask (Python) | REST API mit 31 Endpunkten |
+| ML-Laufzeit | ONNX Runtime (ArcFace) + PyTorch (FaceNet) | Dual-Modell-Embedding-Extraktion |
+| Gesichtserkennung | OpenCV DNN + MediaPipe | Gesichtslokalisierung + 468-Punkt-Landmarks |
+
+![MANTAX Interface](/images/projects/face_scanner/mantax-1.jpg)
+
+---
+
+## Die Daten-Pipeline
+
+Wenn ein Benutzer ein Bild hochlädt, durchläuft es eine gut definierte Pipeline. Verfolgen wir diese Reise:
+
+```mermaid
+flowchart LR
+    subgraph "Eingabe"
+        IMG["Benutzerbild<br/>(Upload/Webcam)"]
+    end
+    
+    subgraph "Vorverarbeitung"
+        ENH["Bildverbesserung<br/>Helligkeit/Kontrast/Schärfe"]
+        QUAL["Qualitätsbewertung<br/>Unschärfe-Erkennung"]
+    end
+    
+    subgraph "Erkennung"
+        DNN["OpenCV DNN<br/>Caffe Modell"]
+        HAAR["Haar Cascade<br/>(Fallback)"]
+        FACES["Gesichtsboxen<br/>(x, y, w, h)"]
+    end
+    
+    subgraph "Landmarks"
+        MP["MediaPipe FaceMesh<br/>468 Punkte"]
+        POSE["Pose-Schätzung<br/>Gieren/Neigen/Rollen"]
+    end
+    
+    subgraph "Embedding"
+        ARC["ArcFace ONNX<br/>512-dim"]
+        FN["FaceNet PyTorch<br/>128-dim"]
+        EMB["Dual Embedding<br/>Speicher"]
+    end
+    
+    IMG --> ENH --> DNN --> FACES --> MP --> POSE --> ARC --> EMB
+    IMG --> ENH --> HAAR --> FACES
+    IMG --> ENH --> QUAL
+    FACES --> FN --> EMB
+    
+    style IMG fill:#e1f5fe
+    style EMB fill:#c8e6c9
+    style FACES fill:#fff3e0
+```
+
+---
+
+## Gesichtserkennungsmodul
+
+Das Erkennungsmodul (`src/detection/__init__.py`) behandelt den ersten kritischen Schritt: Finden, wo sich Gesichter in einem Bild befinden.
+
+### Erkennungsablauf
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API as /api/detect
+    participant Pre as ImagePreprocessor
+    participant Det as FaceDetector
+    participant Vis as Visualizations
+
+    User->>API: POST image (base64)
+    API->>Pre: enhance(image)
+    Pre-->>API: enhanced_image, preprocessing_info
+    API->>Det: detect_faces(enhanced_image)
+    Det-->>API: List[(x, y, w, h), ...]
+    API->>Vis: visualize_detection(image, faces)
+    API-->>User: {faces: [...], visualizations: {...}}
+```
+
+### Primäre Erkennungsmethode: OpenCV DNN
+
+Das System verwendet ein vortrainiertes Caffe-Modell für Deep-Learning-basierte Gesichtserkennung:
+
+```python
+# Aus src/detection/__init__.py:78-97
+def _detect_faces_dnn(self, image: np.ndarray) -> List[Tuple[int, int, int, int]]:
+    h, w = image.shape[:2]
+    blob = cv2.dnn.blobFromImage(
+        cv2.resize(image, (300, 300)), 1.0,
+        (300, 300), (104.0, 177.0, 123.0)
+    )
+    self.net.setInput(blob)
+    detections = self.net.forward()
+
+    faces = []
+    for i in range(detections.shape[2]):
+        confidence = detections[0, 0, i, 2]
+        if confidence > self.confidence_threshold:
+            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+            (startX, startY, endX, endY) = box.astype("int")
+            face_box = (startX, startY, endX - startX, endY - startY)
+            faces.append(face_box)
+    return faces
+```
+
+**Erforderliche Modell-Dateien:**
+- `deploy.prototxt.txt` - Caffe-Architekturdefinition
+- `res10_300x300_ssd_iter_140000.caffemodel` - Vortrainierte Gewichte
+
+### Fallback: Haar Cascade
+
+Wenn DNN nicht geladen werden kann, fällt das System elegant auf Haar Cascade zurück:
+
+```python
+# Aus src/detection/__init__.py:99-102
+def _detect_faces_haar(self, image: np.ndarray):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    faces = self.face_cascade.detectMultiScale(
+        gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
+    )
+    return [(x, y, w, h) for (x, y, w, h) in faces]
+```
+
+### Gesicht-ROI-Extraktion
+
+Sobald Gesichter erkannt wurden, extrahiert die API den Bereich von Interesse (ROI):
+
+```python
+# Aus api_server.py:403-409
+for i, (x, y, w, h) in enumerate(current_faces):
+    face_img = current_image[y:y+h, x:x+w]
+    faces_data.append({
+        'id': i,
+        'bbox': [x, y, w, h],
+        'thumbnail': image_to_base64(face_img)
+    })
+```
+
+![Gesichtserkennung Visualisierung](/images/projects/face_scanner/detection.jpg)
+
+---
+
+## Gesichtspunkt-Erkennung
+
+Nach der Erkennung von Gesichtern extrahiert das System 468 Gesichtspunkte mit MediaPipe Face Mesh:
+
+```mermaid
+graph LR
+    subgraph "Landmark-Erkennung"
+        FACE["Gesicht-ROI<br/>(zugeschnitten)"]
+        MP["MediaPipe<br/>FaceLandmarker"]
+        LM["468 Landmarks<br/>(x, y, z)"]
+        GEO["Geometrische Merkmale<br/>Augenabstand, Nasenverhältnis..."]
+    end
+    
+    FACE --> MP --> LM --> GEO
+    
+    style LM fill:#e1f5fe
+    style GEO fill:#c8e6c9
+```
+
+### Landmark-Extraktionscode
+
+```python
+# Aus src/detection/__init__.py:361-450
+def estimate_landmarks(self, face_image, face_box):
+    landmarks = {}
+    
+    if self._mediapipe_available and hasattr(self, 'face_landmarker'):
+        # MediaPipe für 498 echte Landmarks verwenden
+        rgb_image = cv2.cvtColor(face_image, cv2.COLOR_BGR2RGB)
+        mp_image = Image(image_format=ImageFormat.SRGB, data=rgb_image)
+        results = self.face_landmarker.detect(mp_image)
+        
+        if results.face_landmarks:
+            face_landmarks = results.face_landmarks[0]
+            # Wichtige Landmarks extrahieren
+            landmarks = {
+                'left_eye': (int(lm.x * w), int(lm.y * h)),
+                'right_eye': (int(lm.x * w), int(lm.y * h)),
+                'nose': (int(lm.x * w), int(lm.y * h)),
+                'mouth': (int(lm.x * w), int(lm.y * h)),
+                # ... 468 Punkte insgesamt
+            }
+    else:
+        # Fallback: proportionale Schätzung
+        landmarks = self._estimate_landmarks_proportional(face_image, face_box)
+    
+    return landmarks
+```
+
+### Geometrische Merkmalsextraktion
+
+Zu Vergleichszwecken extrahieren wir skaleninvariante geometrische Merkmale:
+
+```python
+# Aus api_server.py:235-314
+def extract_landmark_features(landmarks):
+    # Augenbezogene Verhältnisse (skaleninvariant)
+    features['eye_distance'] = eye_distance / face_width
+    features['eye_nose_ratio'] = eye_nose / face_width
+    features['nose_mouth_ratio'] = nose_mouth / face_width
+    features['width_height_ratio'] = face_width / face_height
+    features['face_symmetry'] = abs(nose_x - eye_center_x) / face_width
+    # ... weitere Merkmale
+    return features
+```
+
+![Landmark-Erkennung](/images/projects/face_scanner/mantax-landmarks.jpg)
+
+---
+
+## Embedding-Extraktion (Dual-Modell)
+
+Dies ist der Kern des Systems—Umwandlung von Gesichtsbildern in mathematische Embeddings, die verglichen werden können.
+
+```mermaid
+graph TB
+    subgraph "Embedding-Extraktion"
+        FACE["Gesicht-ROI<br/>zugeschnittenes Gesicht"]
+        
+        subgraph "ArcFace (Primär)"
+            ARC_PRE["Vorverarbeitung<br/>112x112 RGB"]
+            ARC_ONNX["ONNX Runtime<br/>ResNet100"]
+            ARC_EMB["512-dim<br/>L2-normalisiert"]
+        end
+        
+        subgraph "FaceNet (Sekundär)"
+            FN_PRE["Vorverarbeitung<br/>224x224 RGB"]
+            FN_TORCH["PyTorch<br/>ResNet18"]
+            FN_EMB["128-dim<br/>L2-normalisiert"]
+            FN_ACT["Aktivierungen<br/>10 Schichten"]
+        end
+        
+        COMB["Kombiniert<br/>Speicher"]
+    end
+    
+    FACE --> ARC_PRE --> ARC_ONNX --> ARC_EMB --> COMB
+    FACE --> FN_PRE --> FN_TORCH --> FN_EMB --> COMB
+    FN_TORCH --> FN_ACT --> COMB
+    
+    style ARC_EMB fill:#fff3e0
+    style FN_EMB fill:#e8f5e9
+    style COMB fill:#e1f5fe
+```
+
+### ArcFace-Implementierung
+
+ArcFace bietet überlegene Diskriminierung zwischen verschiedenen Gesichtern:
+
+```python
+# Aus src/embedding/arcface_extractor.py
+class ArcFaceEmbeddingExtractor:
+    def __init__(self):
+        # ONNX-Modell laden
+        self.session = onnxruntime.InferenceSession('arcface_r100_v1.onnx')
+        self.input_name = self.session.get_inputs()[0].name
+        self.output_name = self.session.get_outputs()[0].name
+        
+    def extract_embedding(self, face_image):
+        # Vorverarbeitung: 112x112 RGB, normalisieren
+        face = cv2.resize(face_image, (112, 112))
+        face = self._preprocess(face)  # Normalisierung
+        
+        # Inferenz ausführen
+        embedding = self.session.run(
+            [self.output_name], 
+            {self.input_name: face}
+        )[0]
+        
+        # L2 normalisieren
+        embedding = embedding / np.linalg.norm(embedding)
+        return embedding.flatten()  # 512-dim
+```
+
+### FaceNet-Implementierung
+
+FaceNet bietet sekundäre Signale und Visualisierungen neuronaler Aktivierungen:
+
+```python
+# Aus src/embedding/__init__.py:52-78
+class FaceNetEmbeddingExtractor:
+    def __init__(self, embedding_size=128):
+        self.model = ImprovedEmbeddingExtractor(embedding_size).to(self.device)
+        self.mean = np.array([0.485, 0.456, 0.406])
+        self.std = np.array([0.229, 0.224, 0.225])
+        
+    def extract_embedding(self, face_image):
+        # Vorverarbeitung: 224x224, ImageNet-Normalisierung
+        face = cv2.resize(face_image, (224, 224))
+        face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
+        face = (face / 255.0 - self.mean) / self.std
+        
+        # Forward-Pass
+        with torch.no_grad():
+            embedding = self.model(torch.from_numpy(face).permute(2,0,1).unsqueeze(0))
+        return embedding.cpu().numpy().flatten()  # 128-dim
+```
+
+### Neuronale Netzwerk-Aktivierungen
+
+FaceNet extrahiert auch Zwischenschichten-Aktivierungen zur Visualisierung:
+
+```python
+# Aus src/embedding/__init__.py:83-130
+def get_activations(self, face_image):
+    activations = {}
+    layer_names = ['conv1', 'bn1', 'relu', 'maxpool', 
+                   'layer1', 'layer2', 'layer3', 'layer4', 'gap', 'fc']
+    
+    with torch.no_grad():
+        x = self.preprocess(face_image)
+        for i, child in enumerate(self.model.backbone.children()):
+            x = child(x)
+            if i < len(layer_names):
+                activations[layer_names[i]] = x.detach().cpu().numpy()[0]
+    
+    activations['embedding'] = self.extract_embedding(face_image)
+    return activations
+```
+
+**Extrahierte Aktivierungen:**
+| Schicht | Ausgabeform | Zweck |
+|---------|-------------|-------|
+| conv1 | (64, 112, 112) | Erste Konvolutionen |
+| bn1 | (64, 112, 112) | Erste Batch-Norm |
+| layer1 | (64, 56, 56) | Niedrigstufige Merkmale |
+| layer2 | (128, 28, 28) | Mittelstufige Merkmale |
+| layer3 | (256, 14, 14) | Hochstufige Merkmale |
+| layer4 | (512, 7, 7) | Endgültige Merkmale |
+| embedding | (128,) | Endgültiges Embedding |
+
+![ArcFace Embedding](/images/projects/face_scanner/arcface.jpg)
+
+---
+
+## Der Compare-Endpunkt (Vollständiger Ablauf)
+
+Hier ist der vollständige Vergleichsablauf vom `/api/compare`-Endpunkt:
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API as /api/compare
+    participant Comp as SimilarityComparator
+    
+    Client->>API: POST {embedding, references}
+    
+    rect rgb(230, 230, 250)
+        note right of API: Query-Embeddings extrahieren
+        API->>API: q_arcface = current_embeddings['arcface']
+        API->>API: q_facenet = current_embeddings['facenet']
+    end
+    
+    loop Für jede Referenz
+        API->>Comp: cosine_similarity(q_arcface, ref_arcface)
+        Comp-->>API: arcface_sim (0-1)
+        
+        API->>Comp: cosine_similarity(q_facenet, ref_facenet)
+        Comp-->>API: facenet_sim (0-1)
+        
+        API->>Comp: landmark_similarity(query_lm, ref_lm)
+        Comp-->>API: landmark_sim (0-1)
+        
+        API->>Comp: activation_similarity(query_act, ref_act)
+        Comp-->>API: activation_sim (0-1)
+        
+        API->>Comp: compute_dual_match_score()
+        Comp-->>API: final_score, status, reasons
+    end
+    
+    API->>API: Ergebnisse nach final_score sortieren (absteigend)
+    API->>API: Ähnlichkeitsvisualisierung erstellen
+    API-->>Client: {results: [...], best_match: {...}}
+```
+
+### Dual-Modell-Bewertung
+
+Die Bewertung kombiniert mehrere Signale mit gelernten Gewichten:
+
+```python
+# Aus src/embedding/__init__.py (SimilarityComparator)
+def compute_dual_match_score(self, arcface_sim, facenet_sim, 
+                             landmark_sim, quality, activation_sim,
+                             iris_sim=None, expression_sim=None):
+    # Gewichtete Kombination
+    score = (
+        0.60 * arcface_sim +      # Primär: ArcFace
+        0.20 * facnet_sim +      # Sekundär: FaceNet
+        0.10 * landmark_sim +     # Geometrie
+        0.05 * activation_sim +   # Neuronale Muster
+        0.05 * quality_factor     # Bildqualität
+    )
+    
+    # Optional: Iris- + Ausdrucksähnlichkeit
+    if iris_sim is not None:
+        score += 0.03 * iris_sim
+    if expression_sim is not None:
+        score += 0.02 * expression_sim
+    
+    return {
+        'score': score,
+        'reasons': [f"ArcFace: {arcface_sim:.0%}", ...]
+    }
+```
+
+### Konfidenzbänder
+
+Anstelle von Binärentscheidungen gibt das System Konfidenzbänder aus:
+
+```python
+# Aus SimilarityComparator
+def get_match_verdict(self, score):
+    if score >= 0.70:
+        return ('match', 'Sehr Hoch', 'Wahrscheinlich dieselbe Person')
+    elif score >= 0.45:
+        return ('possible', 'Hoch', 'Möglicherweise dieselbe Person')
+    elif score >= 0.30:
+        return ('uncertain', 'Mittel', 'Menschliche Überprüfung erforderlich')
+    else:
+        return ('no_match', 'Unzureichend', 'Wahrscheinlich verschiedene Personen')
+```
+
+---
+
+## API-Endpunkte-Referenz
+
+Die Flask-API expose 31 Endpunkte für alle Operationen:
+
+```mermaid
+graph LR
+    subgraph "Kern-Endpunkte"
+        HEALTH["GET /api/health"] --> FLASK
+        DIAG["GET /api/diagnostics"] --> FLASK
+        INFO["GET /api/embedding-info"] --> FLASK
+    end
+    
+    subgraph "Verarbeitung"
+        DETECT["POST /api/detect"] --> FLASK
+        EXTRACT["POST /api/extract"] --> FLASK
+        COMPARE["POST /api/compare"] --> FLASK
+        CLEAR["POST /api/clear"] --> FLASK
+    end
+    
+    subgraph "Referenzen"
+        ADD_REF["POST /api/add-reference"] --> FLASK
+        LIST_REF["GET /api/references"] --> FLASK
+        DEL_REF["DELETE /api/references/<id>"] --> FLASK
+        ADD_POSE["POST /api/add-reference-pose/<id>"] --> FLASK
+    end
+    
+    subgraph "Visualisierungen"
+        VIZ["GET /api/visualizations/<type>"] --> FLASK
+        REF_VIZ["GET /api/visualizations/<type>/reference/<id>"] --> FLASK
+    end
+    
+    FLASK["Flask Server<br/>api_server.py"]
+    
+    style FLASK fill:#e3f2fd
+```
+
+| Endpunkt | Methode | Zweck |
+|----------|---------|-------|
+| `/api/health` | GET | System-Gesundheitscheck |
+| `/api/embedding-info` | GET | Aktuelle Modellinfo |
+| `/api/diagnostics` | GET | System-Diagnose |
+| `/api/detect` | POST | Gesichtserkennung |
+| `/api/extract` | POST | Embedding-Extraktion |
+| `/api/add-reference` | POST | Referenzbild hinzufügen |
+| `/api/references` | GET | Alle Referenzen auflisten |
+| `/api/references/<id>` | DELETE | Referenz entfernen |
+| `/api/compare` | POST | Embeddings vergleichen |
+| `/api/visualizations/<type>` | GET | Visualisierung abrufen |
+| `/api/clear` | POST | Sitzung löschen |
+
+---
+
+## Visualisierungen (14 Typen)
+
+Das System bietet 14 verschiedene KI-Visualisierungen, um Ermittlern zu helfen zu verstehen, *warum* Scores berechnet wurden:
+
+```mermaid
+graph LR
+    subgraph "Erkennungs-Visualisierungen"
+        DET["detection"] --> IMG
+        EXT["extraction"] --> IMG
+        BIO["biometric"] --> IMG
+    end
+    
+    subgraph "Landmark-Visualisierungen"
+        LM["landmarks"] --> IMG
+        MESH["mesh3d"] --> IMG
+        ALIGN["alignment"] --> IMG
+        SAL["saliency"] --> IMG
+    end
+    
+    subgraph "Embedding-Visualisierungen"
+        EMB["embedding"] --> IMG
+        ACT["activations"] --> IMG
+        FEAT["features"] --> IMG
+    end
+    
+    subgraph "Analyse-Visualisierungen"
+        CONF["confidence"] --> IMG
+        MULTI["multiscale"] --> IMG
+        ROBUST["robustness"] --> IMG
+    end
+    
+    IMG["Visualisierungsbild<br/>(base64)"]
+    
+    style IMG fill:#c8e6c9
+```
+
+### Visualisierungsimplementierung-Beispiel
+
+```python
+# Aus src/embedding/__init__.py:132-186
+def visualize_embedding(self, embedding):
+    """Embedding als Balkendiagramm rendern."""
+    output = np.zeros((200, 400, 3), dtype=np.uint8)
+    output.fill(245)
+    
+    # Titel zeichnen
+    cv2.putText(output, "128-Dim Face Embedding", (20, 25), ...)
+    
+    # Balken zeichnen
+    for i in range(0, len(embedding), step):
+        value = embedding[i]
+        normalized = (value - embedding.min()) / (embedding.max() - embedding.min())
+        bar_len = int(normalized * 280)
+        
+        color = (255 - int(normalized * 255), int(normalized * 255), 100)
+        cv2.rectangle(output, (start_x, y), (start_x + bar_len, y + 12), color, -1)
+    
+    return output
+```
+
+![Neural Activationen](/images/projects/face_scanner/activation.jpg)
+
+---
+
+## Sitzungszustandsverwaltung
+
+Die API verwaltet den In-Memory-Sitzungszustand:
+
+```python
+# Aus api_server.py:71-88
+current_image = None              # Hochgeladenes Bild (numpy array)
+current_original_image = None     # Original (vor Verbesserung)
+current_faces = []                 # Liste der Gesichtsboxen
+current_embedding = None           # Primäres Embedding
+current_embeddings = {}            # {'arcface': ..., 'facenet': ...}
+current_face_image = None          # Zugeschnittenes Gesicht-ROI
+current_pose = {}                  # {yaw, pitch, roll, pose_category}
+current_landmarks = None           # Geometrische Merkmale
+current_quality = {}               # Qualitätsmetriken
+current_activations = {}           # Neuronale Aktivierungen
+current_lbp = None                 # LBP-Histogramm
+current_asymmetry = None            # Asymmetrie-Merkmale
+current_normalized_embedding = None # 3D-ausgerichtetes Embedding
+references = []                    # Referenzbibliothek
+```
+
+### Persistenz
+
+Referenzen werden zur Persistenz über Neustarts hinweg in JSON gespeichert:
+
+```python
+# Aus api_server.py:112-120
+def save_references():
+    """Referenzen in JSON-Datei speichern."""
+    with open(REFERENCES_FILE, 'w') as f:
+        json.dump({'references': references}, f, indent=2)
+
+def load_references():
+    """Referenzen beim Start aus JSON-Datei laden."""
+    if os.path.exists(REFERENCES_FILE):
+        with open(REFERENCES_FILE, 'r') as f:
+            data = json.load(f)
+            references = data.get('references', [])
+```
+
+---
+
+## Testinfrastruktur
+
+Das System umfasst umfassende Tests:
+
+```mermaid
+graph TB
+    subgraph "Tests"
+        E2E["test_e2e_pipeline.py<br/>6 Tests"]
+        EDGE["test_edge_cases.py<br/>16 Tests"]
+        FRONT["test_frontend_integration.py<br/>9 Tests"]
+    end
+    
+    subgraph "Testabdeckung"
+        DET["Erkennung ✓"]
+        EMB["Embedding ✓"]
+        REF["Referenzen ✓"]
+        SIM["Ähnlichkeit ✓"]
+        VIZ["Visualisierungen ✓"]
+    end
+    
+    E2E --> DET --> PASS["ALLE BESTANDEN"]
+    E2E --> EMB --> PASS
+    E2E --> REF --> PASS
+    EDGE --> SIM --> PASS
+    FRONT --> VIZ --> PASS
+    
+    style PASS fill:#c8e6c9
+```
+
+### Tests ausführen
+
+```bash
+# E2E-Pipeline-Tests
+python test_e2e_pipeline.py
+
+# Grenzfall-Tests  
+python test_edge_cases.py
+
+# Frontend-Integrations-Tests
+python test_frontend_integration.py
+```
+
+---
+
+## Dateistruktur
+
+```
+MANTAX/
+├── api_server.py              # Flask API (2.131 Zeilen)
+├── start.sh                   # Startskript
+│
+├── src/
+│   ├── detection/
+│   │   └── __init__.py        # FaceDetector (1.247 Zeilen)
+│   │   └── preprocessing.py  # Bildverbesserung
+│   └── embedding/
+│       ├── __init__.py        # FaceNetExtractor + SimilarityComparator (1.070 Zeilen)
+│       └── arcface_extractor.py  # ArcFace ONNX-Wrapper
+│
+├── electron-ui/
+│   ├── index.html             # UI-Struktur
+│   ├── renderer/
+│   │   └── app.js             # Frontend-Logik (3.429 Zeilen, 98 Funktionen)
+│   └── styles/
+│       ├── design-system.scss # Quellstile
+│       └── design-system.css  # Kompilierte Stile
+│
+├── test_e2e_pipeline.py       # E2E-Tests
+├── test_edge_cases.py         # Grenzfall-Tests
+└── reference_images/
+    └── embeddings.json        # Persistenter Speicher
+```
+
+---
+
+## Wichtige Designentscheidungen
+
+### 1. Dual-Modell-Architektur
+Die Verwendung sowohl von ArcFace (512-dim) als auch FaceNet (128-dim) zusammen bietet bessere Diskriminierung als jedes allein. ArcFace bewältigt den primären Abgleich, während FaceNet sekundäre Signale und Aktivierungsvisualisierungen bietet.
+
+### 2. Konfidenzbänder, keine Binärentscheidungen
+Das System gibt Konfidenzbänder (Sehr Hoch/Hoch/Mittel/Unzureichend) statt "Match/Kein Match" aus. Dies stellt sicher, dass menschliche Ermittler immer die endgültige Entscheidung treffen.
+
+### 3. Lokale Verarbeitung
+Keine Bilder werden an externe Server gesendet. Alle Berechnungen finden auf dem Computer des Benutzers statt, was die Datenschutzbedenken der NGOs adressiert.
+
+### 4. Nicht umkehrbare Embeddings
+Gesichtserkennungs-Embeddings können nicht verwendet werden, um das ursprüngliche Gesicht zu rekonstruieren—was eine zusätzliche Schutzebene bietet.
+
+### 5. Einwilligungsverfolgung
+Jedes Referenzbild enthält Metadaten über Einwilligungsstatus, Quelle und Zweck—wesentlich für NGO-Dokumentationsanforderungen.
+
+---
+
+## Zusammenfassung
+
+MANTAX ist ein vollständig funktionsfähiges ethisches Gesichtserkennungssystem, gebaut mit:
+
+- **Flask API** (2.131 Zeilen) mit 31 Endpunkten
+- **Dual-Modell-Embedding** (ArcFace 512-dim + FaceNet 128-dim)
+- **OpenCV DNN** Gesichtserkennung mit MediaPipe-Landmarks
+- **Electron Desktop-App** mit macOS Tahoe Liquid Glass UI
+- **Umfassende Tests** (E2E, Grenzfälle, Frontend)
+
+Das System ist für NGO-Anwendungsfälle konzipiert mit:
+- Lokaler Verarbeitung (kein Cloud)
+- Mensch-in-the-loop Verifizierung
+- Einwilligungsverfolgung
+- Konfidenzbändern statt Binärentscheidungen
+
+Im nächsten Blogpost erkunden wir die JavaScript-Refactoring-Reise—wie wir eine 3.429-Zeilen monolithische `app.js` übernommen und sie in 7 modulare Dateien nach Best Practices aufgeteilt haben.
+
+---
+
+## Demo-Video
+
+Hier ist eine Demo, die ein No-Match-Szenario zeigt:
+
+<video controls width="100%" src="/images/projects/face_scanner/no-match.mov">
+</video>
+
+*Als Nächstes: Die JavaScript-Refactoring-Geschichte*
