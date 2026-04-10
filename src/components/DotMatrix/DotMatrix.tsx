@@ -8,7 +8,7 @@ import { messageToDots, getDecorativePattern, DEFAULT_MESSAGE } from './ascii';
 export interface DotMatrixConfig {
   cols: number;
   rows: number;
-  dotSize: 4 | 6 | 8;
+  dotSize: 4 | 6 | 8 | 10 | 12;
   gap: number;
   color: 'orange' | 'white' | 'green' | 'red';
   animation: 'pulse' | 'scan' | 'trail' | 'wave' | 'static';
@@ -16,6 +16,7 @@ export interface DotMatrixConfig {
   message?: string;
   decorative?: 'arrow-left' | 'arrow-right' | 'wave' | 'grid' | 'heart';
   speed?: number;
+  blackBorder?: boolean;
 }
 
 interface DotContextValue {
@@ -43,8 +44,9 @@ interface DotMatrixProps {
 const defaultConfig: DotMatrixConfig = {
   cols: 12,
   rows: 7,
-  dotSize: 6,
+  dotSize: 10,
   gap: 4,
+  blackBorder: true,
   color: 'orange',
   animation: 'static',
   interactive: false,
@@ -117,6 +119,8 @@ export function DotMatrix({
     4: styles.sizeSmall,
     6: styles.sizeMedium,
     8: styles.sizeLarge,
+    10: styles.sizeLarge,
+    12: styles.sizeLarge,
   }[mergedConfig.dotSize] || styles.sizeMedium;
 
   const colorClass = {
@@ -140,8 +144,36 @@ export function DotMatrix({
         style={gridStyle}
         onMouseLeave={() => setHoveredDot(null)}
       >
-        {/* Border dots */}
-        {Array.from({ length: mergedConfig.rows + 2 }).map((_, y) =>
+        {/* Black border dots */}
+        {mergedConfig.blackBorder && Array.from({ length: mergedConfig.rows + 4 }).map((_, y) =>
+          Array.from({ length: mergedConfig.cols + 4 }).map((_, x) => {
+            const isOuterBorder = 
+              y === 0 || y === mergedConfig.rows + 3 || 
+              x === 0 || x === mergedConfig.cols + 3;
+            const isInnerBorder = 
+              y === 1 || y === mergedConfig.rows + 2 || 
+              x === 1 || x === mergedConfig.cols + 2;
+            const isInner = y > 1 && y <= mergedConfig.rows + 1 && x > 1 && x <= mergedConfig.cols + 1;
+            const innerX = x - 2;
+            const innerY = y - 2;
+            const isLit = isOuterBorder || (isInnerBorder && (x % 2 === 0 || y % 2 === 0)) || (isInner && (litDots.has(`${innerX}-${innerY}`) || dotMatrix[innerY]?.[innerX]));
+            
+            return (
+              <Dot
+                key={`${x}-${y}`}
+                x={x}
+                y={y}
+                lit={isLit}
+                delay={(x + y) * 0.02}
+                interactive={mergedConfig.interactive}
+                animation={isInner ? mergedConfig.animation : 'static'}
+                onHover={handleHover}
+              />
+            );
+          })
+        )}
+        {/* Inner dots (if no black border) */}
+        {!mergedConfig.blackBorder && Array.from({ length: mergedConfig.rows + 2 }).map((_, y) =>
           Array.from({ length: mergedConfig.cols + 2 }).map((_, x) => {
             const isBorder = 
               y === 0 || y === mergedConfig.rows + 1 || 
