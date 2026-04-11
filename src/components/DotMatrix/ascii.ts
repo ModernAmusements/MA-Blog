@@ -414,44 +414,56 @@ export function messageToDots(message: string): boolean[][] {
 }
 
 // 15x15 dot matrix patterns
+// Using character-based patterns for easy editing and visualization
+// Rule: icons start and end 1 dot before the last border (positions 1-13)
+// Rule: icons must be centered inside the matrix
 
-// Arrow right (>) - based on byte array format
-const ARROW_RIGHT: boolean[][] = [
-  [false,false,false,false,false,false,true,false,false,false,false,false,false,false,false],
-  [false,false,false,false,false,true,true,false,false,false,false,false,false,false,false],
-  [false,false,false,false,true,true,false,false,false,false,false,false,false,false,false],
-  [false,false,false,true,true,false,false,false,false,false,false,false,false,false,false],
-  [false,false,true,true,false,false,false,false,false,false,false,false,false,false,false],
-  [false,true,true,false,false,false,false,false,false,false,false,false,false,false,false],
-  [true,true,false,false,false,false,false,false,false,false,false,false,false,false,false],
-  [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],
-  [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],
-  [false,true,true,false,false,false,false,false,false,false,false,false,false,false,false],
-  [false,false,true,true,false,false,false,false,false,false,false,false,false,false,false],
-  [false,false,false,true,true,false,false,false,false,false,false,false,false,false,false],
-  [false,false,false,false,true,true,false,false,false,false,false,false,false,false,false],
-  [false,false,false,false,false,true,true,false,false,false,false,false,false,false,false],
-  [false,false,false,false,false,false,true,false,false,false,false,false,false,false,false],
-];
+function createArrowPattern(direction: 'left' | 'right', size: number = 15): boolean[][] {
+  // Right arrow - 1 for lit, 0 for unlit
+  const rightArrow = [
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0],
+    [0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+    [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+    [0,0,0,0,0,1,1,1,1,1,1,1,0,0,0],
+    [0,0,0,0,0,1,1,1,1,1,1,1,0,0,0],
+    [0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  ];
 
-// Arrow left (<) - mirror of above
-const ARROW_LEFT: boolean[][] = [
-  [false,false,false,false,false,false,false,true,false,false,false,false,false,false,false],
-  [false,false,false,false,false,false,true,true,false,false,false,false,false,false,false],
-  [false,false,false,false,false,true,true,false,false,false,false,false,false,false,false],
-  [false,false,false,false,true,true,false,false,false,false,false,false,false,false,false],
-  [false,false,false,true,true,false,false,false,false,false,false,false,false,false,false],
-  [false,false,true,true,false,false,false,false,false,false,false,false,false,false,false],
-  [false,true,true,false,false,false,false,false,false,false,false,false,false,false,false],
-  [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],
-  [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],
-  [false,true,true,false,false,false,false,false,false,false,false,false,false,false,false],
-  [false,false,true,true,false,false,false,false,false,false,false,false,false,false,false],
-  [false,false,false,true,true,false,false,false,false,false,false,false,false,false,false],
-  [false,false,false,false,true,true,false,false,false,false,false,false,false,false,false],
-  [false,false,false,false,false,true,true,false,false,false,false,false,false,false,false],
-  [false,false,false,false,false,false,true,false,false,false,false,false,false,false,false],
-];
+  // Left arrow - mirrored from right arrow
+  const leftArrow = [
+    [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,1,1,1,0,0,0,0,0],
+    [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+    [0,0,0,0,0,1,1,0,0,0,0,0,0,0,0],
+    [0,0,0,0,1,1,1,1,1,1,1,0,0,0,0],
+    [0,0,0,0,1,1,1,1,1,1,1,0,0,0,0],
+    [0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,1,1,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  ];
+
+  const pattern = direction === 'right' ? rightArrow : leftArrow;
+  
+  return pattern.map(row => row.map(bit => bit === 1));
+}
+
+const ARROW_RIGHT = createArrowPattern('right', 15);
+const ARROW_LEFT = createArrowPattern('left', 15);
 
 // Wave - zigzag pattern
 const WAVE: boolean[][] = Array(15).fill(null).map((_, y) => 

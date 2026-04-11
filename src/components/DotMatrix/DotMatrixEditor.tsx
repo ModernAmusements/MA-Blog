@@ -1,15 +1,17 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import styles from './DotMatrixEditor.module.scss';
 
 interface DotMatrixEditorProps {
-  initialSize?: 8 | 16 | 32;
+  initialSize?: 8 | 16 | 32 | 64 | 128;
   dotSize?: number;
   onChange?: (grid: boolean[][]) => void;
+  maxWidth?: number;
 }
 
-export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onChange }: DotMatrixEditorProps) {
+export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onChange, maxWidth = 0 }: DotMatrixEditorProps) {
   const [gridSize, setGridSize] = useState(initialSize);
   const [grid, setGrid] = useState<boolean[][]>(() => 
     Array(initialSize).fill(null).map(() => Array(initialSize).fill(false))
@@ -18,21 +20,34 @@ export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onCh
   const [drawMode, setDrawMode] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const dotSize = customDotSize || (gridSize <= 8 ? 24 : gridSize <= 16 ? 14 : 8);
+  useEffect(() => {
+    setGridSize(initialSize);
+    setGrid(Array(initialSize).fill(null).map(() => Array(initialSize).fill(false)));
+  }, [initialSize]);
+
+  const dotSize = customDotSize ?? (gridSize <= 8 ? 24 : gridSize <= 16 ? 14 : 8);
   const gap = 2;
   
-  const [isLightMode, setIsLightMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.matchMedia('(prefers-color-scheme: light)').matches;
-    }
-    return false;
-  });
+  const totalDotSize = dotSize + gap;
+  const contentWidth = gridSize * totalDotSize;
+  
+  let scale = 1;
+  if (maxWidth && contentWidth > maxWidth) {
+    scale = maxWidth / contentWidth;
+  }
+  
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const isLightMode = mounted && theme === 'light';
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-    const handleChange = (e: MediaQueryListEvent) => setIsLightMode(e.matches);
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleGlobalMouseUp = () => setIsDrawing(false);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
   }, []);
 
   const handleDotClick = useCallback((x: number, y: number, isPrimary: boolean) => {
@@ -45,7 +60,7 @@ export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onCh
     onChange?.(newGrid);
   }, [grid, onChange]);
 
-  const handleMouseEnter = useCallback((x: number, y: number) => {
+  const handleMouseEnter = useCallback((e: React.MouseEvent, x: number, y: number) => {
     if (isDrawing) {
       const newGrid = grid.map((row, rowIdx) => 
         row.map((cell, colIdx) => 
@@ -59,6 +74,7 @@ export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onCh
 
   const handleMouseDown = useCallback((e: React.MouseEvent, x: number, y: number) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDrawing(true);
     const isRightClick = e.button === 2 || (e.button === 0 && e.ctrlKey);
     setDrawMode(!isRightClick);
@@ -71,12 +87,6 @@ export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onCh
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-  }, []);
-
-  useEffect(() => {
-    const handleGlobalMouseUp = () => setIsDrawing(false);
-    window.addEventListener('mouseup', handleGlobalMouseUp);
-    return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
   }, []);
 
   const handleSizeChange = useCallback((newSize: 8 | 16 | 32) => {
@@ -115,33 +125,25 @@ export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onCh
       data-light-mode={isLightMode}
     >
       <div className={styles.toolbar}>
-        <label>
-          Size:
-          <select 
-            value={gridSize} 
-            onChange={(e) => handleSizeChange(Number(e.target.value) as 8 | 16 | 32)}
-          >
-            <option value={8}>8×8</option>
-            <option value={16}>16×16</option>
-            <option value={32}>32×32</option>
-          </select>
-        </label>
         <button onClick={handleClear}>Clear</button>
         <button onClick={handleExport}>Export C Array</button>
       </div>
 
       <div 
-        ref={containerRef}
         className={`${styles.grid} ${isLightMode ? styles.lightMode : ''}`}
         style={{
           '--cols': gridSize,
           '--rows': gridSize,
           '--dot-size': `${dotSize}px`,
           '--dot-gap': `${gap}px`,
+          transform: scale !== 1 ? `scale(${scale})` : undefined,
+          transformOrigin: 'top left',
+          width: scale !== 1 ? `${contentWidth}px` : undefined,
         } as React.CSSProperties}
+        onMouseDown={(e) => e.preventDefault()}
+        onMouseUp={() => setIsDrawing(false)}
         onMouseLeave={() => setIsDrawing(false)}
-        onMouseUp={handleMouseUp}
-        onContextMenu={handleContextMenu}
+        onContextMenu={(e) => e.preventDefault()}
       >
         {grid.map((row, y) => 
           row.map((isLit, x) => (
@@ -149,7 +151,7 @@ export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onCh
               key={`${x}-${y}`}
               className={`${styles.dot} ${isLit ? styles.lit : ''}`}
               onMouseDown={(e) => handleMouseDown(e, x, y)}
-              onMouseEnter={() => handleMouseEnter(x, y)}
+              onMouseEnter={(e) => handleMouseEnter(e, x, y)}
             />
           ))
         )}

@@ -127,7 +127,109 @@ h3 { font-size: 1.5rem; }
 h4 { font-size: 1.25rem; }
 
 p {
-  margin-bottom: 1em;
+  margin-bottom: 1rem;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  
+  &::-webkit-slider-runnable-track {
+    background: var(--border);
+    height: 4px;
+    border-radius: 0;
+  }
+  
+  &::-moz-range-track {
+    background: var(--border);
+    height: 4px;
+    border-radius: 0;
+  }
+  
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    border: none;
+    border-radius: 0;
+    margin-top: -6px;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+  
+  &::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    border: none;
+    border-radius: 0;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: 1px solid var(--foreground);
+  cursor: pointer;
+  position: relative;
+  border-radius: 0;
+  
+  &:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+    
+    &::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 5px;
+      height: 9px;
+      border: solid var(--background);
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+}
+
+select {
+  background: transparent;
+  border: 1px solid var(--foreground);
+  padding: 8px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--foreground);
+  border-radius: 0;
+  cursor: pointer;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  
+  option {
+    background: var(--background);
+    color: var(--foreground);
+  }
+}
+
+button {
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
 }
 
 img {
@@ -184,6 +286,7 @@ hr {
 }
 
 .main-content {
+  padding-top: 2rem;
 }
 
 @media (max-width: 1445px) {
@@ -196,6 +299,7 @@ hr {
 @media (max-width: 855px) {
   .main-content {
     padding: 1rem;
+    padding-top: 1rem;
   }
 
   html {

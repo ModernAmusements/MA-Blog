@@ -1,0 +1,218 @@
+---
+title: "Building a Dot Matrix Generator: From Image to LED Display"
+description: A technical deep-dive into creating a dot matrix playground - converting images to bitmaps, handling aspect ratios, and building an interactive editor.
+date: 2026-04-11
+tags: ['typescript', 'react', 'canvas', 'image-processing', 'dot-matrix']
+---
+
+## Introduction
+
+Dot matrix displays are everywhere—from old-school LED boards to modern art installations. In this post, I'll walk you through building a dot matrix playground that converts images to pixel grids, handles different aspect ratios, and provides an interactive editor.
+
+---
+
+## Core Concept
+
+A dot matrix is essentially a grid of lights where each position can be on or off. The challenge is converting an image (with potentially millions of colors) into this binary representation.
+
+```mermaid
+flowchart LR
+    A[Image] --> B[Grayscale]
+    B --> C[Threshold]
+    C --> D[Binary Grid]
+    D --> E[Dot Matrix Display]
+    
+    style A fill:#f97316,color:#fff
+    style D fill:#333,color:#fff
+    style E fill:#f97316,color:#fff
+```
+
+---
+
+## Image Processing Pipeline
+
+The conversion happens in several stages:
+
+```mermaid
+flowchart TB
+    subgraph Input
+        IMG[Image File]
+        ASP[Aspect Ratio]
+    end
+    
+    subgraph Processing
+        RES[Resize to Grid]
+        GRAY[Convert to Grayscale]
+        THRESH[Apply Threshold]
+        BITMAP[Generate Bitmap]
+    end
+    
+    subgraph Output
+        DISP[Dot Matrix Display]
+        PNG[PNG Export]
+    end
+    
+    IMG --> RES
+    ASP --> RES
+    RES --> GRAY
+    GRAY --> THRESH
+    THRESH --> BITMAP
+    BITMAP --> DISP
+    BITMAP --> PNG
+    
+    style RES fill:#f97316,color:#fff
+    style BITMAP fill:#333,color:#fff
+```
+
+### Grayscale Conversion
+
+We use the luminosity method to convert RGB to grayscale:
+
+```typescript
+function calculateBrightness(r: number, g: number, b: number): number {
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+```
+
+The weights (0.299, 0.587, 0.114) approximate how human vision perceives color brightness.
+
+---
+
+## Handling Aspect Ratios
+
+One of the trickiest parts is handling images that don't match the target grid aspect ratio:
+
+```mermaid
+flowchart LR
+    subgraph "Fit Mode (Letterbox)"
+        A1[Image] --> P1[Scale to Fit]
+        P1 --> P2[Center in Grid]
+        P2 --> P3[Pad with Color]
+    end
+    
+    subgraph "Crop Mode"
+        B1[Image] --> C1[Calculate Center]
+        C1 --> C2[Crop to Aspect]
+        C2 --> C3[Scale to Fill]
+    end
+    
+    subgraph "Stretch Mode"
+        D1[Image] --> S1[Scale to Fill]
+        S1 --> S2[Distort Image]
+    end
+    
+    style P3 fill:#f97316,color:#fff
+    style C3 fill:#f97316,color:#fff
+    style S2 fill:#f97316,color:#fff
+```
+
+### Implementation
+
+```typescript
+if (fitMode === 'fit') {
+  const imgAspect = img.width / img.height;
+  const gridAspect = gridSize / gridSize;
+  
+  if (imgAspect > gridAspect) {
+    drawH = gridSize;
+    drawW = img.width * (gridSize / img.height);
+  } else {
+    drawW = gridSize;
+    drawH = img.height * (gridSize / img.width);
+  }
+  
+  const offsetX = (gridSize - drawW) / 2;
+  const offsetY = (gridSize - drawH) / 2;
+  
+  ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+}
+```
+
+---
+
+## Building the Interactive Editor
+
+The editor allows users to draw directly on the grid using click and drag:
+
+```mermaid
+flowchart TB
+    subgraph Events
+        DOWN[Mouse Down]
+        MOVE[Mouse Move]
+        UP[Mouse Up]
+    end
+    
+    subgraph State
+        DRAW[isDrawing]
+        MODE[drawMode]
+        GRID[Grid State]
+    end
+    
+    DOWN --> DRAW
+    MOVE --> DRAW
+    UP --> DRAW
+    DRAW --> MODE
+    MODE --> GRID
+    
+    style DOWN fill:#f97316,color:#fff
+    style GRID fill:#333,color:#fff
+```
+
+### Key Features
+
+- **Click**: Toggle single dot
+- **Drag**: Paint multiple dots
+- **Right-click drag**: Erase dots
+- **Export**: Generate C array or PNG
+
+---
+
+## Responsive Display
+
+For large grids, we scale the display to fit the container:
+
+```mermaid
+flowchart LR
+    W[Container Width]
+    C[Content Width]
+    
+    W --> C{Compare}
+    C -->|W < C| SCALE[Apply Transform]
+    C -->|W >= C| NATIVE[No Change]
+    
+    SCALE --> FIT[Fits in Container]
+    NATIVE --> FIT
+    
+    style SCALE fill:#f97316,color:#fff
+    style FIT fill:#333,color:#fff
+```
+
+---
+
+## Results
+
+The playground supports:
+
+- Grid sizes from 8×8 to 128×128
+- Multiple fit modes (fit, crop, stretch)
+- Adjustable threshold for binary conversion
+- Interactive drawing with real-time feedback
+- PNG export for integration with hardware
+
+```mermaid
+flowchart LR
+    A[Upload Image] --> B[Adjust Settings]
+    B --> C[View Result]
+    C --> D[Export]
+    
+    style A fill:#f97316,color:#fff
+    style D fill:#f97316,color:#fff
+```
+
+---
+
+## Conclusion
+
+Building a dot matrix generator involves interesting challenges around image processing, responsive design, and user interaction. The key is providing flexible controls while maintaining a clean, usable interface.
+
+The complete implementation is available in the dot matrix playground on this site. Try uploading different images, adjusting the threshold, and switching between fit modes to see how the conversion works!

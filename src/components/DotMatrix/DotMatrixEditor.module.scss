@@ -5,24 +5,22 @@
   --dot-hover-light: #d1d1d1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
   align-items: center;
-  
-  &[data-light-mode="true"] {
-    --dot-bg-dark: #f1f1f1;
-    --dot-hover-dark: #d1d1d1;
-  }
 }
 
 .toolbar {
   display: flex;
-  gap: 16px;
+  gap: 24px;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
+  flex-wrap: wrap;
+  border: 1px solid var(--foreground);
+  padding: 16px 24px;
+  width: 100%;
   
   label {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 12px;
     font-family: 'JetBrains Mono', monospace;
@@ -33,25 +31,28 @@
     select {
       background: transparent;
       border: 1px solid var(--foreground);
-      opacity: 0.7;
       padding: 8px 12px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 14px;
       color: var(--foreground);
       border-radius: 0;
-      min-width: 100px;
+      min-width: 90px;
+      cursor: pointer;
       
       &:focus {
         outline: none;
         border-color: #f97316;
-        opacity: 1;
+      }
+      
+      option {
+        background: var(--background);
+        color: var(--foreground);
       }
     }
   }
   
   button {
-    padding: 8px 12px;
-    border-radius: 0;
+    padding: 8px 16px;
     border: 1px solid var(--foreground);
     background: transparent;
     color: var(--foreground);
@@ -59,13 +60,24 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
     font-weight: 500;
-    opacity: 0.7;
+    border-radius: 0;
+    transition: all 0.15s ease;
     
     &:hover {
       background: #f97316;
       color: var(--background);
-      opacity: 1;
       border-color: #f97316;
+    }
+    
+    &:last-child {
+      background: #f97316;
+      border-color: #f97316;
+      color: var(--background);
+      
+      &:hover {
+        background: transparent;
+        color: #f97316;
+      }
     }
   }
 }
@@ -85,7 +97,6 @@
   height: var(--dot-size);
   background: var(--dot-bg-dark);
   border-radius: 50%;
-  transition: background 0.1s ease, box-shadow 0.1s ease;
   
   &:hover {
     background: var(--dot-hover-dark) !important;
@@ -94,5 +105,15 @@
   &.lit {
     background: #f97316 !important;
     box-shadow: 0 0 calc(var(--dot-size) * 0.8) #f97316;
+  }
+}
+
+[data-theme="light"] {
+  .grid .dot {
+    background: var(--dot-bg-light);
+    
+    &:hover {
+      background: var(--dot-hover-light) !important;
+    }
   }
 }

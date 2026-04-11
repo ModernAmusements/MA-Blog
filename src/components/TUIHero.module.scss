@@ -44,6 +44,8 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
 
     .separator {
       color: var(--border);
@@ -54,6 +56,8 @@
     font-size: 36px;
     margin-bottom: 16px;
     color: var(--foreground);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
 
     .prompt {
       color: var(--accent);
@@ -68,6 +72,8 @@
     color: var(--muted);
     margin-bottom: 24px;
     max-width: 400px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
   }
 }
 
@@ -77,6 +83,8 @@
   margin: 0 0 1.5rem 0;
   color: var(--muted);
   font-size: 0.85rem;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
 
   li {
     padding: 2px 0;

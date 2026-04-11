@@ -1,0 +1,186 @@
+---
+title: "Dot-Matrix-Generator erstellen: Vom Bild zur LED-Anzeige"
+description: Ein technischer Deep-Dive in die Erstellung eines Dot-Matrix-Playgrounds - Bilder in Bitmaps konvertieren, Seitenverhältnisse handhaben und einen interaktiven Editor bauen.
+date: 2026-04-11
+tags: ['typescript', 'react', 'canvas', 'bildverarbeitung', 'dot-matrix']
+---
+
+## Einführung
+
+Dot-Matrix-Anzeigen sind überall – von altmodischen LED-Boards bis hin zu modernen Kunstinstallationen. In diesem Beitrag zeige ich, wie man einen Dot-Matrix-Playground erstellt, der Bilder in Pixelraster konvertiert, verschiedene Seitenverhältnisse handhabt und einen interaktiven Editor bietet.
+
+---
+
+## Kernkonzept
+
+Eine Dot-Matrix ist im Wesentlichen ein Raster von Lichtern, wobei jede Position an oder aus sein kann. Die Herausforderung ist, ein Bild (mit potenziell Millionen von Farben) in diese binäre Darstellung umzuwandeln.
+
+```mermaid
+flowchart LR
+    A[Bild] --> B[Graustufen]
+    B --> C[Schwellwert]
+    C --> D[Binäres Raster]
+    D --> E[Dot-Matrix-Anzeige]
+    
+    style A fill:#f97316,color:#fff
+    style D fill:#333,color:#fff
+    style E fill:#f97316,color:#fff
+```
+
+---
+
+## Bildverarbeitungs-Pipeline
+
+Die Konvertierung erfolgt in mehreren Stufen:
+
+```mermaid
+flowchart TB
+    subgraph Eingabe
+        IMG[Bilddatei]
+        ASP[Seitenverhältnis]
+    end
+    
+    subgraph Verarbeitung
+        RES[Auf Rastergröße ändern]
+        GRAY[In Graustufen umwandeln]
+        THRESH[Schwellwert anwenden]
+        BITMAP[Bitmap generieren]
+    end
+    
+    subgraph Ausgabe
+        DISP[Dot-Matrix-Anzeige]
+        PNG[PNG-Export]
+    end
+    
+    IMG --> RES
+    ASP --> RES
+    RES --> GRAY
+    GRAY --> THRESH
+    THRESH --> BITMAP
+    BITMAP --> DISP
+    BITMAP --> PNG
+    
+    style RES fill:#f97316,color:#fff
+    style BITMAP fill:#333,color:#fff
+```
+
+### Graustufen-Konvertierung
+
+Wir verwenden die Luminosity-Methode, um RGB in Graustufen umzuwandeln:
+
+```typescript
+function calculateBrightness(r: number, g: number, b: number): number {
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+```
+
+Die Gewichte (0.299, 0.587, 0.114) approximieren, wie das menschliche Sehen Farbhelligkeit wahrnimmt.
+
+---
+
+## Seitenverhältnisse handhaben
+
+Einer der kniffligsten Teile ist die Handhabung von Bildern, die nicht dem Zielraster-Seitenverhältnis entsprechen:
+
+```mermaid
+flowchart LR
+    subgraph "Fit-Modus (Letterbox)"
+        A1[Bild] --> P1[Skalieren]
+        P1 --> P2[Zentrieren]
+        P2 --> P3[Mit Farbe auffüllen]
+    end
+    
+    subgraph "Crop-Modus"
+        B1[Bild] --> C1[Berechne Mitte]
+        C1 --> C2[Crop auf Seitenverhältnis]
+        C2 --> C3[Skalieren]
+    end
+    
+    subgraph "Stretch-Modus"
+        D1[Bild] --> S1[Skalieren]
+        S1 --> S2[Bild verzerren]
+    end
+    
+    style P3 fill:#f97316,color:#fff
+    style C3 fill:#f97316,color:#fff
+    style S2 fill:#f97316,color:#fff
+```
+
+---
+
+## Den interaktiven Editor bauen
+
+Der Editor ermöglicht es Benutzern, direkt auf dem Raster zu zeichnen:
+
+```mermaid
+flowchart TB
+    subgraph Ereignisse
+        DOWN[Maus gedrückt]
+        MOVE[Maus bewegt]
+        UP[Maus losgelassen]
+    end
+    
+    subgraph Zustand
+        DRAW[isDrawing]
+        MODE[drawMode]
+        GRID[Raster-Zustand]
+    end
+    
+    DOWN --> DRAW
+    MOVE --> DRAW
+    UP --> DRAW
+    DRAW --> MODE
+    MODE --> GRID
+    
+    style DOWN fill:#f97316,color:#fff
+    style GRID fill:#333,color:#fff
+```
+
+### Hauptfunktionen
+
+- **Klick**: Einzelner Punkt umschalten
+- **Ziehen**: Mehrere Punkte zeichnen
+- **Rechtsklick-Ziehen**: Punkte löschen
+- **Export**: C-Array oder PNG generieren
+
+---
+
+## Responsive Anzeige
+
+Für große Raster skalieren wir die Anzeige, um in den Container zu passen:
+
+```mermaid
+flowchart LR
+    W[Container-Breite]
+    C[Inhaltsbreite]
+    
+    W --> C{Vergleichen}
+    C -->|W < C| SCALE[Transform anwenden]
+    C -->|W >= C| NATIVE[Keine Änderung]
+    
+    SCALE --> FIT[Passt in Container]
+    NATIVE --> FIT
+    
+    style SCALE fill:#f97316,color:#fff
+    style FIT fill:#333,color:#fff
+```
+
+---
+
+## Ergebnisse
+
+Der Playground unterstützt:
+
+- Rastergrößen von 8×8 bis 128×128
+- Mehrere Fit-Modi (fit, crop, stretch)
+- Einstellbare Schwellwerte für binäre Konvertierung
+- Interaktives Zeichnen mit Echtzeit-Feedback
+- PNG-Export für Integration mit Hardware
+
+---
+
+## Fazit
+
+Das Erstellen eines Dot-Matrix-Generators involves interessante Herausforderungen rund um Bildverarbeitung, responsives Design und Benutzerinteraktion. Das Wichtigste ist, flexible Kontrollen zu bieten, während eine saubere, benutzerfreundliche Oberfläche beibehalten wird.
+
+Die vollständige Implementierung ist im Dot-Matrix-Playground auf dieser Seite verfügbar. Laden Sie verschiedene Bilder hoch, passen Sie den Schwellwert an und wechseln Sie zwischen den Fit-Modi, um zu sehen, wie die Konvertierung funktioniert!

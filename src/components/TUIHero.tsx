@@ -114,10 +114,10 @@ export function TUIHero({ navItems, lang, heroText, exploreText, initialExpanded
 
   const t = heroText || {
     title: 'Welcome to My Portfolio',
-    subtitle: 'Full-stack developer specializing in algorithms, performance optimization, and clean code.',
+    subtitle: 'Senior Data Scientist at Opencode',
     name: 'ModernAmusements Development',
     author: 'Shady Nathan Tawfik',
-    tags: 'Algorithms | Performance',
+    tags: 'Data Science | Machine Learning | AI',
     viewProjects: 'View Projects',
     getInTouch: 'Get in Touch'
   };
