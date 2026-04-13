@@ -25,6 +25,8 @@
 - next-themes needs `suppressHydrationWarning`
 
 ## Recent Changes (Apr 2026)
+- New blog post: face-tracking-xplane (EN + DE) - Head tracking for X-Plane 12 using iPhone
+- Added video support in blog posts with <video> tag
 - New blog post: ai_energy_os (EN + DE) with mermaid diagrams
 - Fixed projects showing in both languages in TUI menu
 - Standardized padding across all pages

@@ -108,6 +108,13 @@
 - tocLevel3 margin-left: 2rem
 - tocLevel4 margin-left: 3rem
 
+## Video
+
+- Width: 100%
+- Border-radius: 4px
+- Margin-bottom: 1.5rem
+- Use: `<video controls width="100%" src="/path/to/video.mov">`
+
 ## Notes
 
 - No bullet points - use "-" instead

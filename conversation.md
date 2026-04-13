@@ -1,3 +1,25 @@
+# Blog Post Development
+
+## Face Tracking X-Plane (April 13, 2026)
+
+### New Blog Posts
+- Created `face-tracking-xplane.mdx` (EN) - Technical article about building 6DoF head tracking using iPhone TrueDepth camera
+- Created `face-tracking-xplane.de.mdx` (DE) - German translation
+
+### Features
+- Added video first (LiDARSight_Alpha.mov)
+- Added architecture diagram image
+- Added protocols comparison image
+- Mermaid diagrams for system architecture, data flow, One Euro Filter
+
+### Assets
+- Used images from `public/images/projects/LiDARSight/`:
+  - LiDARSight_Alpha.mov
+  - LiDARSight_Architecture.png
+  - protocols.png
+
+---
+
 # Dot Matrix Feature Development Session
 
 ## Summary
