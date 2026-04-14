@@ -25,8 +25,12 @@
 - next-themes needs `suppressHydrationWarning`
 
 ## Recent Changes (Apr 2026)
-- New blog post: face-tracking-xplane (EN + DE) - Head tracking for X-Plane 12 using iPhone
-- Added video support in blog posts with <video> tag
+- New blog post + project: german-police-shootings (EN + DE) - Interactive map of police shootings in Germany
+- Added 4 images to blog/project (map, popup, charts, overview)
+- Added external links (live demo, repo, Kaggle dataset, write-up)
+- New blog post: LiDARSight (EN + DE) - Head tracking for X-Plane 12 using iPhone TrueDepth
+- Added video support in blog posts: `<video controls width="100%" src="...">`
+- Fixed mermaid node labels (no parentheses, brackets only)
 - New blog post: ai_energy_os (EN + DE) with mermaid diagrams
 - Fixed projects showing in both languages in TUI menu
 - Standardized padding across all pages

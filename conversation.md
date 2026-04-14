@@ -1,77 +1,60 @@
-# Blog Post Development
+# German Police Shootings Project (April 14, 2026)
 
-## Face Tracking X-Plane (April 13, 2026)
+## Summary
+Created new blog post and project for visualizing police firearm incidents in Germany from 1976-2025 using Leaflet.js, SVG charts, and vanilla JavaScript.
 
-### New Blog Posts
-- Created `face-tracking-xplane.mdx` (EN) - Technical article about building 6DoF head tracking using iPhone TrueDepth camera
-- Created `face-tracking-xplane.de.mdx` (DE) - German translation
+## New Blog Posts
+- `german-police-shootings.mdx` (English)
+- `german-police-shootings.de.mdx` (German translation)
 
-### Features
-- Added video first (LiDARSight_Alpha.mov)
-- Added architecture diagram image
-- Added protocols comparison image
-- Mermaid diagrams for system architecture, data flow, One Euro Filter
+## New Projects
+- `german-police-shootings.mdx` (English)
+- `german-police-shootings.de.mdx` (German translation)
 
-### Assets
-- Used images from `public/images/projects/LiDARSight/`:
+## Features
+- Interactive Leaflet.js map with OpenStreetMap tiles
+- Marker clustering for dense areas
+- SVG pie charts (categories, weapons, locations, armed status)
+- Dynamic filtering (year, category)
+- Search functionality
+- Chronological timeline
+- Fallback data mechanism (CSV + embedded JSON)
+
+## Images Used
+- `public/images/projects/german-police-shootings/`:
+  - police_shootings_overview.png
+  - police_shootings_map.png
+  - police_shootings_map_popup.png
+  - Charts.png
+
+## Links Added
+- Live Demo: https://police-shootings-germany.vercel.app/
+- Repository: https://github.com/ModernAmusements/Police-Shootings-Germany
+- Dataset: https://www.kaggle.com/datasets/nathanamusement/german-police-shootings-1976-2026
+- Write-up: https://www.kaggle.com/writeups/nathanamusement/documentation-of-police-firearms-deployments-in-ge
+
+## Previous Work (April 13, 2026)
+
+### LiDARSight Blog Post
+Created new blog post "LiDARSight" about building 6DoF head tracking for X-Plane 12 using iPhone TrueDepth camera.
+
+## Assets Used (LiDARSight)
+- `public/images/projects/LiDARSight/`:
   - LiDARSight_Alpha.mov
   - LiDARSight_Architecture.png
   - protocols.png
+  - LiDAR_Settings.jpg
+  - Connection_State.jpg
 
----
+## Fixes Made
+1. Video tag: changed from `<source>` to `src` attribute
+2. Fixed `playsinline` → `playsInline` (React camelCase)
+3. Removed parentheses from mermaid node labels (caused parse errors)
+4. Simplified mermaid syntax (no `<br/>`, no special chars)
 
-# Dot Matrix Feature Development Session
+## Typography Rules Used
+- Video: `<video controls width="100%" src="...">`
+- Mermaid node labels: plain text only, no `<br/>`, no `()`, no `{}`
 
-## Summary
-Working on a Dot Matrix Playground feature for the portfolio website.
-
-## Changes Made
-
-### DotMatrix Components
-- Created `DotMatrix` component for rendering dot matrix displays
-- Created `DotMatrixEditor` for interactive editing
-- Created `imageConverter` for converting images to dot matrix format
-- Implemented aspect ratio handling (fit, crop, stretch modes)
-- Added responsive scaling with max-width support
-
-### Image to Dot Matrix
-- Added grid size control (8-128)
-- Added dot size slider
-- Added threshold control for brightness
-- Added invert colors option
-- Added fit mode selector (Fit/Crop/Stretch)
-- Added pad color picker for letterbox mode
-- Added loading indicator with status text
-- Added download functionality (PNG export)
-
-### Interactive Editor
-- Added drag-to-draw functionality
-- Removed CSS transitions for instant response
-- Default values: Grid 16x16, Dot size 16px
-- Added C Array export
-
-### UI/UX Improvements
-- Global styles for range sliders, checkboxes, selects (no border-radius)
-- Added borders to hero section elements (subheader, h1, p, ul)
-- Updated hero text to "Senior Data Scientist at Opencode"
-- Added loading state indicator
-
-### Bug Fixes
-- Fixed DotMatrixEditor not syncing with parent grid size changes
-- Fixed dot size not being applied correctly
-
-## Files Modified
-- `src/app/[lang]/dotmatrix/page.tsx`
-- `src/app/[lang]/dotmatrix/dotmatrix.module.scss`
-- `src/components/DotMatrix/DotMatrix.tsx`
-- `src/components/DotMatrix/DotMatrix.module.scss`
-- `src/components/DotMatrix/DotMatrixEditor.tsx`
-- `src/components/DotMatrix/DotMatrixEditor.module.scss`
-- `src/components/DotMatrix/ascii.ts`
-- `src/components/DotMatrix/index.ts`
-- `src/components/DotMatrix/imageConverter.ts` (new)
-- `src/components/TUIHero.tsx`
-- `src/components/TUIHero.module.scss`
-- `src/i18n/en.json`
-- `src/i18n/de.json`
-- `src/styles/globals.scss`
+## Committed
+- Pushed to origin/main on April 13, 2026
