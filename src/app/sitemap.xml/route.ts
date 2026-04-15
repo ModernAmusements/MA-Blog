@@ -7,31 +7,37 @@ export async function GET() {
   const projects = getProjectPosts();
 
   const staticUrls = [
-    { loc: '/en', changefreq: 'weekly', priority: 1.0 },
-    { loc: '/de', changefreq: 'weekly', priority: 1.0 },
-    { loc: '/en/about', changefreq: 'monthly', priority: 0.8 },
-    { loc: '/de/about', changefreq: 'monthly', priority: 0.8 },
-    { loc: '/en/blog', changefreq: 'weekly', priority: 0.8 },
-    { loc: '/de/blog', changefreq: 'weekly', priority: 0.8 },
-    { loc: '/en/projects', changefreq: 'weekly', priority: 0.8 },
-    { loc: '/de/projects', changefreq: 'weekly', priority: 0.8 },
-    { loc: '/en/contact', changefreq: 'monthly', priority: 0.7 },
-    { loc: '/de/contact', changefreq: 'monthly', priority: 0.7 },
+    { loc: '/en', changefreq: 'weekly', priority: 1.0, lastmod: '2026-04-15' },
+    { loc: '/de', changefreq: 'weekly', priority: 1.0, lastmod: '2026-04-15' },
+    { loc: '/en/about', changefreq: 'monthly', priority: 0.8, lastmod: '2026-04-15' },
+    { loc: '/de/about', changefreq: 'monthly', priority: 0.8, lastmod: '2026-04-15' },
+    { loc: '/en/blog', changefreq: 'weekly', priority: 0.8, lastmod: '2026-04-15' },
+    { loc: '/de/blog', changefreq: 'weekly', priority: 0.8, lastmod: '2026-04-15' },
+    { loc: '/en/projects', changefreq: 'weekly', priority: 0.8, lastmod: '2026-04-15' },
+    { loc: '/de/projects', changefreq: 'weekly', priority: 0.8, lastmod: '2026-04-15' },
+    { loc: '/en/contact', changefreq: 'monthly', priority: 0.7, lastmod: '2026-04-15' },
+    { loc: '/de/contact', changefreq: 'monthly', priority: 0.7, lastmod: '2026-04-15' },
   ];
 
   const blogUrls = posts
     .filter(p => !p.slug.endsWith('.de'))
-    .flatMap((post) => [
-      { loc: `/en/blog/${post.slug}`, changefreq: 'weekly', priority: 0.7 },
-      { loc: `/de/blog/${post.slug}.de`, changefreq: 'weekly', priority: 0.7 },
-    ]);
+    .flatMap((post) => {
+      const date = post.date || '2026-04-15';
+      return [
+        { loc: `/en/blog/${post.slug}`, changefreq: 'weekly', priority: 0.7, lastmod: date },
+        { loc: `/de/blog/${post.slug}.de`, changefreq: 'weekly', priority: 0.7, lastmod: date },
+      ];
+    });
 
   const projectUrls = projects
     .filter(p => !p.slug.endsWith('.de'))
-    .flatMap((project) => [
-      { loc: `/en/projects/${project.slug}`, changefreq: 'weekly', priority: 0.7 },
-      { loc: `/de/projects/${project.slug}.de`, changefreq: 'weekly', priority: 0.7 },
-    ]);
+    .flatMap((project) => {
+      const date = project.date || '2026-04-15';
+      return [
+        { loc: `/en/projects/${project.slug}`, changefreq: 'weekly', priority: 0.7, lastmod: date },
+        { loc: `/de/projects/${project.slug}.de`, changefreq: 'weekly', priority: 0.7, lastmod: date },
+      ];
+    });
 
   const allUrls = [...staticUrls, ...blogUrls, ...projectUrls];
 
@@ -40,6 +46,7 @@ export async function GET() {
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${allUrls.map((url) => `  <url>
     <loc>${baseUrl}${url.loc}</loc>
+    <lastmod>${url.lastmod}</lastmod>
     <changefreq>${url.changefreq}</changefreq>
     <priority>${url.priority}</priority>
   </url>`).join('\n')}
