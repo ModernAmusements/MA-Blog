@@ -138,23 +138,11 @@ export function DotMatrix({
     black: styles.colorBlack,
   }[mergedConfig.color] || styles.colorOrange;
 
-  const totalDotSize = mergedConfig.dotSize + mergedConfig.gap;
-  const contentWidth = (mergedConfig.cols + 2) * totalDotSize;
-  const contentHeight = (mergedConfig.rows + 2) * totalDotSize;
-  
-  let scale = 1;
-  if (mergedConfig.maxWidth && contentWidth > mergedConfig.maxWidth) {
-    scale = mergedConfig.maxWidth / contentWidth;
-  }
-  
   const gridStyle = {
     gridTemplateColumns: `repeat(${mergedConfig.cols + 2}, ${mergedConfig.dotSize}px)`,
     gridTemplateRows: `repeat(${mergedConfig.rows + 2}, ${mergedConfig.dotSize}px)`,
     '--dot-size': `${mergedConfig.dotSize}px`,
     '--dot-gap': `${mergedConfig.gap}px`,
-    transform: scale !== 1 ? `scale(${scale})` : undefined,
-    transformOrigin: 'top left',
-    width: scale !== 1 ? `${contentWidth}px` : undefined,
   } as React.CSSProperties;
 
   return (

@@ -48,12 +48,23 @@
     padding-bottom: 16px;
     border-bottom: 1px solid var(--foreground);
   }
+  
+  &:last-child {
+    display: none;
+  }
 }
 
 .controls {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  
+  .gridSizeLabel,
+  .dotSizeLabel {
+    @media (max-width: 640px) {
+      display: none;
+    }
+  }
   
   label {
     display: flex;
@@ -248,6 +259,29 @@
   font-size: 12px;
   color: var(--foreground);
   opacity: 0.6;
+}
+
+.progressContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  width: 100%;
+}
+
+.progressBar {
+  height: 8px;
+  background: #f97316;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+  min-width: 0;
+}
+
+.progressLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--foreground);
+  min-width: 60px;
 }
 
 .loader {

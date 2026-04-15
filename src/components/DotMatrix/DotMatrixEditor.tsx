@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useTheme } from 'next-themes';
 import styles from './DotMatrixEditor.module.scss';
 
@@ -18,6 +18,7 @@ export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onCh
   );
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawMode, setDrawMode] = useState(true);
+  const [viewportWidth, setViewportWidth] = useState(600);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,7 +26,25 @@ export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onCh
     setGrid(Array(initialSize).fill(null).map(() => Array(initialSize).fill(false)));
   }, [initialSize]);
 
-  const dotSize = customDotSize ?? (gridSize <= 8 ? 24 : gridSize <= 16 ? 14 : 8);
+  useEffect(() => {
+    const updateWidth = () => {
+      setViewportWidth(window.innerWidth);
+    };
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  const computedDotSize = useMemo(() => {
+    if (customDotSize) return customDotSize;
+    const isMobile = viewportWidth < 640;
+    if (gridSize <= 8) return isMobile ? 28 : 24;
+    if (gridSize <= 16) return isMobile ? 18 : 14;
+    if (gridSize <= 32) return isMobile ? 12 : 10;
+    return isMobile ? 8 : 6;
+  }, [gridSize, customDotSize, viewportWidth]);
+
+  const dotSize = computedDotSize;
   const gap = 2;
   
   const totalDotSize = dotSize + gap;
@@ -75,10 +94,11 @@ export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onCh
   const handleMouseDown = useCallback((e: React.MouseEvent, x: number, y: number) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDrawing(true);
     const isRightClick = e.button === 2 || (e.button === 0 && e.ctrlKey);
-    setDrawMode(!isRightClick);
-    handleDotClick(x, y, !isRightClick);
+    const shouldDraw = !isRightClick;
+    setIsDrawing(true);
+    setDrawMode(shouldDraw);
+    handleDotClick(x, y, shouldDraw);
   }, [handleDotClick]);
 
   const handleMouseUp = useCallback(() => {

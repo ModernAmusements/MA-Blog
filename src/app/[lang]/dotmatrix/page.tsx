@@ -1,126 +1,151 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { DotMatrix, DotMatrixEditor, convertImageToDotMatrix } from '@/components/DotMatrix';
 import type { DotCell } from '@/components/DotMatrix';
 import styles from './dotmatrix.module.scss';
 
-const sizes = [2, 4, 6, 8, 10, 12, 16, 20, 24] as const;
-const colors = ['orange', 'white', 'green', 'red', 'black'] as const;
-const gridSizes = [8, 16, 32, 64, 128] as const;
+const GRID_SIZES = [8, 16, 32, 64, 128] as const;
+const COLORS = ['orange', 'white', 'green', 'red', 'black'] as const;
 
 export default function DotMatrixPlayground() {
   const [color, setColor] = useState<'orange' | 'white' | 'green' | 'red' | 'black'>('orange');
-  const [interactive, setInteractive] = useState(true);
-  const [editorGrid, setEditorGrid] = useState<boolean[][] | null>(null);
-  
-  const [editorGridSize, setEditorGridSize] = useState<8 | 16 | 32 | 64 | 128>(16);
-  const [editorDotSizeInput, setEditorDotSizeInput] = useState(16);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
-  const [convertedGrid, setConvertedGrid] = useState<DotCell[][] | null>(null);
+  const [imageGrid, setImageGrid] = useState<boolean[][] | null>(null);
   const [isConverting, setIsConverting] = useState(false);
-  const [hasPendingChanges, setHasPendingChanges] = useState(false);
-  const [gridSize, setGridSize] = useState<8 | 16 | 32 | 64 | 128>(128);
-  const [invertColors, setInvertColors] = useState(false);
-  const [imageDotSize, setImageDotSize] = useState(4);
+  const [conversionProgress, setConversionProgress] = useState(0);
+  const [gridSize, setGridSize] = useState<8 | 16 | 32 | 64 | 128>(16);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 640;
+      if (mobile) {
+        setGridSize(32);
+        setImageDotSize(8);
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  const [imageDotSize, setImageDotSize] = useState(16);
   const [threshold, setThreshold] = useState(30);
   const [fitMode, setFitMode] = useState<'stretch' | 'fit' | 'crop'>('fit');
   const [padColor, setPadColor] = useState('#000000');
+  const [containerWidth, setContainerWidth] = useState(600);
 
-  const displayDotSize = Math.max(1, Math.min(12, imageDotSize * (16 / (gridSize / 8))));
+  const [editorGrid, setEditorGrid] = useState<boolean[][] | null>(null);
+  const [editorGridSize, setEditorGridSize] = useState<8 | 16 | 32 | 64 | 128>(16);
+  const [editorDotSizeInput, setEditorDotSizeInput] = useState(16);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    const updateWidth = () => {
+      const container = document.querySelector('[class*="editorColumn"]');
+      if (container) {
+        setContainerWidth(Math.min(container.clientWidth - 64, 600));
+      } else {
+        setContainerWidth(600);
+      }
+    };
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (imageDataUrl) {
+        URL.revokeObjectURL(imageDataUrl);
+      }
       setImageFile(file);
       const url = URL.createObjectURL(file);
       setImageDataUrl(url);
     }
-  };
+  }, [imageDataUrl]);
 
   useEffect(() => {
     if (!imageDataUrl) return;
-    
+
+    let cancelled = false;
+
     const convert = async () => {
       setIsConverting(true);
-      setHasPendingChanges(false);
+      setConversionProgress(0);
       try {
+        setConversionProgress(10);
+        await new Promise(r => setTimeout(r, 50));
+        
         const result = await convertImageToDotMatrix(imageDataUrl, {
           gridSize,
           dotSize: imageDotSize,
-          invertColors,
+          invertColors: false,
           fitMode,
           padColor,
         });
         
+        if (cancelled) return;
+        
+        await new Promise(r => setTimeout(r, 50));
+        setConversionProgress(60);
+
         const thresholdValue = threshold / 100;
-        const booleanGrid = result.map(row => 
+        const booleanGrid = result.map(row =>
           row.map(cell => cell.brightness > thresholdValue)
         );
-        setConvertedGrid(result);
-        setEditorGrid(booleanGrid);
+        setImageGrid(booleanGrid);
+        
+        await new Promise(r => setTimeout(r, 50));
+        setConversionProgress(90);
       } catch (error) {
         console.error('Conversion failed:', error);
       } finally {
-        setIsConverting(false);
+        if (!cancelled) {
+          setIsConverting(false);
+          setConversionProgress(0);
+        }
       }
     };
 
-    const timer = setTimeout(() => {
-      convert();
-    }, 300);
+    convert();
 
-    return () => clearTimeout(timer);
-  }, [imageDataUrl, gridSize, imageDotSize, invertColors, threshold, fitMode, padColor]);
+    return () => {
+      cancelled = true;
+    };
+  }, [imageDataUrl, gridSize, imageDotSize, threshold, fitMode, padColor]);
+
+  useEffect(() => {
+    return () => {
+      if (imageDataUrl) {
+        URL.revokeObjectURL(imageDataUrl);
+      }
+    };
+  }, []);
 
   const handleGridSizeChange = (value: number) => {
     setGridSize(value as 8 | 16 | 32 | 64 | 128);
-    if (imageDataUrl) setHasPendingChanges(true);
   };
 
-  const handleImageDotSizeChange = (value: number) => {
-    setImageDotSize(value);
-    if (imageDataUrl) setHasPendingChanges(true);
-  };
-
-  const handleInvertColorsChange = (checked: boolean) => {
-    setInvertColors(checked);
-    if (imageDataUrl) setHasPendingChanges(true);
-  };
-
-  const handleThresholdChange = (value: number) => {
-    setThreshold(value);
-    if (imageDataUrl) setHasPendingChanges(true);
-  };
-
-  const handleFitModeChange = (value: 'stretch' | 'fit' | 'crop') => {
-    setFitMode(value);
-    if (imageDataUrl) setHasPendingChanges(true);
-  };
-
-  const handlePadColorChange = (value: string) => {
-    setPadColor(value);
-    if (imageDataUrl) setHasPendingChanges(true);
-  };
-
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
+    if (imageDataUrl) {
+      URL.revokeObjectURL(imageDataUrl);
+    }
     setImageFile(null);
     setImageDataUrl(null);
-    setConvertedGrid(null);
-    setEditorGrid(null);
-  };
+    setImageGrid(null);
+  }, [imageDataUrl]);
 
-  const handleDownload = () => {
-    if (!editorGrid || !gridSize) return;
+  const handleDownload = useCallback(() => {
+    if (!imageGrid) return;
     
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const dotSize = 8;
-    const gap = 1;
+    const dotSize = 10;
+    const gap = 2;
     const padding = 16;
     const size = gridSize * (dotSize + gap) + padding * 2;
 
@@ -131,7 +156,7 @@ export default function DotMatrixPlayground() {
 
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
-        if (editorGrid[y]?.[x]) {
+        if (imageGrid[y]?.[x]) {
           ctx.fillStyle = '#f97316';
           ctx.beginPath();
           ctx.arc(
@@ -150,85 +175,83 @@ export default function DotMatrixPlayground() {
     link.download = `dotmatrix-${gridSize}x${gridSize}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
-  };
+  }, [imageGrid, gridSize]);
+
+  const displayDotSize = (() => {
+    if (imageDotSize > 0) {
+      return imageDotSize;
+    }
+    const base = containerWidth / gridSize;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+    const max = isMobile ? 16 : 12;
+    const min = isMobile ? 4 : 2;
+    return Math.max(min, Math.min(max, base));
+  })();
 
   const blankGrid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(false));
-  const displayGrid = convertedGrid ? editorGrid : blankGrid;
 
   return (
     <div className={styles.playground}>
       <h1 className={styles.title}>Dot Matrix Playground</h1>
       <p className={styles.subtitle}>Test all dot matrix configurations</p>
 
-      {/* Image Upload Section */}
       <div className={styles.customSection}>
         <h2>Image to Dot Matrix</h2>
-        
+
         <div className={styles.editorLayout}>
           <div className={styles.controlsColumn}>
             <div className={styles.controls}>
-              <div className={styles.uploadRow}>
-                <label className={styles.uploadLabel}>
-                  Upload Image:
-                  <label className={styles.fileUploadBtn}>
-                    {imageFile ? imageFile.name : 'Choose file'}
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className={styles.fileInput}
-                    />
-                  </label>
+              <label className={styles.uploadLabel}>
+                Upload Image:
+                <label className={styles.fileUploadBtn}>
+                  {imageFile ? imageFile.name : 'Choose file'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className={styles.fileInput}
+                  />
                 </label>
-              </div>
+              </label>
 
-              <label>
+              <label className={styles.gridSizeLabel}>
                 Grid Size: {gridSize}×{gridSize}
-                <input 
-                  type="range" 
-                  min="8" 
-                  max="128" 
+                <input
+                  type="range"
+                  min="8"
+                  max="128"
                   step="8"
-                  value={gridSize} 
+                  value={gridSize}
                   onChange={(e) => handleGridSizeChange(Number(e.target.value))}
                 />
               </label>
 
-              <label>
-                Invert Colors:
-                <input
-                  type="checkbox"
-                  checked={invertColors}
-                  onChange={(e) => handleInvertColorsChange(e.target.checked)}
-                />
-              </label>
-
-              <label>
+              <label className={styles.dotSizeLabel}>
                 Dot Size: {imageDotSize}px
-                <input 
-                  type="range" 
-                  min="0.1" 
-                  max="16" 
+                <input
+                  type="range"
+                  min="0.1"
+                  max="16"
                   step="0.1"
                   value={imageDotSize}
-                  onChange={(e) => handleImageDotSizeChange(Number(e.target.value))}
+                  onChange={(e) => setImageDotSize(Number(e.target.value))}
                 />
               </label>
 
               <label>
                 Threshold: {threshold}%
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="100" 
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
                   value={threshold}
-                  onChange={(e) => handleThresholdChange(Number(e.target.value))}
+                  onChange={(e) => setThreshold(Number(e.target.value))}
                 />
               </label>
 
               <label>
                 Fit Mode:
-                <select value={fitMode} onChange={(e) => handleFitModeChange(e.target.value as 'stretch' | 'fit' | 'crop')}>
+                <select value={fitMode} onChange={(e) => setFitMode(e.target.value as 'stretch' | 'fit' | 'crop')}>
                   <option value="fit">Fit (Letterbox)</option>
                   <option value="crop">Crop to Center</option>
                   <option value="stretch">Stretch</option>
@@ -241,7 +264,7 @@ export default function DotMatrixPlayground() {
                   <input
                     type="color"
                     value={padColor}
-                    onChange={(e) => handlePadColorChange(e.target.value)}
+                    onChange={(e) => setPadColor(e.target.value)}
                     className={styles.colorInput}
                   />
                 </label>
@@ -249,19 +272,15 @@ export default function DotMatrixPlayground() {
 
               <div className={styles.buttonRow}>
                 <button onClick={handleClear} disabled={!imageFile}>Clear</button>
-                {convertedGrid && (
+                {imageGrid && (
                   <button className={styles.primaryButton} onClick={handleDownload}>Download</button>
                 )}
               </div>
-              
-              {(isConverting || hasPendingChanges) && (
-                <div className={styles.loaderRow}>
-                  <div className={styles.loader}>
-                    <div className={styles.loaderBar} />
-                  </div>
-                  <span className={styles.loaderLabel}>
-                    {isConverting ? 'Converting...' : 'Processing...'}
-                  </span>
+
+              {isConverting && (
+                <div className={styles.progressContainer}>
+                  <div className={styles.progressBar} style={{ width: `${conversionProgress}%` }} />
+                  <span className={styles.progressLabel}>Converting... {conversionProgress}%</span>
                 </div>
               )}
             </div>
@@ -274,34 +293,33 @@ export default function DotMatrixPlayground() {
                   cols: gridSize,
                   rows: gridSize,
                   dotSize: displayDotSize,
-                  color: color as 'orange' | 'white' | 'green' | 'red' | 'black',
+                  color: 'orange',
                   animation: 'static',
                   interactive: false,
-                  imageGrid: displayGrid ?? undefined,
-                  maxWidth: 600,
+                  imageGrid: imageGrid ?? blankGrid,
+                  maxWidth: Math.min(containerWidth - 32, 600),
                 }}
               />
               <div className={styles.gridInfo}>
-                Grid: {gridSize}×{gridSize}{convertedGrid ? ` | Dots: ${convertedGrid.flat().filter(c => c.brightness > threshold / 100).length}` : ''}
+                Grid: {gridSize}×{gridSize}{imageGrid ? ` | Dots: ${imageGrid.flat().filter(Boolean).length}` : ''}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Interactive Editor */}
       <div className={styles.customSection}>
         <h2>Interactive Editor</h2>
-        
+
         <div className={styles.editorLayout}>
           <div className={styles.controlsColumn}>
             <div className={styles.controls}>
               <label>
                 Grid Size: {editorGridSize}×{editorGridSize}
-                <input 
-                  type="range" 
-                  min="8" 
-                  max="128" 
+                <input
+                  type="range"
+                  min="8"
+                  max="128"
                   step="8"
                   value={editorGridSize}
                   onChange={(e) => setEditorGridSize(Number(e.target.value) as 8 | 16 | 32 | 64 | 128)}
@@ -310,11 +328,11 @@ export default function DotMatrixPlayground() {
 
               <label>
                 Dot Size: {editorDotSizeInput}px
-                <input 
-                  type="range" 
-                  min="0.1" 
-                  max="16" 
-                  step="0.1"
+                <input
+                  type="range"
+                  min="4"
+                  max="24"
+                  step="1"
                   value={editorDotSizeInput}
                   onChange={(e) => setEditorDotSizeInput(Number(e.target.value))}
                 />
@@ -323,24 +341,15 @@ export default function DotMatrixPlayground() {
               <label>
                 Color:
                 <select value={color} onChange={(e) => setColor(e.target.value as typeof color)}>
-                  {colors.map(c => <option key={c} value={c}>{c}</option>)}
+                  {COLORS.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
-              </label>
-
-              <label>
-                Interactive:
-                <input
-                  type="checkbox"
-                  checked={interactive}
-                  onChange={(e) => setInteractive(e.target.checked)}
-                />
               </label>
             </div>
           </div>
 
           <div className={styles.editorColumn}>
-            <DotMatrixEditor 
-              initialSize={editorGridSize} 
+            <DotMatrixEditor
+              initialSize={editorGridSize}
               dotSize={editorDotSizeInput}
               onChange={setEditorGrid}
               maxWidth={600}

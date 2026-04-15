@@ -3,7 +3,8 @@
   gap: var(--dot-gap, 4px);
   padding: var(--matrix-padding, 16px);
   background: var(--matrix-bg, transparent);
-  max-width: 100%;
+  text-align: center;
+  margin: 0 auto;
   
   .dot {
     width: var(--dot-size, 6px);
@@ -27,6 +28,13 @@
       [data-theme="light"] & {
         background: var(--dot-on-color-light, #f97316) !important;
       }
+      
+      &:hover {
+        box-shadow: 
+          0 0 calc(var(--dot-size, 6px) * 1.5) var(--dot-on-color, #f97316),
+          0 0 calc(var(--dot-size, 6px) * 3) rgba(249, 115, 22, 0.5);
+        transform: scale(1.3);
+      }
     }
     
     &.interactive {
@@ -35,10 +43,17 @@
       &:hover {
         background: var(--dot-on-color, #f97316);
         box-shadow: 
-          0 0 calc(var(--dot-size, 6px) * 1.5) var(--dot-on-color, #f97316),
-          0 0 calc(var(--dot-size, 6px) * 3) rgba(249, 115, 22, 0.5);
-        transform: scale(1.3);
+          0 0 calc(var(--dot-size, 6px) * 2) var(--dot-on-color, #f97316),
+          0 0 calc(var(--dot-size, 6px) * 4) rgba(249, 115, 22, 0.6);
+        transform: scale(1.4);
       }
+    }
+    
+    &.lit.interactive:hover {
+      box-shadow: 
+        0 0 calc(var(--dot-size, 6px) * 2.5) var(--dot-on-color, #f97316),
+        0 0 calc(var(--dot-size, 6px) * 5) rgba(249, 115, 22, 0.7);
+      transform: scale(1.5);
     }
     
     // Animations
