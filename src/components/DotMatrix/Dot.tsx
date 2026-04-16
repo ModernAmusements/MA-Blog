@@ -10,9 +10,10 @@ interface DotProps {
   brightness?: number;
   delay?: number;
   interactive?: boolean;
-  animation?: 'pulse' | 'scan' | 'trail' | 'wave' | 'static';
+  animation?: 'pulse' | 'wave' | 'sparkle' | 'scan' | 'rain' | 'orbit' | 'reveal' | 'static' | 'diagSwipe' | 'invert';
   onHover?: (x: number, y: number, isHovering: boolean) => void;
   forceColor?: 'orange' | 'black';
+  animatePulse?: boolean;
 }
 
 export function Dot({
@@ -25,6 +26,7 @@ export function Dot({
   animation = 'static',
   onHover,
   forceColor,
+  animatePulse = false,
 }: DotProps) {
   const [isLit, setIsLit] = useState(lit);
   const [localBrightness, setLocalBrightness] = useState(brightness);
@@ -45,13 +47,25 @@ export function Dot({
     }
   }, [interactive, x, y, onHover]);
 
+  const animationStyle = animatePulse 
+    ? (animation === 'wave' ? styles.wave 
+      : animation === 'sparkle' ? styles.sparkle
+      : animation === 'scan' ? styles.scan
+      : animation === 'rain' ? styles.rain
+      : animation === 'orbit' ? styles.orbit
+      : animation === 'reveal' ? styles.reveal
+      : animation === 'diagSwipe' ? styles.diagSwipe
+      : animation === 'invert' ? styles.invert
+      : styles.animating)
+    : '';
+  
   const dotClass = [
     styles.dot,
-    styles[animation],
     isLit || lit ? styles.lit : '',
     interactive ? styles.interactive : '',
     forceColor === 'black' ? styles.forceBlack : '',
     forceColor === 'orange' ? styles.forceOrange : '',
+    animationStyle,
   ]
     .filter(Boolean)
     .join(' ');

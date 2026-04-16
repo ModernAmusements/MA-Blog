@@ -1,34 +1,26 @@
 'use client';
 
-import { useState, useCallback, useMemo, createContext, useContext } from 'react';
+import { useMemo, createContext, useContext } from 'react';
 import { Dot } from './Dot';
-import styles from './DotMatrix.module.scss';
 import { messageToDots, getDecorativePattern, DEFAULT_MESSAGE } from './ascii';
+import { DotCell } from './imageConverter';
+import styles from './DotMatrix.module.scss';
 
 export interface DotMatrixConfig {
-  cols: number;
-  rows: number;
-  dotSize: number;
-  gap: number;
-  color: 'orange' | 'white' | 'green' | 'red' | 'black';
-  animation: 'pulse' | 'scan' | 'trail' | 'wave' | 'static';
-  interactive: boolean;
-  message?: string;
-  decorative?: 'arrow-left' | 'arrow-right' | 'wave' | 'grid' | 'heart';
-  speed?: number;
-  blackBorder?: boolean;
-  borderColor?: 'black' | 'orange';
-  imageGrid?: boolean[][];
-  maxWidth?: number;
-}
+   cols: number;
+   rows: number;
+   dotSize: number;
+   gap: number;
+   color: 'orange' | 'white' | 'green' | 'red' | 'black';
+   interactive: boolean;
+   blackBorder?: boolean;
+   imageGrid?: boolean[][];
+   imageData?: DotCell[][];
+   message?: string;
+   decorative?: 'arrow-left' | 'arrow-right' | 'wave' | 'grid' | 'heart';
+ }
 
-interface DotContextValue {
-  config: DotMatrixConfig;
-  litDots: Set<string>;
-  hoverDot: (x: number, y: number, isHovering: boolean) => void;
-}
-
-const DotMatrixContext = createContext<DotContextValue | null>(null);
+const DotMatrixContext = createContext<{ config: DotMatrixConfig; litDots: Set<string> } | null>(null);
 
 export function useDotMatrix() {
   const context = useContext(DotMatrixContext);
@@ -38,10 +30,13 @@ export function useDotMatrix() {
   return context;
 }
 
+type AnimationType = 'pulse' | 'wave' | 'sparkle' | 'scan' | 'rain' | 'orbit' | 'reveal' | 'static' | 'diagSwipe' | 'invert';
+
 interface DotMatrixProps {
   config?: Partial<DotMatrixConfig>;
   className?: string;
-  children?: React.ReactNode;
+  animatePulse?: boolean;
+  animation?: AnimationType;
 }
 
 const defaultConfig: DotMatrixConfig = {
@@ -51,75 +46,52 @@ const defaultConfig: DotMatrixConfig = {
   gap: 1,
   color: 'orange',
   blackBorder: false,
-  animation: 'static',
   interactive: true,
-  maxWidth: 0,
 };
 
 export function DotMatrix({
   config,
   className = '',
-  children,
+  animatePulse = false,
+  animation = 'static',
 }: DotMatrixProps) {
   const mergedConfig = { ...defaultConfig, ...config };
-  const [hoveredDot, setHoveredDot] = useState<{ x: number; y: number } | null>(null);
-
+  
   const dotMatrix = useMemo(() => {
-    let dots: boolean[][] = [];
+    let baseDots: boolean[][] = [];
     
     if (mergedConfig.imageGrid) {
-      dots = mergedConfig.imageGrid;
+      baseDots = mergedConfig.imageGrid;
     } else if (mergedConfig.decorative) {
-      dots = getDecorativePattern(mergedConfig.decorative);
+      baseDots = getDecorativePattern(mergedConfig.decorative);
     } else if (mergedConfig.message) {
-      dots = messageToDots(mergedConfig.message);
+      baseDots = messageToDots(mergedConfig.message);
     } else {
-      dots = messageToDots(DEFAULT_MESSAGE);
+      baseDots = messageToDots(DEFAULT_MESSAGE);
     }
     
     const paddedDots: boolean[][] = [];
     for (let y = 0; y < mergedConfig.rows; y++) {
       paddedDots[y] = [];
       for (let x = 0; x < mergedConfig.cols; x++) {
-        paddedDots[y][x] = dots[y]?.[x] ?? false;
+        paddedDots[y][x] = baseDots[y]?.[x] ?? false;
       }
     }
     
     return paddedDots;
   }, [mergedConfig.rows, mergedConfig.cols, mergedConfig.message, mergedConfig.decorative, mergedConfig.imageGrid]);
 
-  const handleHover = useCallback((x: number, y: number, isHovering: boolean) => {
-    setHoveredDot(isHovering ? { x, y } : null);
-  }, []);
-
   const litDots = useMemo(() => {
     const lit = new Set<string>();
-    
-    // Add base lit dots from message
-    dotMatrix.forEach((row, y) => {
-      row.forEach((isLit, x) => {
-        if (isLit) {
+    for (let y = 0; y < mergedConfig.rows; y++) {
+      for (let x = 0; x < mergedConfig.cols; x++) {
+        if (dotMatrix[y]?.[x]) {
           lit.add(`${x}-${y}`);
-        }
-      });
-    });
-    
-    // Add hovered dot for trail effect
-    if (mergedConfig.interactive && hoveredDot && mergedConfig.animation === 'trail') {
-      // Light up 3x3 area around cursor
-      for (let dy = -1; dy <= 1; dy++) {
-        for (let dx = -1; dx <= 1; dx++) {
-          const nx = hoveredDot.x + dx;
-          const ny = hoveredDot.y + dy;
-          if (nx >= 0 && nx < mergedConfig.cols && ny >= 0 && ny < mergedConfig.rows) {
-            lit.add(`${nx}-${ny}`);
-          }
         }
       }
     }
-    
     return lit;
-  }, [dotMatrix, hoveredDot, mergedConfig.interactive, mergedConfig.animation, mergedConfig.cols, mergedConfig.rows]);
+  }, [dotMatrix, mergedConfig.rows, mergedConfig.cols]);
 
   const sizeClass = {
     2: styles.sizeTiny,
@@ -145,53 +117,21 @@ export function DotMatrix({
     '--dot-gap': `${mergedConfig.gap}px`,
   } as React.CSSProperties;
 
+  const animationClass = animatePulse ? styles.animatingContainer : '';
+
   return (
-    <DotMatrixContext.Provider value={{ config: mergedConfig, litDots, hoverDot: handleHover }}>
+    <DotMatrixContext.Provider value={{ config: mergedConfig, litDots }}>
       <div
-        className={`${styles.dotMatrix} ${sizeClass} ${colorClass} ${mergedConfig.interactive ? styles.interactive : ''} ${className}`}
+        className={`${styles.dotMatrix} ${sizeClass} ${colorClass} ${animationClass} ${className}`}
         style={gridStyle}
-        onMouseLeave={() => setHoveredDot(null)}
       >
-        {/* Black border dots */}
-        {mergedConfig.blackBorder && Array.from({ length: mergedConfig.rows + 4 }).map((_, y) =>
-          Array.from({ length: mergedConfig.cols + 4 }).map((_, x) => {
-            const isOuterBorder = 
-              y === 0 || y === mergedConfig.rows + 3 || 
-              x === 0 || x === mergedConfig.cols + 3;
-            const isInnerBorder = 
-              y === 1 || y === mergedConfig.rows + 2 || 
-              x === 1 || x === mergedConfig.cols + 2;
-            const isInner = y > 1 && y <= mergedConfig.rows + 1 && x > 1 && x <= mergedConfig.cols + 1;
-            const innerX = x - 2;
-            const innerY = y - 2;
-            const isLit = isOuterBorder || (isInnerBorder && (x % 2 === 0 || y % 2 === 0)) || (isInner && (litDots.has(`${innerX}-${innerY}`) || dotMatrix[innerY]?.[innerX]));
-            const isBorder = isOuterBorder || isInnerBorder;
-            
-            return (
-              <Dot
-                key={`${x}-${y}`}
-                x={x}
-                y={y}
-                lit={isLit}
-                delay={(x + y) * 0.02}
-                interactive={mergedConfig.interactive}
-                animation={isInner ? mergedConfig.animation : 'static'}
-                onHover={handleHover}
-                forceColor={isBorder ? (mergedConfig.borderColor || 'black') : undefined}
-              />
-            );
-          })
-        )}
-        {/* Inner dots (if no black border) */}
         {!mergedConfig.blackBorder && Array.from({ length: mergedConfig.rows + 2 }).map((_, y) =>
           Array.from({ length: mergedConfig.cols + 2 }).map((_, x) => {
-            const isBorder = 
-              y === 0 || y === mergedConfig.rows + 1 || 
-              x === 0 || x === mergedConfig.cols + 1;
+            const isBorder = y === 0 || y === mergedConfig.rows + 1 || x === 0 || x === mergedConfig.cols + 1;
             const isInner = y > 0 && y <= mergedConfig.rows && x > 0 && x <= mergedConfig.cols;
             const innerX = x - 1;
             const innerY = y - 1;
-            const isLit = isInner && (litDots.has(`${innerX}-${innerY}`) || dotMatrix[innerY]?.[innerX]);
+            const isLit = isInner && litDots.has(`${innerX}-${innerY}`);
             
             return (
               <Dot
@@ -199,112 +139,13 @@ export function DotMatrix({
                 x={x}
                 y={y}
                 lit={isLit}
-                delay={(x + y) * 0.02}
-                interactive={mergedConfig.interactive}
-                animation={isInner ? mergedConfig.animation : 'static'}
-                onHover={handleHover}
+                animatePulse={animatePulse && isInner}
+                animation={isInner ? animation : 'static'}
               />
             );
           })
         )}
       </div>
     </DotMatrixContext.Provider>
-  );
-}
-
-// Pre-built variants for quick use
-export function DotMatrixPulse({
-  cols = 16,
-  rows = 7,
-  message = 'PULSE',
-  interactive = false,
-}: Partial<DotMatrixConfig>) {
-  return (
-    <DotMatrix
-      config={{
-        cols,
-        rows,
-        animation: 'pulse',
-        interactive,
-        message,
-      }}
-    />
-  );
-}
-
-export function DotMatrixScan({
-  cols = 24,
-  rows = 7,
-  message = 'SCAN',
-  interactive = true,
-}: Partial<DotMatrixConfig>) {
-  return (
-    <DotMatrix
-      config={{
-        cols,
-        rows,
-        animation: 'scan',
-        interactive,
-        message,
-      }}
-    />
-  );
-}
-
-export function DotMatrixWave({
-  cols = 16,
-  rows = 7,
-  message = 'WAVE',
-  interactive = false,
-}: Partial<DotMatrixConfig>) {
-  return (
-    <DotMatrix
-      config={{
-        cols,
-        rows,
-        animation: 'wave',
-        interactive,
-        message,
-      }}
-    />
-  );
-}
-
-export function DotMatrixTrail({
-  cols = 24,
-  rows = 7,
-  message = 'TRAIL',
-  interactive = true,
-}: Partial<DotMatrixConfig>) {
-  return (
-    <DotMatrix
-      config={{
-        cols,
-        rows,
-        animation: 'trail',
-        interactive,
-        message,
-      }}
-    />
-  );
-}
-
-export function DotMatrixDecor({
-  decorative = 'arrow-right',
-  dotSize = 6,
-}: Partial<DotMatrixConfig>) {
-  return (
-    <DotMatrix
-      config={{
-        cols: 15,
-        rows: 15,
-        dotSize,
-        gap: 1,
-        color: 'orange',
-        animation: 'static',
-        decorative,
-        interactive: true,
-      }}
-    />
   );
 }

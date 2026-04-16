@@ -1,10 +1,5 @@
 export { 
   DotMatrix, 
-  DotMatrixPulse, 
-  DotMatrixScan, 
-  DotMatrixWave, 
-  DotMatrixTrail,
-  DotMatrixDecor,
   useDotMatrix,
 } from './DotMatrix';
 
@@ -16,3 +11,5 @@ export { ASCII_PATTERNS, messageToDots, getDecorativePattern, DEFAULT_MESSAGE } 
 
 export { convertImageToDotMatrix } from './imageConverter';
 export type { DotCell, ImageConversionOptions } from './imageConverter';
+
+export { createGIF } from './gifEncoder';

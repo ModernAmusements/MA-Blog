@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { DotMatrix, DotMatrixEditor, convertImageToDotMatrix } from '@/components/DotMatrix';
+import { DotMatrix, DotMatrixEditor, convertImageToDotMatrix, createGIF } from '@/components/DotMatrix';
 import type { DotCell } from '@/components/DotMatrix';
+import { ANIMATIONS, AnimationType } from '@/components/DotMatrix/animations/presets';
 import styles from './dotmatrix.module.scss';
+
+const ANIMATION_TYPES = Object.keys(ANIMATIONS) as AnimationType[];
 
 const GRID_SIZES = [8, 16, 32, 64, 128] as const;
 const COLORS = ['orange', 'white', 'green', 'red', 'black'] as const;
@@ -13,10 +16,15 @@ export default function DotMatrixPlayground() {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const [imageData, setImageData] = useState<DotCell[][] | null>(null);
   const [imageGrid, setImageGrid] = useState<boolean[][] | null>(null);
+  const [useShades, setUseShades] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
   const [conversionProgress, setConversionProgress] = useState(0);
   const [gridSize, setGridSize] = useState<8 | 16 | 32 | 64 | 128>(16);
+  const [selectedAnimation, setSelectedAnimation] = useState<AnimationType>('scan');
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [invertColors, setInvertColors] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -54,67 +62,80 @@ export default function DotMatrixPlayground() {
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
-  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (imageDataUrl) {
-        URL.revokeObjectURL(imageDataUrl);
-      }
-      setImageFile(file);
-      const url = URL.createObjectURL(file);
-      setImageDataUrl(url);
-    }
-  }, [imageDataUrl]);
+   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+     const file = e.target.files?.[0];
+     if (file) {
+       if (imageDataUrl) {
+         URL.revokeObjectURL(imageDataUrl);
+       }
+       setImageFile(file);
+       setIsAnimating(false);
+       setImageData(null);
+       setImageGrid(null);
+       const url = URL.createObjectURL(file);
+       setImageDataUrl(url);
+       e.target.value = '';
+     }
+   }, [imageDataUrl]);
 
   useEffect(() => {
     if (!imageDataUrl) return;
 
     let cancelled = false;
 
-    const convert = async () => {
-      setIsConverting(true);
-      setConversionProgress(0);
-      try {
-        setConversionProgress(10);
-        await new Promise(r => setTimeout(r, 50));
-        
-        const result = await convertImageToDotMatrix(imageDataUrl, {
-          gridSize,
-          dotSize: imageDotSize,
-          invertColors: false,
-          fitMode,
-          padColor,
-        });
-        
-        if (cancelled) return;
-        
-        await new Promise(r => setTimeout(r, 50));
-        setConversionProgress(60);
-
-        const thresholdValue = threshold / 100;
-        const booleanGrid = result.map(row =>
-          row.map(cell => cell.brightness > thresholdValue)
-        );
-        setImageGrid(booleanGrid);
-        
-        await new Promise(r => setTimeout(r, 50));
-        setConversionProgress(90);
-      } catch (error) {
-        console.error('Conversion failed:', error);
-      } finally {
-        if (!cancelled) {
-          setIsConverting(false);
-          setConversionProgress(0);
-        }
-      }
-    };
+const convert = async () => {
+       setIsConverting(true);
+       setConversionProgress(0);
+       try {
+         setConversionProgress(10);
+         await new Promise(r => setTimeout(r, 50));
+         
+         const result = await convertImageToDotMatrix(imageDataUrl, {
+           gridSize,
+           dotSize: imageDotSize,
+           invertColors: false,
+           fitMode,
+           padColor,
+         });
+         
+         if (cancelled) return;
+         
+         await new Promise(r => setTimeout(r, 50));
+         setConversionProgress(60);
+         
+         // Store the full result with brightness data
+         setImageData(result);
+         
+         // Also create boolean grid for backward compatibility
+         const thresholdValue = threshold / 100;
+         let boolGrid = result.map(row =>
+           row.map(cell => cell.brightness > thresholdValue)
+         );
+         
+         if (invertColors) {
+           boolGrid = boolGrid.map(row => row.map(v => !v));
+         }
+         
+         setImageGrid(boolGrid);
+         
+         await new Promise(r => setTimeout(r, 50));
+         setConversionProgress(90);
+       } catch (error) {
+         console.error('Conversion failed:', error);
+       } finally {
+         if (!cancelled) {
+           setIsConverting(false);
+           setConversionProgress(0);
+         }
+       }
+     };
 
     convert();
 
     return () => {
       cancelled = true;
     };
-  }, [imageDataUrl, gridSize, imageDotSize, threshold, fitMode, padColor]);
+  }, [imageDataUrl, gridSize, imageDotSize, threshold, fitMode, padColor, invertColors]);
 
   useEffect(() => {
     return () => {
@@ -128,64 +149,168 @@ export default function DotMatrixPlayground() {
     setGridSize(value as 8 | 16 | 32 | 64 | 128);
   };
 
-  const handleClear = useCallback(() => {
-    if (imageDataUrl) {
-      URL.revokeObjectURL(imageDataUrl);
-    }
-    setImageFile(null);
-    setImageDataUrl(null);
-    setImageGrid(null);
-  }, [imageDataUrl]);
+   const handleClear = useCallback(() => {
+     if (imageDataUrl) {
+       URL.revokeObjectURL(imageDataUrl);
+     }
+     setImageFile(null);
+     setImageDataUrl(null);
+     setImageData(null);
+     setImageGrid(null);
+     setIsAnimating(false);
+   }, [imageDataUrl]);
 
-  const handleDownload = useCallback(() => {
-    if (!imageGrid) return;
-    
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+   const handleDownload = useCallback(async () => {
+     if (!imageData) return;
 
-    const dotSize = 10;
-    const gap = 2;
-    const padding = 16;
-    const size = gridSize * (dotSize + gap) + padding * 2;
+     // If animation is active, create GIF
+     if (isAnimating) {
+       try {
+         // Import animation presets
+         const { ANIMATIONS } = await import('@/components/DotMatrix/animations/presets');
+         
+         // Get animation function from presets
+         const animationCreator = ANIMATIONS[selectedAnimation];
+         if (!animationCreator) {
+           throw new Error(`Unknown animation: ${selectedAnimation}`);
+         }
+         
+         const animation = animationCreator(gridSize, gridSize);
+         
+         // Create GIF using animation frames
+         const gifBytes = createGIF(gridSize, gridSize, (t) => {
+           const frame = animation.frame(t % animation.duration);
+           // Convert animation grid (0/1) to brightness values (0 or 1) for GIF encoding
+           return frame.map(row => 
+             row.map(cell => cell ? 1 : 0)
+           );
+         }, 30);
+         
+          // Create blob and download
+          const blob = new Blob([new Uint8Array(gifBytes)], { type: 'image/gif' });
+         const url = URL.createObjectURL(blob);
+         const link = document.createElement('a');
+         link.download = `dotmatrix-${selectedAnimation}-${gridSize}x${gridSize}.gif`;
+         link.href = url;
+         link.click();
+         
+         // Clean up
+         setTimeout(() => {
+           URL.revokeObjectURL(url);
+         }, 100);
+       } catch (error) {
+         console.error('Failed to create GIF:', error);
+         alert('Failed to create GIF. Please try again.');
+       }
+     } else {
+       // Static PNG download - use brightness data for shades when enabled
+       const canvas = document.createElement('canvas');
+       const ctx = canvas.getContext('2d');
+       if (!ctx) return;
 
-    canvas.width = size;
-    canvas.height = size;
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, size, size);
+       const dotSize = 10;
+       const gap = 2;
+       const padding = 16;
+       const size = gridSize * (dotSize + gap) + padding * 2;
 
-    for (let y = 0; y < gridSize; y++) {
-      for (let x = 0; x < gridSize; x++) {
-        if (imageGrid[y]?.[x]) {
-          ctx.fillStyle = '#f97316';
-          ctx.beginPath();
-          ctx.arc(
-            padding + x * (dotSize + gap) + dotSize / 2,
-            padding + y * (dotSize + gap) + dotSize / 2,
-            dotSize / 2,
-            0,
-            Math.PI * 2
-          );
-          ctx.fill();
-        }
-      }
-    }
+       canvas.width = size;
+       canvas.height = size;
+       ctx.fillStyle = '#000000';
+       ctx.fillRect(0, 0, size, size);
 
-    const link = document.createElement('a');
-    link.download = `dotmatrix-${gridSize}x${gridSize}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  }, [imageGrid, gridSize]);
+       for (let y = 0; y < gridSize; y++) {
+         for (let x = 0; x < gridSize; x++) {
+           if (imageData[y]?.[x]) {
+             // Calculate fill style based on brightness and color
+             const brightness = imageData[y][x].brightness;
+             let fillStyle = '';
+             
+             if (useShades) {
+               // Create shade based on brightness and selected color
+               switch (color) {
+                 case 'orange':
+                   // Orange: rgb(249, 115, 22)
+                   const r = Math.floor(249 * brightness);
+                   const g = Math.floor(115 * brightness);
+                   const b = Math.floor(22 * brightness);
+                   fillStyle = `rgb(${r},${g},${b})`;
+                   break;
+                 case 'white':
+                   // White: rgb(255, 255, 255)
+                   const val = Math.floor(255 * brightness);
+                   fillStyle = `rgb(${val},${val},${val})`;
+                   break;
+                 case 'green':
+                   // Green: rgb(34, 197, 94)
+                   const r2 = Math.floor(34 * brightness);
+                   const g2 = Math.floor(197 * brightness);
+                   const b2 = Math.floor(94 * brightness);
+                   fillStyle = `rgb(${r2},${g2},${b2})`;
+                   break;
+                 case 'red':
+                   // Red: rgb(239, 68, 68)
+                   const r3 = Math.floor(239 * brightness);
+                   const g3 = Math.floor(68 * brightness);
+                   const b3 = Math.floor(68 * brightness);
+                   fillStyle = `rgb(${r3},${g3},${b3})`;
+                   break;
+                 case 'black':
+                   // Black: rgb(0, 0, 0) - always black regardless of brightness
+                   fillStyle = 'rgb(0,0,0)';
+                   break;
+                 default:
+                   // Default to orange
+                   const r4 = Math.floor(249 * brightness);
+                   const g4 = Math.floor(115 * brightness);
+                   const b4 = Math.floor(22 * brightness);
+                   fillStyle = `rgb(${r4},${g4},${b4})`;
+                   break;
+               }
+             } else {
+               // Binary mode - use full color if brightness > 0.5
+               fillStyle = brightness > 0.5 ? 
+                 (() => {
+                   switch (color) {
+                     case 'orange': return '#f97316';
+                     case 'white': return '#ffffff';
+                     case 'green': return '#22c55e';
+                     case 'red': return '#ef4444';
+                     case 'black': return '#000000';
+                     default: return '#f97316';
+                   }
+                 })() : '#000000';
+             }
+             
+             ctx.fillStyle = fillStyle;
+             ctx.beginPath();
+             ctx.arc(
+               padding + x * (dotSize + gap) + dotSize / 2,
+               padding + y * (dotSize + gap) + dotSize / 2,
+               dotSize / 2,
+               0,
+               Math.PI * 2
+             );
+             ctx.fill();
+           }
+         }
+       }
+
+       const link = document.createElement('a');
+       link.download = `dotmatrix-${gridSize}x${gridSize}.png`;
+       link.href = canvas.toDataURL('image/png');
+       link.click();
+     }
+   }, [imageData, gridSize, isAnimating, selectedAnimation, color, useShades]);
 
   const displayDotSize = (() => {
-    if (imageDotSize > 0) {
+    if (imageDotSize >= 1) {
       return imageDotSize;
     }
     const base = containerWidth / gridSize;
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
     const max = isMobile ? 16 : 12;
     const min = isMobile ? 4 : 2;
-    return Math.max(min, Math.min(max, base));
+    return Math.max(min, Math.min(max, Math.round(base)));
   })();
 
   const blankGrid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(false));
@@ -230,9 +355,9 @@ export default function DotMatrixPlayground() {
                 Dot Size: {imageDotSize}px
                 <input
                   type="range"
-                  min="0.1"
+                  min="1"
                   max="16"
-                  step="0.1"
+                  step="1"
                   value={imageDotSize}
                   onChange={(e) => setImageDotSize(Number(e.target.value))}
                 />
@@ -248,6 +373,35 @@ export default function DotMatrixPlayground() {
                   onChange={(e) => setThreshold(Number(e.target.value))}
                 />
               </label>
+
+               <label>
+                 Animation:
+                 <select value={selectedAnimation} onChange={(e) => setSelectedAnimation(e.target.value as AnimationType)}>
+                   {ANIMATION_TYPES.map(anim => (
+                     <option key={anim} value={anim}>{anim}</option>
+                   ))}
+                 </select>
+               </label>
+
+               <label>
+                 Use Shades: 
+                 <input
+                   type="checkbox"
+                   checked={useShades}
+                   onChange={(e) => setUseShades(e.target.checked)}
+                 />
+               </label>
+
+               <button 
+                 onClick={() => setIsAnimating(!isAnimating)}
+                 className={isAnimating ? styles.stopButton : styles.startButton}
+               >
+                 {isAnimating ? 'Stop' : 'Start'}
+               </button>
+
+              <button onClick={() => setInvertColors(!invertColors)}>
+                {invertColors ? 'Invert ON' : 'Invert'}
+              </button>
 
               <label>
                 Fit Mode:
@@ -294,11 +448,11 @@ export default function DotMatrixPlayground() {
                   rows: gridSize,
                   dotSize: displayDotSize,
                   color: 'orange',
-                  animation: 'static',
                   interactive: false,
                   imageGrid: imageGrid ?? blankGrid,
-                  maxWidth: Math.min(containerWidth - 32, 600),
                 }}
+                animatePulse={isAnimating}
+                animation={isAnimating ? selectedAnimation : 'static'}
               />
               <div className={styles.gridInfo}>
                 Grid: {gridSize}×{gridSize}{imageGrid ? ` | Dots: ${imageGrid.flat().filter(Boolean).length}` : ''}

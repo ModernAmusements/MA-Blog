@@ -1,5 +1,5 @@
 export interface DotCell {
-  brightness: number;
+  brightness: number; // 0-1 value
   normalizedSize: number;
 }
 
@@ -9,6 +9,7 @@ export interface ImageConversionOptions {
   invertColors: boolean;
   fitMode?: 'stretch' | 'fit' | 'crop';
   padColor?: string;
+  useShades?: boolean;
 }
 
 function calculateBrightness(r: number, g: number, b: number): number {
