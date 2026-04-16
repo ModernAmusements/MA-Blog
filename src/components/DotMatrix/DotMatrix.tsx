@@ -64,7 +64,7 @@ export function DotMatrix({
 }: DotMatrixProps) {
   const mergedConfig = { ...defaultConfig, ...config };
   
-  const [animationFrame, setAnimationFrame] = useState<boolean[][] | null>(null);
+  const [animationProgress, setAnimationProgress] = useState<number>(0);
   const engineRef = useRef<AnimationEngine | null>(null);
   
   const dotMatrix = useMemo(() => {
@@ -98,13 +98,12 @@ export function DotMatrix({
       
       const updateFrame = () => {
         if (engineRef.current) {
-          const frame = engineRef.current.getFrame() as unknown as boolean[][];
-          setAnimationFrame(frame);
+          setAnimationProgress(prev => (prev + 1) % preset.duration);
         }
       };
       
       const intervalId = setInterval(updateFrame, 125);
-      updateFrame();
+      setAnimationProgress(0);
       engineRef.current.start();
       
       return () => {
@@ -114,7 +113,7 @@ export function DotMatrix({
         clearInterval(intervalId);
       };
     } else {
-      setAnimationFrame(null);
+      setAnimationProgress(0);
       if (engineRef.current) {
         engineRef.current.stop();
         engineRef.current = null;
@@ -126,11 +125,14 @@ export function DotMatrix({
     const baseLit = dotMatrix[y]?.[x] ?? false;
     if (!baseLit) return false;
     
-    if (animationFrame) {
-      return animationFrame[y]?.[x] ?? baseLit;
+    if (animatePulse && isPresetAnimation(animation) && ANIMATIONS[animation]) {
+      const preset = ANIMATIONS[animation](mergedConfig.cols, mergedConfig.rows);
+      const animGrid = preset.frame(animationProgress);
+      return !!(animGrid[y]?.[x]) || baseLit;
     }
+    
     return baseLit;
-  }, [animationFrame, dotMatrix]);
+  }, [dotMatrix, animatePulse, animation, animationProgress, mergedConfig.cols, mergedConfig.rows]);
 
   const litDots = useMemo(() => {
     const lit = new Set<string>();

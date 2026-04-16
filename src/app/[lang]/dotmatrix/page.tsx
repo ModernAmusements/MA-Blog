@@ -395,15 +395,20 @@ const convert = async () => {
                <button 
                  onClick={() => setIsAnimating(!isAnimating)}
                  className={isAnimating ? styles.stopButton : styles.startButton}
-               >
-                 {isAnimating ? 'Stop' : 'Start'}
-               </button>
+                >
+                  {isAnimating ? 'Stop' : 'Start'}
+                </button>
 
-              <button onClick={() => setInvertColors(!invertColors)}>
-                {invertColors ? 'Invert ON' : 'Invert'}
-              </button>
+                <label>
+                  Invert Colors: 
+                  <input
+                    type="checkbox"
+                    checked={invertColors}
+                    onChange={(e) => setInvertColors(e.target.checked)}
+                  />
+                </label>
 
-              <label>
+                <label>
                 Fit Mode:
                 <select value={fitMode} onChange={(e) => setFitMode(e.target.value as 'stretch' | 'fit' | 'crop')}>
                   <option value="fit">Fit (Letterbox)</option>
