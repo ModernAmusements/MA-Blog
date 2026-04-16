@@ -220,105 +220,77 @@ const convert = async () => {
           console.error('Failed to create GIF:', error);
           alert('Failed to create GIF. Please try again.');
         }
-     } else {
-       // Static PNG download - use brightness data for shades when enabled
-       const canvas = document.createElement('canvas');
-       const ctx = canvas.getContext('2d');
-       if (!ctx) return;
+      } else {
+        // Static PNG download - use brightness data for shades when enabled
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
 
-       const dotSize = 10;
-       const gap = 2;
-       const padding = 16;
-       const size = gridSize * (dotSize + gap) + padding * 2;
+        // Get the active color for download
+        const activeColor = displayColor === 'primary' ? 'orange' : displayColor === 'accent' ? 'neon-green' : 'pink';
+        
+        // Map to hex colors
+        const colorToHex: Record<string, string> = {
+          orange: '#f97316',
+          white: '#ffffff',
+          green: '#22c55e',
+          red: '#ef4444',
+          black: '#000000',
+          'neon-green': '#4BFF00',
+          purple: '#992EFE',
+          pink: '#FF9CEA',
+        };
+        
+        const dotHex = colorToHex[activeColor] || '#f97316';
+        
+        // Parse color for shading
+        const parseColor = (hex: string) => ({
+          r: parseInt(hex.slice(1, 3), 16),
+          g: parseInt(hex.slice(3, 5), 16),
+          b: parseInt(hex.slice(5, 7), 16),
+        });
+        
+        const dotRgb = parseColor(dotHex);
 
-       canvas.width = size;
-       canvas.height = size;
-       ctx.fillStyle = '#000000';
-       ctx.fillRect(0, 0, size, size);
+        const dotSize = 10;
+        const gap = 2;
+        const padding = 16;
+        const size = gridSize * (dotSize + gap) + padding * 2;
 
-       for (let y = 0; y < gridSize; y++) {
-         for (let x = 0; x < gridSize; x++) {
-           if (imageData[y]?.[x]) {
-             // Calculate fill style based on brightness and color
-             const brightness = imageData[y][x].brightness;
-             let fillStyle = '';
-             
-             if (useShades) {
-               // Create shade based on brightness and selected color
-               switch (color) {
-                 case 'orange':
-                   // Orange: rgb(249, 115, 22)
-                   const r = Math.floor(249 * brightness);
-                   const g = Math.floor(115 * brightness);
-                   const b = Math.floor(22 * brightness);
-                   fillStyle = `rgb(${r},${g},${b})`;
-                   break;
-                 case 'white':
-                   // White: rgb(255, 255, 255)
-                   const val = Math.floor(255 * brightness);
-                   fillStyle = `rgb(${val},${val},${val})`;
-                   break;
-                 case 'green':
-                   // Green: rgb(34, 197, 94)
-                   const r2 = Math.floor(34 * brightness);
-                   const g2 = Math.floor(197 * brightness);
-                   const b2 = Math.floor(94 * brightness);
-                   fillStyle = `rgb(${r2},${g2},${b2})`;
-                   break;
-                 case 'red':
-                   // Red: rgb(239, 68, 68)
-                   const r3 = Math.floor(239 * brightness);
-                   const g3 = Math.floor(68 * brightness);
-                   const b3 = Math.floor(68 * brightness);
-                   fillStyle = `rgb(${r3},${g3},${b3})`;
-                   break;
-                 case 'black':
-                   // Black: rgb(0, 0, 0) - always black regardless of brightness
-                   fillStyle = 'rgb(0,0,0)';
-                   break;
-                 default:
-                   // Default to orange
-                   const r4 = Math.floor(249 * brightness);
-                   const g4 = Math.floor(115 * brightness);
-                   const b4 = Math.floor(22 * brightness);
-                   fillStyle = `rgb(${r4},${g4},${b4})`;
-                   break;
-               }
-             } else {
-               // Binary mode - use full color if brightness > 0.5
-               fillStyle = brightness > 0.5 ? 
-                 (() => {
-                   switch (color) {
-                     case 'orange': return '#f97316';
-                     case 'white': return '#ffffff';
-                     case 'green': return '#22c55e';
-                     case 'red': return '#ef4444';
-                     case 'black': return '#000000';
-                     default: return '#f97316';
-                   }
-                 })() : '#000000';
-             }
-             
-             ctx.fillStyle = fillStyle;
-             ctx.beginPath();
-             ctx.arc(
-               padding + x * (dotSize + gap) + dotSize / 2,
-               padding + y * (dotSize + gap) + dotSize / 2,
-               dotSize / 2,
-               0,
-               Math.PI * 2
-             );
-             ctx.fill();
-           }
-         }
-       }
+        canvas.width = size;
+        canvas.height = size;
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, size, size);
 
-       const link = document.createElement('a');
-       link.download = `dotmatrix-${gridSize}x${gridSize}.png`;
-       link.href = canvas.toDataURL('image/png');
-       link.click();
-     }
-   }, [imageData, gridSize, isAnimating, selectedAnimation, color, useShades]);
+        for (let y = 0; y < gridSize; y++) {
+          for (let x = 0; x < gridSize; x++) {
+            if (imageData[y]?.[x]) {
+              const brightness = imageData[y][x].brightness;
+              let fillStyle = '';
+              
+              if (useShades) {
+                const r = Math.floor(dotRgb.r * brightness);
+                const g = Math.floor(dotRgb.g * brightness);
+                const b = Math.floor(dotRgb.b * brightness);
+                fillStyle = `rgb(${r},${g},${b})`;
+              } else {
+                fillStyle = brightness > 0.5 ? dotHex : '#000000';
+              }
+              
+              const px = padding + x * (dotSize + gap);
+              const py = padding + y * (dotSize + gap);
+              ctx.fillStyle = fillStyle;
+              ctx.fillRect(px, py, dotSize, dotSize);
+            }
+          }
+        }
+
+        const link = document.createElement('a');
+        link.download = `dotmatrix-${gridSize}x${gridSize}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }
+    }, [imageData, gridSize, isAnimating, selectedAnimation, color, useShades, displayColor]);
 
   const displayDotSize = (() => {
     if (imageDotSize >= 1) {
@@ -450,10 +422,10 @@ const convert = async () => {
               </div>
               
               <div className={styles.buttonRow}>
-                {imageGrid && isAnimating && selectedAnimation !== 'static' && (
+                {imageGrid && selectedAnimation !== 'static' && (
                   <button className={styles.primaryButton} onClick={handleDownload}>Download GIF</button>
                 )}
-                {imageGrid && !isAnimating && (
+                {imageGrid && (
                   <button className={styles.primaryButton} onClick={handleDownload}>Download PNG</button>
                 )}
               </div>
