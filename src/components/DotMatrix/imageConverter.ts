@@ -1,6 +1,5 @@
 export interface DotCell {
-  brightness: number; // 0-1 value
-  normalizedSize: number;
+  brightness: number;
 }
 
 export interface ImageConversionOptions {
@@ -9,7 +8,6 @@ export interface ImageConversionOptions {
   invertColors: boolean;
   fitMode?: 'stretch' | 'fit' | 'crop';
   padColor?: string;
-  useShades?: boolean;
 }
 
 function calculateBrightness(r: number, g: number, b: number): number {
@@ -117,12 +115,7 @@ export async function convertImageToDotMatrix(
             brightness = 1 - brightness;
           }
 
-          const normalizedSize = brightness * options.dotSize;
-
-          grid[y][x] = {
-            brightness,
-            normalizedSize,
-          };
+          grid[y][x] = { brightness };
         }
       }
 

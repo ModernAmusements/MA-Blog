@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import styles from './DotMatrix.module.scss';
 
 interface DotProps {
@@ -10,7 +10,7 @@ interface DotProps {
   brightness?: number;
   delay?: number;
   interactive?: boolean;
-  animation?: 'pulse' | 'wave' | 'sparkle' | 'scan' | 'rain' | 'orbit' | 'reveal' | 'static' | 'diagSwipe' | 'invert';
+  animation?: 'static' | 'reveal';
   onHover?: (x: number, y: number, isHovering: boolean) => void;
   forceColor?: 'orange' | 'black';
   animatePulse?: boolean;
@@ -28,40 +28,23 @@ export function Dot({
   forceColor,
   animatePulse = false,
 }: DotProps) {
-  const [isLit, setIsLit] = useState(lit);
-  const [localBrightness, setLocalBrightness] = useState(brightness);
-
   const handleMouseEnter = useCallback(() => {
     if (interactive) {
-      setIsLit(true);
-      setLocalBrightness(1);
       onHover?.(x, y, true);
     }
   }, [interactive, x, y, onHover]);
 
   const handleMouseLeave = useCallback(() => {
     if (interactive) {
-      setIsLit(false);
-      setLocalBrightness(0.3);
       onHover?.(x, y, false);
     }
   }, [interactive, x, y, onHover]);
 
-  const animationStyle = animatePulse 
-    ? (animation === 'wave' ? styles.wave 
-      : animation === 'sparkle' ? styles.sparkle
-      : animation === 'scan' ? styles.scan
-      : animation === 'rain' ? styles.rain
-      : animation === 'orbit' ? styles.orbit
-      : animation === 'reveal' ? styles.reveal
-      : animation === 'diagSwipe' ? styles.diagSwipe
-      : animation === 'invert' ? styles.invert
-      : styles.animating)
-    : '';
+  const animationStyle = animatePulse && animation !== 'static' ? styles.animating : '';
   
   const dotClass = [
     styles.dot,
-    isLit || lit ? styles.lit : '',
+    lit ? styles.lit : '',
     interactive ? styles.interactive : '',
     forceColor === 'black' ? styles.forceBlack : '',
     forceColor === 'orange' ? styles.forceOrange : '',
@@ -75,7 +58,7 @@ export function Dot({
       className={dotClass}
       style={{
         '--dot-delay': `${delay}s`,
-        '--dot-brightness': lit || isLit ? brightness : 0.15,
+        '--dot-brightness': lit ? brightness : 0.15,
         gridColumn: x + 1,
         gridRow: y + 1,
       } as React.CSSProperties}

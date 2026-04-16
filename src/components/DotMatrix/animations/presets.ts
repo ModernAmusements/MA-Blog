@@ -1,4 +1,11 @@
-import { Animation, createGrid, setCell } from './engine';
+import { createGrid, setCell } from './engine';
+
+export interface Animation {
+  width: number;
+  height: number;
+  duration: number;
+  frame: (t: number) => ReturnType<typeof createGrid>;
+}
 
 export function createReveal(width: number, height: number): Animation {
   return {
