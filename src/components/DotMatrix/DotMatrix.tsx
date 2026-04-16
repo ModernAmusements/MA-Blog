@@ -1,27 +1,25 @@
 'use client';
 
-import { useMemo, createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { useMemo, createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Dot } from './Dot';
 import { messageToDots, getDecorativePattern, DEFAULT_MESSAGE } from './ascii';
 import { DotCell } from './imageConverter';
-import { createAnimationEngine, Animation, AnimationEngine } from './animations/engine';
-import { ANIMATIONS, AnimationType as PresetAnimationType } from './animations/presets';
+import { ANIMATIONS, AnimationType } from './animations/presets';
 import styles from './DotMatrix.module.scss';
 
 export interface DotMatrixConfig {
-   cols: number;
-   rows: number;
-   dotSize: number;
-   gap: number;
-   color: 'orange' | 'white' | 'green' | 'red' | 'black';
-   interactive: boolean;
-   blackBorder?: boolean;
-   imageGrid?: boolean[][];
-   imageData?: DotCell[][];
-   message?: string;
-   decorative?: 'arrow-left' | 'arrow-right' | 'wave' | 'grid' | 'heart';
-   useShades?: boolean;
- }
+  cols: number;
+  rows: number;
+  dotSize: number;
+  gap: number;
+  color: 'orange' | 'white' | 'green' | 'red' | 'black';
+  interactive: boolean;
+  blackBorder?: boolean;
+  imageGrid?: boolean[][];
+  imageData?: DotCell[][];
+  message?: string;
+  decorative?: 'arrow-left' | 'arrow-right' | 'wave' | 'grid' | 'heart';
+}
 
 const DotMatrixContext = createContext<{ config: DotMatrixConfig; litDots: Set<string> } | null>(null);
 
@@ -32,8 +30,6 @@ export function useDotMatrix() {
   }
   return context;
 }
-
-type AnimationType = 'pulse' | 'wave' | 'sparkle' | 'scan' | 'rain' | 'orbit' | 'reveal' | 'static' | 'diagSwipe' | 'invert';
 
 interface DotMatrixProps {
   config?: Partial<DotMatrixConfig>;
@@ -52,20 +48,15 @@ const defaultConfig: DotMatrixConfig = {
   interactive: true,
 };
 
-function isPresetAnimation(type: AnimationType): type is PresetAnimationType {
-  return type !== 'static' && type !== 'pulse' && type !== 'reveal';
-}
-
 export function DotMatrix({
   config,
   className = '',
   animatePulse = false,
   animation = 'static',
 }: DotMatrixProps) {
-  const mergedConfig = { ...defaultConfig, ...config };
+  const mergedConfig = { ...defaultConfig, ...config } as DotMatrixConfig;
   
   const [animationProgress, setAnimationProgress] = useState<number>(0);
-  const engineRef = useRef<AnimationEngine | null>(null);
   
   const dotMatrix = useMemo(() => {
     let baseDots: boolean[][] = [];
@@ -92,43 +83,39 @@ export function DotMatrix({
   }, [mergedConfig.rows, mergedConfig.cols, mergedConfig.message, mergedConfig.decorative, mergedConfig.imageGrid]);
 
   useEffect(() => {
-    if (animatePulse && isPresetAnimation(animation) && ANIMATIONS[animation]) {
-      const preset = ANIMATIONS[animation](mergedConfig.cols, mergedConfig.rows);
-      engineRef.current = createAnimationEngine(preset, 8);
-      
-      const updateFrame = () => {
-        if (engineRef.current) {
-          setAnimationProgress(prev => (prev + 1) % preset.duration);
-        }
-      };
-      
-      const intervalId = setInterval(updateFrame, 125);
+    if (!animatePulse) {
       setAnimationProgress(0);
-      engineRef.current.start();
-      
-      return () => {
-        if (engineRef.current) {
-          engineRef.current.stop();
-        }
-        clearInterval(intervalId);
-      };
-    } else {
-      setAnimationProgress(0);
-      if (engineRef.current) {
-        engineRef.current.stop();
-        engineRef.current = null;
-      }
+      return;
     }
+
+    const preset = (ANIMATIONS as Record<string, (w: number, h: number) => { frame: (t: number) => any; duration: number }>)[animation];
+    if (!preset) {
+      setAnimationProgress(0);
+      return;
+    }
+
+    const anim = preset(mergedConfig.cols, mergedConfig.rows);
+    
+    const intervalId = setInterval(() => {
+      setAnimationProgress(prev => (prev + 1) % anim.duration);
+    }, 150);
+    
+    setAnimationProgress(0);
+    
+    return () => clearInterval(intervalId);
   }, [animatePulse, animation, mergedConfig.cols, mergedConfig.rows]);
 
   const getEffectiveGrid = useCallback((x: number, y: number): boolean => {
     const baseLit = dotMatrix[y]?.[x] ?? false;
     if (!baseLit) return false;
     
-    if (animatePulse && isPresetAnimation(animation) && ANIMATIONS[animation]) {
-      const preset = ANIMATIONS[animation](mergedConfig.cols, mergedConfig.rows);
-      const animGrid = preset.frame(animationProgress);
-      return !!(animGrid[y]?.[x]) || baseLit;
+    if (animatePulse && animation !== 'static') {
+      const preset = (ANIMATIONS as Record<string, (w: number, h: number) => { frame: (t: number) => any; duration: number }>)[animation];
+      if (preset) {
+        const anim = preset(mergedConfig.cols, mergedConfig.rows);
+        const animGrid = anim.frame(animationProgress);
+        return !!(animGrid[y]?.[x]) && baseLit;
+      }
     }
     
     return baseLit;

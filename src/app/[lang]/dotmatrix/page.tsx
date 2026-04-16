@@ -165,15 +165,19 @@ const convert = async () => {
 
      // If animation is active, create GIF
      if (isAnimating) {
-       try {
-         // Import animation presets
-         const { ANIMATIONS } = await import('@/components/DotMatrix/animations/presets');
-         
-         // Get animation function from presets
-         const animationCreator = ANIMATIONS[selectedAnimation];
-         if (!animationCreator) {
-           throw new Error(`Unknown animation: ${selectedAnimation}`);
-         }
+        try {
+          // Import animation presets
+          const { ANIMATIONS } = await import('@/components/DotMatrix/animations/presets');
+          
+          // Get animation function from presets (skip if static)
+          if (selectedAnimation === 'static') {
+            throw new Error('Static animation not supported for GIF export');
+          }
+          
+          const animationCreator = ANIMATIONS[selectedAnimation];
+          if (!animationCreator) {
+            throw new Error(`Unknown animation: ${selectedAnimation}`);
+          }
          
          const animation = animationCreator(gridSize, gridSize);
          

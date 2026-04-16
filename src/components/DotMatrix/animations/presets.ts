@@ -24,4 +24,4 @@ export const ANIMATIONS = {
   reveal: createReveal,
 } as const;
 
-export type AnimationType = keyof typeof ANIMATIONS;
+export type AnimationType = 'static' | keyof typeof ANIMATIONS;
