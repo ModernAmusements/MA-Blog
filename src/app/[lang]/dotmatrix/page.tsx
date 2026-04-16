@@ -438,6 +438,9 @@ const convert = async () => {
                 {imageGrid && isAnimating && selectedAnimation !== 'static' && (
                   <button className={styles.primaryButton} onClick={handleDownload}>Download GIF</button>
                 )}
+                {imageGrid && !isAnimating && (
+                  <button className={styles.primaryButton} onClick={handleDownload}>Download PNG</button>
+                )}
               </div>
 
               {isConverting && (
