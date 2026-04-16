@@ -75,7 +75,7 @@ export function Dot({
       className={dotClass}
       style={{
         '--dot-delay': `${delay}s`,
-        '--dot-brightness': lit || isLit ? localBrightness : 0.15,
+        '--dot-brightness': lit || isLit ? brightness : 0.15,
         gridColumn: x + 1,
         gridRow: y + 1,
       } as React.CSSProperties}

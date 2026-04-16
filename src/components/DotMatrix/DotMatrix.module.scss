@@ -22,11 +22,12 @@
     }
     
 &.lit {
-      background: var(--dot-on-color, #f97316) !important;
+      background: var(--dot-on-color, #f97316);
+      opacity: var(--dot-brightness, 1);
       box-shadow: 0 0 calc(var(--dot-size, 6px) * 0.8) var(--dot-on-color, #f97316);
       
       [data-theme="light"] & {
-        background: var(--dot-on-color-light, #f97316) !important;
+        background: var(--dot-on-color-light, #f97316);
       }
       
       &:hover {
