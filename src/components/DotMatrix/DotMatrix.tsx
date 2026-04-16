@@ -67,6 +67,7 @@ export function DotMatrix({
   const [animationProgress, setAnimationProgress] = useState(0);
   
   const preset = getAnimationPreset(animation);
+  console.log('DotMatrix received animation:', animation, 'preset:', preset);
   const anim = useMemo(() => {
     if (!preset) return null;
     return preset(mergedConfig.cols, mergedConfig.rows);
@@ -109,7 +110,7 @@ export function DotMatrix({
     setAnimationProgress(0);
     
     return () => clearInterval(intervalId);
-  }, [animatePulse, anim]);
+  }, [animatePulse, anim, animation]);
 
   const getEffectiveGrid = useCallback((x: number, y: number): boolean => {
     const baseLit = dotMatrix[y]?.[x] ?? false;
