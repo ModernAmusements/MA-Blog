@@ -41,7 +41,7 @@ export default function DotMatrixPlayground() {
   const [imageDotSize, setImageDotSize] = useState(16);
   const [threshold, setThreshold] = useState(30);
   const [fitMode, setFitMode] = useState<'stretch' | 'fit' | 'crop'>('fit');
-  const [padColor, setPadColor] = useState('#000000');
+  const [displayColor, setDisplayColor] = useState<'primary' | 'accent'>('primary');
   const [containerWidth, setContainerWidth] = useState(600);
 
   const [editorGrid, setEditorGrid] = useState<boolean[][] | null>(null);
@@ -90,13 +90,12 @@ const convert = async () => {
          setConversionProgress(10);
          await new Promise(r => setTimeout(r, 50));
          
-         const result = await convertImageToDotMatrix(imageDataUrl, {
-           gridSize,
-           dotSize: imageDotSize,
-           invertColors: false,
-           fitMode,
-           padColor,
-         });
+          const result = await convertImageToDotMatrix(imageDataUrl, {
+            gridSize,
+            dotSize: imageDotSize,
+            invertColors: false,
+            fitMode,
+          });
          
          if (cancelled) return;
          
@@ -135,7 +134,7 @@ const convert = async () => {
     return () => {
       cancelled = true;
     };
-  }, [imageDataUrl, gridSize, imageDotSize, threshold, fitMode, padColor, invertColors]);
+  }, [imageDataUrl, gridSize, imageDotSize, threshold, fitMode, invertColors]);
 
   useEffect(() => {
     return () => {
@@ -413,17 +412,13 @@ const convert = async () => {
                 </select>
               </label>
 
-              {fitMode === 'fit' && (
-                <label>
-                  Pad Color:
-                  <input
-                    type="color"
-                    value={padColor}
-                    onChange={(e) => setPadColor(e.target.value)}
-                    className={styles.colorInput}
-                  />
-                </label>
-              )}
+              <label>
+                Display Color:
+                <select value={displayColor} onChange={(e) => setDisplayColor(e.target.value as 'primary' | 'accent')}>
+                  <option value="primary">Primary</option>
+                  <option value="accent">Accent</option>
+                </select>
+              </label>
 
               <div className={styles.buttonRow}>
                 {imageGrid && selectedAnimation !== 'static' && (
@@ -462,7 +457,7 @@ const convert = async () => {
                   cols: gridSize,
                   rows: gridSize,
                   dotSize: displayDotSize,
-                  color: 'orange',
+                  color: displayColor === 'primary' ? 'orange' : 'neon-green',
                   interactive: false,
                   imageData: useShades && imageData ? imageData : undefined,
                   imageGrid: imageGrid ?? blankGrid,
