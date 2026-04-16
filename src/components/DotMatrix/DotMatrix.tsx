@@ -174,11 +174,11 @@ export function DotMatrix({
                 x={x}
                 y={y}
                 lit={isLit}
-              brightness={brightness}
-              animatePulse={animatePulse && isInner}
-              animation={isInner ? animation : 'static'}
-            />
-          );
+                brightness={brightness}
+                animatePulse={animatePulse && isInner && animation === 'static'}
+                animation={isInner ? animation : 'static'}
+              />
+            );
         })
       )}
       </div>
