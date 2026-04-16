@@ -20,6 +20,7 @@ export interface DotMatrixConfig {
    imageData?: DotCell[][];
    message?: string;
    decorative?: 'arrow-left' | 'arrow-right' | 'wave' | 'grid' | 'heart';
+   useShades?: boolean;
  }
 
 const DotMatrixContext = createContext<{ config: DotMatrixConfig; litDots: Set<string> } | null>(null);
@@ -122,10 +123,13 @@ export function DotMatrix({
   }, [animatePulse, animation, mergedConfig.cols, mergedConfig.rows]);
 
   const getEffectiveGrid = useCallback((x: number, y: number): boolean => {
+    const baseLit = dotMatrix[y]?.[x] ?? false;
+    if (!baseLit) return false;
+    
     if (animationFrame) {
-      return animationFrame[y]?.[x] ?? false;
+      return animationFrame[y]?.[x] ?? baseLit;
     }
-    return dotMatrix[y]?.[x] ?? false;
+    return baseLit;
   }, [animationFrame, dotMatrix]);
 
   const litDots = useMemo(() => {
@@ -179,6 +183,7 @@ export function DotMatrix({
             const innerX = x - 1;
             const innerY = y - 1;
             const isLit = isInner && getEffectiveGrid(innerX, innerY);
+            const brightness = mergedConfig.imageData?.[innerY]?.[innerX]?.brightness ?? 1;
             
             return (
               <Dot
@@ -186,6 +191,7 @@ export function DotMatrix({
                 x={x}
                 y={y}
                 lit={isLit}
+                brightness={brightness}
                 animatePulse={animatePulse && isInner}
                 animation={isInner ? animation : 'static'}
               />

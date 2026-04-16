@@ -449,6 +449,7 @@ const convert = async () => {
                   dotSize: displayDotSize,
                   color: 'orange',
                   interactive: false,
+                  imageData: useShades && imageData ? imageData : undefined,
                   imageGrid: imageGrid ?? blankGrid,
                 }}
                 animatePulse={isAnimating}
