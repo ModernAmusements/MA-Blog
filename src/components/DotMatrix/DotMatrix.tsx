@@ -12,7 +12,7 @@ export interface DotMatrixConfig {
   rows: number;
   dotSize: number;
   gap: number;
-  color: 'orange' | 'white' | 'green' | 'red' | 'black';
+  color: 'orange' | 'white' | 'green' | 'red' | 'black' | 'neon-green' | 'purple';
   interactive: boolean;
   blackBorder?: boolean;
   imageGrid?: boolean[][];
@@ -113,15 +113,15 @@ export function DotMatrix({
 
   const getEffectiveGrid = useCallback((x: number, y: number): boolean => {
     const baseLit = dotMatrix[y]?.[x] ?? false;
-    if (!baseLit) return false;
     
     if (animatePulse && anim) {
       const animGrid = anim.frame(animationProgress);
-      return !!(animGrid[y]?.[x]) && baseLit;
+      const animLit = animGrid[y]?.[x];
+      return !!(animLit) && baseLit;
     }
     
     return baseLit;
-  }, [dotMatrix, animatePulse, anim, animationProgress]);
+  }, [dotMatrix, animatePulse, anim, animationProgress, animation]);
 
   const sizeClass = {
     2: styles.sizeTiny,
@@ -140,6 +140,8 @@ export function DotMatrix({
     green: styles.colorGreen,
     red: styles.colorRed,
     black: styles.colorBlack,
+    'neon-green': styles.colorNeonGreen,
+    purple: styles.colorPurple,
   }[mergedConfig.color] || styles.colorOrange;
 
   const gridStyle = {

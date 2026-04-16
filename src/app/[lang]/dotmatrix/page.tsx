@@ -9,7 +9,7 @@ import styles from './dotmatrix.module.scss';
 const ANIMATION_TYPES = Object.keys(ANIMATIONS) as AnimationType[];
 
 const GRID_SIZES = [8, 16, 32, 64, 128] as const;
-const COLORS = ['orange', 'white', 'green', 'red', 'black'] as const;
+const COLORS = ['orange', 'white', 'green', 'red', 'black', 'neon-green', 'purple'] as const;
 
 export default function DotMatrixPlayground() {
   const [color, setColor] = useState<'orange' | 'white' | 'green' | 'red' | 'black'>('orange');

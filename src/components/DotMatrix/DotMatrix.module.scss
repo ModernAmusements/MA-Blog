@@ -409,6 +409,20 @@
   --dot-off-color-light: #cccccc;
 }
 
+.colorNeonGreen {
+  --dot-on-color: #4BFF00;
+  --dot-off-color: #1a3d00;
+  --dot-on-color-light: #4BFF00;
+  --dot-off-color-light: #2d5a00;
+}
+
+.colorPurple {
+  --dot-on-color: #992EFE;
+  --dot-off-color: #2d0a3d;
+  --dot-on-color-light: #992EFE;
+  --dot-off-color-light: #4d1a5c;
+}
+
 .forceBlack.lit {
   background: #1a1a1a !important;
   box-shadow: none !important;
