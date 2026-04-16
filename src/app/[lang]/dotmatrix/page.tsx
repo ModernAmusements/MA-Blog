@@ -22,7 +22,7 @@ export default function DotMatrixPlayground() {
   const [isConverting, setIsConverting] = useState(false);
   const [conversionProgress, setConversionProgress] = useState(0);
   const [gridSize, setGridSize] = useState<8 | 16 | 32 | 64 | 128>(16);
-  const [selectedAnimation, setSelectedAnimation] = useState<AnimationType>('scan');
+  const [selectedAnimation, setSelectedAnimation] = useState<AnimationType>('reveal');
   const [isAnimating, setIsAnimating] = useState(false);
   const [invertColors, setInvertColors] = useState(false);
 
