@@ -160,35 +160,34 @@ const convert = async () => {
      setIsAnimating(false);
    }, [imageDataUrl]);
 
-   const handleDownload = useCallback(async () => {
-     if (!imageData) return;
+    const handleDownload = useCallback(async () => {
+      if (!imageData) return;
 
-     // If animation is active, create GIF
-     if (isAnimating) {
-        try {
-          // Import animation presets
-          const { ANIMATIONS } = await import('@/components/DotMatrix/animations/presets');
+      // If animation is active, create GIF
+      if (isAnimating && selectedAnimation !== 'static') {
+         try {
+           // Import animation presets
+           const { ANIMATIONS } = await import('@/components/DotMatrix/animations/presets');
+           
+           const animationCreator = ANIMATIONS[selectedAnimation];
+           if (!animationCreator) {
+             throw new Error(`Unknown animation: ${selectedAnimation}`);
+           }
           
-          // Get animation function from presets (skip if static)
-          if (selectedAnimation === 'static') {
-            throw new Error('Static animation not supported for GIF export');
-          }
+          const animation = animationCreator(gridSize, gridSize);
+          const thresholdValue = threshold / 100;
           
-          const animationCreator = ANIMATIONS[selectedAnimation];
-          if (!animationCreator) {
-            throw new Error(`Unknown animation: ${selectedAnimation}`);
-          }
-         
-         const animation = animationCreator(gridSize, gridSize);
-         
-         // Create GIF using animation frames
-         const gifBytes = createGIF(gridSize, gridSize, (t) => {
-           const frame = animation.frame(t % animation.duration);
-           // Convert animation grid (0/1) to brightness values (0 or 1) for GIF encoding
-           return frame.map(row => 
-             row.map(cell => cell ? 1 : 0)
-           );
-         }, 30);
+          // Create GIF using animation frames - combine image with animation
+          const gifBytes = createGIF(gridSize, gridSize, (t) => {
+            const animFrame = animation.frame(t % animation.duration);
+            // Apply animation mask to image - only show dot if BOTH image has it AND animation reveals it
+            return animFrame.map((row, y) => 
+              row.map((cell, x) => {
+                const brightness = imageData[y]?.[x]?.brightness ?? 0;
+                return (brightness > thresholdValue && cell) ? 1 : 0;
+              })
+            );
+          }, 30);
          
           // Create blob and download
           const blob = new Blob([new Uint8Array(gifBytes)], { type: 'image/gif' });
@@ -394,14 +393,7 @@ const convert = async () => {
                    checked={useShades}
                    onChange={(e) => setUseShades(e.target.checked)}
                  />
-               </label>
-
-               <button 
-                 onClick={() => setIsAnimating(!isAnimating)}
-                 className={isAnimating ? styles.stopButton : styles.startButton}
-                >
-                  {isAnimating ? 'Stop' : 'Start'}
-                </button>
+                </label>
 
                 <label>
                   Invert Colors: 
@@ -434,9 +426,17 @@ const convert = async () => {
               )}
 
               <div className={styles.buttonRow}>
+                {imageGrid && selectedAnimation !== 'static' && (
+                  <button 
+                    onClick={() => setIsAnimating(!isAnimating)}
+                    className={isAnimating ? styles.stopButton : styles.startButton}
+                  >
+                    {isAnimating ? 'Stop' : 'Start'}
+                  </button>
+                )}
                 <button onClick={handleClear} disabled={!imageFile}>Clear</button>
-                {imageGrid && (
-                  <button className={styles.primaryButton} onClick={handleDownload}>Download</button>
+                {imageGrid && isAnimating && selectedAnimation !== 'static' && (
+                  <button className={styles.primaryButton} onClick={handleDownload}>Download GIF</button>
                 )}
               </div>
 
