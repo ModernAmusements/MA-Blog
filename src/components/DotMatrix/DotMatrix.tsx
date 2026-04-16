@@ -67,7 +67,6 @@ export function DotMatrix({
   const [animationProgress, setAnimationProgress] = useState(0);
   
   const preset = getAnimationPreset(animation);
-  console.log('DotMatrix received animation:', animation, 'preset:', preset);
   const anim = useMemo(() => {
     if (!preset) return null;
     return preset(mergedConfig.cols, mergedConfig.rows);
@@ -90,7 +89,7 @@ export function DotMatrix({
     for (let y = 0; y < mergedConfig.rows; y++) {
       paddedDots[y] = [];
       for (let x = 0; x < mergedConfig.cols; x++) {
-        paddedDots[y][x] = baseDots[y]?.[x] ?? false;
+        paddedDots[y][x] = !!baseDots[y]?.[x];
       }
     }
     
