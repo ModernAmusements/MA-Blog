@@ -18,15 +18,26 @@ export function createGIF(
   
   const bg = parseColor(bgColor);
   const dot = parseColor(dotColor);
-  const colorPalette = [bg, dot];
+  const colorPalette = [...bg, ...dot];
   
+  // GIF Header with color table
+  const packedField = 0xf7; // Global color table, 256 colors (2^8 - 1 = 255, but we use 2 colors)
   const header = [
-    0x47, 0x49, 0x46, 0x38, 0x39, 0x61,
+    0x47, 0x49, 0x46, 0x38, 0x39, 0x61, // GIF89a
     width & 0xff, (width >> 8) & 0xff,
     height & 0xff, (height >> 8) & 0xff,
-    0xf7, 0x00, 0x00,
+    packedField,
+    0x00, // Background color index
+    0x00, // Pixel aspect ratio
+    ...colorPalette,
   ];
   
+  // Add padding to make color table 256 colors (3 bytes * 256 = 768 bytes)
+  for (let i = 0; i < 768 - colorPalette.length; i++) {
+    header.push(0x00);
+  }
+  
+  // Netscape extension for looping
   const netscapeExt = [0x21, 0xff, 0x0b, 0x4e, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, 0x32, 0x2e, 0x30, 0x00, 0x00];
   
   const allFrames: number[] = [];
@@ -44,8 +55,8 @@ export function createGIF(
     // Graphics Control Extension
     const gce = [0x21, 0xf9, 0x04, 0x00, delay & 0xff, (delay >> 8) & 0xff, 0x00, 0x00];
     
-    // Image Descriptor
-    const imgDesc = [0x2c, 0x00, 0x00, 0x00, 0x00, width & 0xff, (width >> 8) & 0xff, height & 0xff, (height >> 8) & 0xff, 0x00, 0x08];
+    // Image Descriptor (no local color table)
+    const imgDesc = [0x2c, 0x00, 0x00, 0x00, 0x00, width & 0xff, (width >> 8) & 0xff, height & 0xff, (height >> 8) & 0xff, 0x00];
     
     // LZW minimum code size
     const codeSize = 2;
