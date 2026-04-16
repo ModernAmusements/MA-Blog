@@ -159,51 +159,67 @@ const convert = async () => {
      setIsAnimating(false);
    }, [imageDataUrl]);
 
-    const handleDownload = useCallback(async () => {
-      if (!imageData) return;
-
-      // If animation is active, create GIF
-      if (isAnimating && selectedAnimation !== 'static') {
-         try {
-           // Import animation presets
-           const { ANIMATIONS } = await import('@/components/DotMatrix/animations/presets');
-           
-           const animationCreator = ANIMATIONS[selectedAnimation];
-           if (!animationCreator) {
-             throw new Error(`Unknown animation: ${selectedAnimation}`);
-           }
-          
-          const animation = animationCreator(gridSize, gridSize);
-          const thresholdValue = threshold / 100;
-          
-          // Create GIF using animation frames - combine image with animation
-          const gifBytes = createGIF(gridSize, gridSize, (t) => {
-            const animFrame = animation.frame(t % animation.duration);
-            // Apply animation mask to image - only show dot if BOTH image has it AND animation reveals it
-            return animFrame.map((row, y) => 
-              row.map((cell, x) => {
-                const brightness = imageData[y]?.[x]?.brightness ?? 0;
-                return (brightness > thresholdValue && cell) ? 1 : 0;
-              })
-            );
-          }, 30);
-         
-          // Create blob and download
-          const blob = new Blob([new Uint8Array(gifBytes)], { type: 'image/gif' });
-         const url = URL.createObjectURL(blob);
-         const link = document.createElement('a');
-         link.download = `dotmatrix-${selectedAnimation}-${gridSize}x${gridSize}.gif`;
-         link.href = url;
-         link.click();
-         
-         // Clean up
-         setTimeout(() => {
-           URL.revokeObjectURL(url);
-         }, 100);
-       } catch (error) {
-         console.error('Failed to create GIF:', error);
-         alert('Failed to create GIF. Please try again.');
+     const handleDownload = useCallback(async () => {
+       if (!imageData) {
+         console.log('No imageData');
+         return;
        }
+
+       // If animation is active, create GIF
+       if (isAnimating && selectedAnimation !== 'static') {
+          try {
+            console.log('Creating GIF with animation:', selectedAnimation);
+            // Import animation presets
+            const { ANIMATIONS } = await import('@/components/DotMatrix/animations/presets');
+            
+            const animationCreator = ANIMATIONS[selectedAnimation];
+            if (!animationCreator) {
+              throw new Error(`Unknown animation: ${selectedAnimation}`);
+            }
+           
+            const animation = animationCreator(gridSize, gridSize);
+            const thresholdValue = threshold / 100;
+            
+            // Get the dot color based on display color
+            const dotColorMap: Record<string, string> = {
+              primary: '#f97316',   // orange
+              accent: '#4BFF00',    // neon-green
+              pink: '#FF9CEA',      // pink
+            };
+            const dotColor = dotColorMap[displayColor] || '#f97316';
+            
+            console.log('Animation duration:', animation.duration, 'color:', dotColor);
+            
+            // Create GIF using animation frames - combine image with animation
+            const gifBytes = createGIF(gridSize, gridSize, (t) => {
+              const animFrame = animation.frame(t % animation.duration);
+              // Apply animation mask to image - only show dot if BOTH image has it AND animation reveals it
+              return animFrame.map((row, y) => 
+                row.map((cell, x) => {
+                  const brightness = imageData[y]?.[x]?.brightness ?? 0;
+                  return (brightness > thresholdValue && cell) ? 1 : 0;
+                })
+              );
+            }, animation.duration, dotColor, '#000000');
+           
+            console.log('GIF created, bytes:', gifBytes.length);
+           
+           // Create blob and download
+           const blob = new Blob([new Uint8Array(gifBytes)], { type: 'image/gif' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = `dotmatrix-${selectedAnimation}-${gridSize}x${gridSize}.gif`;
+          link.href = url;
+          link.click();
+          
+          // Clean up
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 100);
+        } catch (error) {
+          console.error('Failed to create GIF:', error);
+          alert('Failed to create GIF. Please try again.');
+        }
      } else {
        // Static PNG download - use brightness data for shades when enabled
        const canvas = document.createElement('canvas');

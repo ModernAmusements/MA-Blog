@@ -1,6 +1,24 @@
-export function createGIF(width: number, height: number, getFrame: (t: number) => number[][], frameCount: number = 30): Uint8Array {
+export function createGIF(
+  width: number, 
+  height: number, 
+  getFrame: (t: number) => number[][], 
+  frameCount: number = 30,
+  dotColor: string = '#f97316',
+  bgColor: string = '#000000'
+): Uint8Array {
   const delay = 8;
-  const lzwMinCodeSize = 2;
+  
+  // Parse colors to RGB
+  const parseColor = (hex: string) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return [r, g, b];
+  };
+  
+  const bg = parseColor(bgColor);
+  const dot = parseColor(dotColor);
+  const colorPalette = [bg, dot];
   
   const header = [
     0x47, 0x49, 0x46, 0x38, 0x39, 0x61,
@@ -11,7 +29,7 @@ export function createGIF(width: number, height: number, getFrame: (t: number) =
   
   const netscapeExt = [0x21, 0xff, 0x0b, 0x4e, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, 0x32, 0x2e, 0x30, 0x00, 0x00];
   
-  const frames: number[][] = [];
+  const allFrames: number[] = [];
   
   for (let t = 0; t < frameCount; t++) {
     const grid = getFrame(t);
@@ -23,13 +41,17 @@ export function createGIF(width: number, height: number, getFrame: (t: number) =
       }
     }
     
+    // Graphics Control Extension
     const gce = [0x21, 0xf9, 0x04, 0x00, delay & 0xff, (delay >> 8) & 0xff, 0x00, 0x00];
     
+    // Image Descriptor
     const imgDesc = [0x2c, 0x00, 0x00, 0x00, 0x00, width & 0xff, (width >> 8) & 0xff, height & 0xff, (height >> 8) & 0xff, 0x00, 0x08];
     
-    const codeSize = lzwMinCodeSize;
+    // LZW minimum code size
+    const codeSize = 2;
     imgDesc.push(codeSize);
     
+    // Prepare pixel data
     const pixels8 = [...pixels];
     let output: number[] = [];
     let codeSizeNow = codeSize + 1;
@@ -83,6 +105,7 @@ export function createGIF(width: number, height: number, getFrame: (t: number) =
     
     if (bits > 0) output.push(buffer & 0xff);
     
+    // Sub-block the image data
     const imgData: number[] = [];
     for (let i = 0; i < output.length; i += 255) {
       const chunk = output.slice(i, i + 255);
@@ -90,10 +113,10 @@ export function createGIF(width: number, height: number, getFrame: (t: number) =
     }
     imgData.push(0x00);
     
-    frames.push([...gce, ...imgDesc, ...imgData]);
+    allFrames.push(...gce, ...imgDesc, ...imgData);
   }
   
   const trailer = [0x3b];
   
-  return new Uint8Array([...header, ...netscapeExt, ...frames.flat(), ...trailer]);
+  return new Uint8Array([...header, ...netscapeExt, ...allFrames, ...trailer]);
 }
