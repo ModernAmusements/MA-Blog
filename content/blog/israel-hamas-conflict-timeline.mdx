@@ -1,0 +1,66 @@
+---
+title: Visualizing the Israel-Hamas Conflict - A Timeline Map
+description: An interactive web application that visualizes the Israel-Hamas conflict from 1900 to 2025 using Leaflet.js and vanilla JavaScript.
+date: 2026-04-16
+tags: ['javascript', 'leaflet', 'mapping', 'data-visualization', 'vite']
+---
+
+# Visualizing the Israel-Hamas Conflict - A Timeline Map
+
+I've just released an interactive timeline visualization of the Israel-Hamas conflict, spanning over 120 years of history from 1900 to 2025. Built with vanilla JavaScript, Leaflet.js, and SCSS, this project provides an immersive way to explore historical events through an interactive map interface.
+
+![Full Page View](/images/projects/conflict/Bildschirmfoto%202026-04-16%20um%2011.59.10.png)
+
+## The Challenge
+
+The goal was to make complex historical data **accessible and understandable**. Instead of presenting static lists or tables of events, this visualization places each event on a geographic context, allowing users to see spatial relationships between conflicts, military operations, and territorial shifts.
+
+## Technical Stack
+
+| Component | Technology |
+|-----------|------------|
+| Frontend | Vanilla JavaScript (ES6+) |
+| Mapping | Leaflet.js 1.9.4 |
+| Styling | SCSS |
+| Build Tool | Vite 7.3.1 |
+| Hosting | Vercel |
+
+## Key Features
+
+- **Interactive Timeline Slider** - Navigate from 1900 to 2025
+- **NATO Military Symbology** - Standardized symbols for different factions
+- **Event Clustering** - Groups nearby events to prevent marker overlap
+- **Side Panel** - Shows latest 15 events for the current timeline position
+- **Swiss Design** - Clean, minimal black and white aesthetic
+
+## Design Decisions
+
+I chose vanilla JavaScript over React because the project didn't require the complexity of a component-based architecture. This resulted in **better performance** and **smaller bundle sizes**.
+
+The map uses CartoDB's light tile layer for a clean white background that makes military symbols stand out clearly. NATO symbology provides instant recognition:
+- **Blue** - Israeli-aligned forces
+- **Red** - Hamas/Palestinian militants  
+- **Green** - Regional/International forces
+- **Orange** - Unaffiliated events
+
+## Lessons Learned
+
+Several challenges came up during development:
+
+1. **Marker Overlap** - Solved with a hierarchical spiral offset system based on priority scoring (casualties, impact level, recency)
+
+2. **Empty Timeline Years** - Created a filter to only stop on years with valid geographic coordinates
+
+3. **Vite External Scripts** - Required manual copy step in build script since Vite doesn't automatically bundle external CDN scripts
+
+```json
+"build": "vite build && cp -r js dist/ && cp -r data dist/"
+```
+
+## Try It Live
+
+The project is live at: [israel-hamas-conflict.vercel.app](https://israel-hamas-conflict.vercel.app)
+
+Source code: [github.com/ModernAmusements/Conflict-Visulizer](https://github.com/ModernAmusements/Conflict-Visulizer)
+
+![Map Detail](/images/projects/conflict/Bildschirmfoto%202026-04-16%20um%2011.58.44.png)
