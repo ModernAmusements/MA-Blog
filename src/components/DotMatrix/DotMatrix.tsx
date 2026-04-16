@@ -12,7 +12,7 @@ export interface DotMatrixConfig {
   rows: number;
   dotSize: number;
   gap: number;
-  color: 'orange' | 'white' | 'green' | 'red' | 'black' | 'neon-green' | 'purple';
+  color: 'orange' | 'white' | 'green' | 'red' | 'black' | 'neon-green' | 'purple' | 'pink';
   interactive: boolean;
   blackBorder?: boolean;
   imageGrid?: boolean[][];
@@ -142,6 +142,7 @@ export function DotMatrix({
     black: styles.colorBlack,
     'neon-green': styles.colorNeonGreen,
     purple: styles.colorPurple,
+    pink: styles.colorPink,
   }[mergedConfig.color] || styles.colorOrange;
 
   const gridStyle = {

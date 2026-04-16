@@ -423,6 +423,13 @@
   --dot-off-color-light: #4d1a5c;
 }
 
+.colorPink {
+  --dot-on-color: #FF9CEA;
+  --dot-off-color: #3d1a2d;
+  --dot-on-color-light: #FF9CEA;
+  --dot-off-color-light: #5c2a4d;
+}
+
 .forceBlack.lit {
   background: #1a1a1a !important;
   box-shadow: none !important;

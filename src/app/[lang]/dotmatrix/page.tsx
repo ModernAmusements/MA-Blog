@@ -9,7 +9,7 @@ import styles from './dotmatrix.module.scss';
 const ANIMATION_TYPES = Object.keys(ANIMATIONS) as AnimationType[];
 
 const GRID_SIZES = [8, 16, 32, 64, 128] as const;
-const COLORS = ['orange', 'white', 'green', 'red', 'black', 'neon-green', 'purple'] as const;
+const COLORS = ['orange', 'white', 'green', 'red', 'black', 'neon-green', 'purple', 'pink'] as const;
 
 export default function DotMatrixPlayground() {
   const [color, setColor] = useState<'orange' | 'white' | 'green' | 'red' | 'black'>('orange');
@@ -41,7 +41,7 @@ export default function DotMatrixPlayground() {
   const [imageDotSize, setImageDotSize] = useState(16);
   const [threshold, setThreshold] = useState(30);
   const [fitMode, setFitMode] = useState<'stretch' | 'fit' | 'crop'>('fit');
-  const [displayColor, setDisplayColor] = useState<'primary' | 'accent'>('primary');
+  const [displayColor, setDisplayColor] = useState<'primary' | 'accent' | 'pink'>('primary');
   const [containerWidth, setContainerWidth] = useState(600);
 
   const [editorGrid, setEditorGrid] = useState<boolean[][] | null>(null);
@@ -414,9 +414,10 @@ const convert = async () => {
 
               <label>
                 Display Color:
-                <select value={displayColor} onChange={(e) => setDisplayColor(e.target.value as 'primary' | 'accent')}>
+                <select value={displayColor} onChange={(e) => setDisplayColor(e.target.value as 'primary' | 'accent' | 'pink')}>
                   <option value="primary">Primary</option>
                   <option value="accent">Accent</option>
+                  <option value="pink">Pink</option>
                 </select>
               </label>
 
@@ -457,7 +458,7 @@ const convert = async () => {
                   cols: gridSize,
                   rows: gridSize,
                   dotSize: displayDotSize,
-                  color: displayColor === 'primary' ? 'orange' : 'neon-green',
+                  color: displayColor === 'primary' ? 'orange' : displayColor === 'accent' ? 'neon-green' : 'pink',
                   interactive: false,
                   imageData: useShades && imageData ? imageData : undefined,
                   imageGrid: imageGrid ?? blankGrid,
