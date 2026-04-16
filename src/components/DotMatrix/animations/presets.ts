@@ -8,12 +8,13 @@ export interface Animation {
 }
 
 export function createReveal(width: number, height: number): Animation {
+  const duration = height;
   return {
     width,
     height,
-    duration: height,
-    frame: (t) => {
-      const grid = createGrid(width, height);
+    duration,
+    frame: (t: number) => {
+      const grid = createGrid(width, height, 0);
       const revealRow = Math.min(t, height - 1);
       
       for (let y = 0; y <= revealRow; y++) {
@@ -28,12 +29,13 @@ export function createReveal(width: number, height: number): Animation {
 }
 
 export function createScan(width: number, height: number): Animation {
+  const duration = width;
   return {
     width,
     height,
-    duration: width,
-    frame: (t) => {
-      const grid = createGrid(width, height);
+    duration,
+    frame: (t: number) => {
+      const grid = createGrid(width, height, 0);
       const scanCol = Math.min(t, width - 1);
       
       for (let y = 0; y < height; y++) {
