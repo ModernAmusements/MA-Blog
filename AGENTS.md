@@ -4,6 +4,13 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
+## Session Rules
+
+- Work independently without asking user for clarification
+- Continue through tasks in priority order until blocked
+- If blocked, note the issue and move to next available task
+- ALWAYS test changes by running build and verifying in browser when needed
+
 ## Workflow Rules
 
 ### Always Build and Check for Errors

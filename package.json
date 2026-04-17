@@ -12,6 +12,7 @@
     "@formspree/react": "^3.0.0",
     "@tailwindcss/typography": "^0.5.19",
     "@vercel/analytics": "^2.0.1",
+    "gifenc": "^1.0.3",
     "gray-matter": "^4.0.3",
     "highlight.js": "^11.11.1",
     "mermaid": "^11.14.0",

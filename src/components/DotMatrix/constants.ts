@@ -1,0 +1,13 @@
+export const DEFAULT_GRID_SIZE = 15;
+export const DEFAULT_DOT_SIZE = 4;
+export const DEFAULT_GAP = 1;
+export const ANIMATION_INTERVAL_MS = 150;
+export const GIF_DELAY_MS = 80;
+export const MIN_DOT_SIZE = 2;
+export const MAX_DOT_SIZE = 16;
+export const MIN_GRID_SIZE = 8;
+export const MAX_GRID_SIZE = 128;
+export const DEFAULT_THRESHOLD = 50;
+export const DEFAULT_PADDING = 16;
+export const DEFAULT_DOWNLOAD_DOT_SIZE = 10;
+export const DEFAULT_DOWNLOAD_GAP = 2;

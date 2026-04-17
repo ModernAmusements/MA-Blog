@@ -1,6 +1,4 @@
-export interface DotCell {
-  brightness: number;
-}
+import type { DotCell } from './types';
 
 export interface ImageConversionOptions {
   gridSize: 8 | 16 | 32 | 64 | 128;
@@ -9,6 +7,8 @@ export interface ImageConversionOptions {
   fitMode?: 'stretch' | 'fit' | 'crop';
   padColor?: string;
 }
+
+export type { DotCell };
 
 function calculateBrightness(r: number, g: number, b: number): number {
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255;

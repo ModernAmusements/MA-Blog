@@ -5,21 +5,10 @@ import { Dot } from './Dot';
 import { messageToDots, getDecorativePattern, DEFAULT_MESSAGE } from './ascii';
 import { DotCell } from './imageConverter';
 import { ANIMATIONS, AnimationType, Animation } from './animations/presets';
+import type { DotMatrixConfig } from './types';
 import styles from './DotMatrix.module.scss';
 
-export interface DotMatrixConfig {
-  cols: number;
-  rows: number;
-  dotSize: number;
-  gap: number;
-  color: 'orange' | 'white' | 'green' | 'red' | 'black' | 'neon-green' | 'purple' | 'pink';
-  interactive: boolean;
-  blackBorder?: boolean;
-  imageGrid?: boolean[][];
-  imageData?: DotCell[][];
-  message?: string;
-  decorative?: 'arrow-left' | 'arrow-right' | 'wave' | 'grid' | 'heart';
-}
+export { type DotMatrixConfig, type DotCell, type Animation, type AnimationType, type DotColor, type DecorativePattern } from './types';
 
 const DotMatrixContext = createContext<{ config: DotMatrixConfig } | null>(null);
 
@@ -36,6 +25,7 @@ interface DotMatrixProps {
   className?: string;
   animatePulse?: boolean;
   animation?: AnimationType;
+  animationSpeed?: number;
 }
 
 const defaultConfig: DotMatrixConfig = {
@@ -61,6 +51,7 @@ export function DotMatrix({
   className = '',
   animatePulse = false,
   animation = 'static',
+  animationSpeed = 150,
 }: DotMatrixProps) {
   const mergedConfig = { ...defaultConfig, ...config } as DotMatrixConfig;
   
@@ -104,7 +95,7 @@ export function DotMatrix({
     
     const intervalId = setInterval(() => {
       setAnimationProgress(prev => (prev + 1) % anim.duration);
-    }, 150);
+    }, animationSpeed);
     
     setAnimationProgress(0);
     
@@ -150,6 +141,7 @@ export function DotMatrix({
     gridTemplateRows: `repeat(${mergedConfig.rows + 2}, ${mergedConfig.dotSize}px)`,
     '--dot-size': `${mergedConfig.dotSize}px`,
     '--dot-gap': `${mergedConfig.gap}px`,
+    '--matrix-bg': mergedConfig.bgColor || 'transparent',
   } as React.CSSProperties;
 
   const animationClass = animatePulse ? styles.animatingContainer : '';
@@ -159,6 +151,8 @@ export function DotMatrix({
       <div
         className={`${styles.dotMatrix} ${sizeClass} ${colorClass} ${animationClass} ${className}`}
         style={gridStyle}
+        role="grid"
+        aria-label={`${mergedConfig.cols} by ${mergedConfig.rows} dot matrix display`}
       >
         {!mergedConfig.blackBorder && Array.from({ length: mergedConfig.rows + 2 }).map((_, y) =>
           Array.from({ length: mergedConfig.cols + 2 }).map((_, x) => {
