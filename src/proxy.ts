@@ -27,7 +27,7 @@ function getPathWithoutLang(pathname: string): string {
   return pathname;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   if (

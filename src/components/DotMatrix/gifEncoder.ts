@@ -1,5 +1,71 @@
 import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 
+export function createSpriteSheet(
+  width: number,
+  height: number,
+  getFrame: (t: number) => number[][],
+  frameCount: number,
+  dotColor: string = '#f97316',
+  bgColor: string = '#000000',
+  dotSize: number = 10,
+  gap: number = 2
+): string {
+  const frameWidth = width * (dotSize + gap);
+  const frameHeight = height * (dotSize + gap);
+  const sheetWidth = frameWidth * Math.min(frameCount, 4);
+  const sheetHeight = frameHeight * Math.ceil(frameCount / 4);
+  
+  let rects = '';
+  for (let f = 0; f < frameCount; f++) {
+    const grid = getFrame(f);
+    const col = f % 4;
+    const row = Math.floor(f / 4);
+    const offsetX = col * frameWidth;
+    const offsetY = row * frameHeight;
+    
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (grid[y]?.[x]) {
+          rects += `<rect x="${offsetX + x * (dotSize + gap)}" y="${offsetY + y * (dotSize + gap)}" width="${dotSize}" height="${dotSize}" fill="${dotColor}"/>`;
+        }
+      }
+    }
+  }
+  
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${sheetWidth}" height="${sheetHeight}" viewBox="0 0 ${sheetWidth} ${sheetHeight}">
+    <rect width="${sheetWidth}" height="${sheetHeight}" fill="${bgColor}"/>
+    ${rects}
+  </svg>`;
+}
+
+export function createSVG(
+  width: number,
+  height: number,
+  grid: number[][],
+  dotColor: string = '#f97316',
+  bgColor: string = '#000000',
+  dotSize: number = 10,
+  gap: number = 2
+): string {
+  const totalSize = dotSize + gap;
+  const svgWidth = width * totalSize;
+  const svgHeight = height * totalSize;
+  
+  let dots = '';
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (grid[y]?.[x]) {
+        dots += `<rect x="${x * totalSize}" y="${y * totalSize}" width="${dotSize}" height="${dotSize}" fill="${dotColor}"/>`;
+      }
+    }
+  }
+  
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}">
+    <rect width="${svgWidth}" height="${svgHeight}" fill="${bgColor}"/>
+    ${dots}
+  </svg>`;
+}
+
 export function createGIF(
   width: number, 
   height: number, 

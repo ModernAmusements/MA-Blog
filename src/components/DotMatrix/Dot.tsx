@@ -10,7 +10,7 @@ interface DotProps {
   brightness?: number;
   delay?: number;
   interactive?: boolean;
-  animation?: 'static' | 'reveal' | 'scan' | 'blink' | 'wave';
+  animation?: 'static' | 'reveal' | 'scan' | 'blink' | 'wave' | 'spiral' | 'sparkle' | 'snake' | 'bounce';
   onHover?: (x: number, y: number, isHovering: boolean) => void;
   forceColor?: 'orange' | 'black';
   animatePulse?: boolean;

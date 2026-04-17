@@ -133,3 +133,61 @@ export async function convertImageToDotMatrix(
     }
   });
 }
+
+export function applyEdgeDetection(grid: DotCell[][], threshold: number = 0.3): DotCell[][] {
+  const height = grid.length;
+  const width = grid[0]?.length || 0;
+  const result: DotCell[][] = [];
+  
+  for (let y = 0; y < height; y++) {
+    result[y] = [];
+    for (let x = 0; x < width; x++) {
+      const current = grid[y]?.[x]?.brightness || 0;
+      const right = grid[y]?.[x + 1]?.brightness || 0;
+      const below = grid[y + 1]?.[x]?.brightness || 0;
+      const diff = Math.abs(current - right) + Math.abs(current - below);
+      result[y][x] = { brightness: diff > threshold ? 1 : diff > threshold / 2 ? 0.5 : 0 };
+    }
+  }
+  
+  return result;
+}
+
+export function applyDithering(grid: DotCell[][]): DotCell[][] {
+  const height = grid.length;
+  const width = grid[0]?.length || 0;
+  const result: DotCell[][] = [];
+  
+  for (let y = 0; y < height; y++) {
+    result[y] = [];
+    for (let x = 0; x < width; x++) {
+      const val = grid[y]?.[x]?.brightness || 0;
+      const threshold = ((x + y) % 2) * 0.5;
+      result[y][x] = { brightness: val > threshold ? 1 : 0 };
+    }
+  }
+  
+  return result;
+}
+
+export function adjustBrightness(grid: DotCell[][], delta: number): DotCell[][] {
+  return grid.map(row =>
+    row.map(cell => ({
+      brightness: Math.max(0, Math.min(1, cell.brightness + delta))
+    }))
+  );
+}
+
+export function adjustContrast(grid: DotCell[][], factor: number): DotCell[][] {
+  return grid.map(row =>
+    row.map(cell => ({
+      brightness: Math.max(0, Math.min(1, (cell.brightness - 0.5) * factor + 0.5))
+    }))
+  );
+}
+
+export function invertGrid(grid: DotCell[][]): DotCell[][] {
+  return grid.map(row =>
+    row.map(cell => ({ brightness: 1 - cell.brightness }))
+  );
+}

@@ -13,9 +13,9 @@ export { DotMatrixEditor } from './DotMatrixEditor';
 
 export { ASCII_PATTERNS, messageToDots, getDecorativePattern, DEFAULT_MESSAGE } from './ascii';
 
-export { convertImageToDotMatrix } from './imageConverter';
+export { convertImageToDotMatrix, applyEdgeDetection, applyDithering, adjustBrightness, adjustContrast, invertGrid } from './imageConverter';
 export type { ImageConversionOptions } from './imageConverter';
 
-export { createGIF } from './gifEncoder';
+export { createGIF, createSVG, createSpriteSheet } from './gifEncoder';
 
 export * from './constants';
