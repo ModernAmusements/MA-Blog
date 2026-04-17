@@ -9,7 +9,14 @@ import styles from './dotmatrix.module.scss';
 const ANIMATION_TYPES = Object.keys(ANIMATIONS) as AnimationType[];
 
 const GRID_SIZES = [8, 16, 32, 64, 128] as const;
+const GRID_PRESETS = [8, 16, 32, 64] as const;
 const COLORS = ['orange', 'white', 'green', 'red', 'black', 'neon-green', 'purple', 'pink'] as const;
+
+const DOT_COLOR_MAP: Record<string, string> = {
+  primary: '#f97316',
+  accent: '#4BFF00',
+  pink: '#FF9CEA',
+};
 
 export default function DotMatrixPlayground() {
   const [color, setColor] = useState<'orange' | 'white' | 'green' | 'red' | 'black'>('orange');
@@ -24,6 +31,7 @@ export default function DotMatrixPlayground() {
   const [gridSize, setGridSize] = useState<8 | 16 | 32 | 64 | 128>(16);
   const [selectedAnimation, setSelectedAnimation] = useState<AnimationType>('reveal');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [animationSpeed, setAnimationSpeed] = useState(150);
   const [invertColors, setInvertColors] = useState(false);
 
   useEffect(() => {
@@ -339,6 +347,18 @@ const convert = async () => {
                   value={gridSize}
                   onChange={(e) => handleGridSizeChange(Number(e.target.value))}
                 />
+                <div className={styles.presetButtons}>
+                  {GRID_PRESETS.map(size => (
+                    <button
+                      key={size}
+                      type="button"
+                      className={gridSize === size ? styles.presetActive : ''}
+                      onClick={() => handleGridSizeChange(size)}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
               </label>
 
               <label className={styles.dotSizeLabel}>
@@ -364,14 +384,26 @@ const convert = async () => {
                 />
               </label>
 
-               <label>
-                 Animation:
-                 <select value={selectedAnimation} onChange={(e) => setSelectedAnimation(e.target.value as AnimationType)}>
-                   {ANIMATION_TYPES.map(anim => (
-                     <option key={anim} value={anim}>{anim}</option>
-                   ))}
-                 </select>
-               </label>
+<label>
+                  Animation:
+                  <select value={selectedAnimation} onChange={(e) => setSelectedAnimation(e.target.value as AnimationType)}>
+                    {ANIMATION_TYPES.map(anim => (
+                      <option key={anim} value={anim}>{anim}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  Speed: {animationSpeed}ms
+                  <input
+                    type="range"
+                    min="50"
+                    max="500"
+                    step="10"
+                    value={animationSpeed}
+                    onChange={(e) => setAnimationSpeed(Number(e.target.value))}
+                  />
+                </label>
 
                <label>
                  Use Shades: 
@@ -402,11 +434,17 @@ const convert = async () => {
 
               <label>
                 Display Color:
-                <select value={displayColor} onChange={(e) => setDisplayColor(e.target.value as 'primary' | 'accent' | 'pink')}>
-                  <option value="primary">Primary</option>
-                  <option value="accent">Accent</option>
-                  <option value="pink">Pink</option>
-                </select>
+                <div className={styles.colorPickerWrapper}>
+                  <select value={displayColor} onChange={(e) => setDisplayColor(e.target.value as 'primary' | 'accent' | 'pink')}>
+                    <option value="primary">Primary</option>
+                    <option value="accent">Accent</option>
+                    <option value="pink">Pink</option>
+                  </select>
+                  <span 
+                    className={styles.colorSwatch} 
+                    style={{ background: DOT_COLOR_MAP[displayColor] }}
+                  />
+                </div>
               </label>
 
               <div className={styles.buttonRow}>
@@ -453,6 +491,7 @@ const convert = async () => {
                 }}
                 animatePulse={isAnimating}
                 animation={isAnimating ? selectedAnimation : 'static'}
+                animationSpeed={animationSpeed}
               />
               <div className={styles.gridInfo}>
                 Grid: {gridSize}×{gridSize}{imageGrid ? ` | Dots: ${imageGrid.flat().filter(Boolean).length}` : ''}
