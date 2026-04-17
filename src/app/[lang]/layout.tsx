@@ -124,6 +124,7 @@ export default async function RootLayout({
         <link rel="alternate" hrefLang="de" href={`${BASE_URL}/de`} />
       </head>
       <body suppressHydrationWarning>
+        <a href="#main-content" className="skip-link">Skip to main content</a>
         <ClientProviders>
           <Header lang={lang} />
           <main className="main-content" style={{ margin: '0 auto', maxWidth: '1400px', minHeight: 'calc(100vh - 200px)', width: '100%' }}>

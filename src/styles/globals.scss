@@ -5,6 +5,21 @@ $border: #e5e5e5;
 $accent: #f97316;
 $code-bg: #f4f4f4;
 
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  padding: 8px 16px;
+  background: $accent;
+  color: white;
+  z-index: 9999;
+  transition: top 0.2s;
+  
+  &:focus {
+    top: 0;
+  }
+}
+
 .shiki-block {
   margin-bottom: 1.5rem;
    
