@@ -66,6 +66,9 @@ textarea:focus-visible {
     --border: #262626;
     --accent: #ff6600;
     --code-bg: #171717;
+    --bg: #0a0a0a;
+    --text: #ffffff;
+    --card-bg: #18181b;
   }
 }
 
@@ -83,6 +86,9 @@ textarea:focus-visible {
   --border: #e5e5e5;
   --accent: #ff6600;
   --code-bg: #f4f4f4;
+  --bg: #fafafa;
+  --text: #1a1a1a;
+  --card-bg: #f4f4f5;
 }
 
 [data-theme='dark'] {
@@ -92,6 +98,9 @@ textarea:focus-visible {
   --border: #262626;
   --accent: #ff6600;
   --code-bg: #171717;
+  --bg: #0a0a0a;
+  --text: #ffffff;
+  --card-bg: #18181b;
 }
 
 * {

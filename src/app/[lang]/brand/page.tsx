@@ -127,7 +127,7 @@ function sayHello() {
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2>Colors</h2>
-          <p className={styles.description}>Our color palette uses a dark theme with a distinctive neon green accent.</p>
+          <p className={styles.description}>Our color palette features a vibrant orange accent with alternative accent colors for specific use cases.</p>
         </div>
 
         <div className={styles.colorPalette}>
@@ -144,10 +144,10 @@ function sayHello() {
             <div className={styles.colorInfo}>
               <span className={styles.colorName}>Text</span>
               <code>var(--text)</code>
-              <span className={styles.colorHex}>#ffffff / #0a0a0a</span>
+              <span className={styles.colorHex}>#ffffff / #1a1a1a</span>
             </div>
           </div>
-<div className={styles.colorItem}>
+          <div className={styles.colorItem}>
             <div className={styles.colorSwatch} style={{ background: 'var(--accent)' }} />
             <div className={styles.colorInfo}>
               <span className={styles.colorName}>Primary Orange</span>
@@ -176,7 +176,7 @@ function sayHello() {
             <div className={styles.colorInfo}>
               <span className={styles.colorName}>Muted</span>
               <code>var(--muted)</code>
-              <span className={styles.colorHex}>#6b7280</span>
+              <span className={styles.colorHex}>#888 / #666</span>
             </div>
           </div>
           <div className={styles.colorItem}>
@@ -184,7 +184,7 @@ function sayHello() {
             <div className={styles.colorInfo}>
               <span className={styles.colorName}>Border</span>
               <code>var(--border)</code>
-              <span className={styles.colorHex}>#27272a</span>
+              <span className={styles.colorHex}>#262626 / #e5e5e5</span>
             </div>
           </div>
           <div className={styles.colorItem}>
