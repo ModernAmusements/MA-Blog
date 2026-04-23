@@ -1,14 +1,12 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote/rsc';
-import { Mermaid } from '@/components/Mermaid';
-import Image from 'next/image';
 import { CollapsibleTOC } from '@/components/CollapsibleTOC';
-import { CodeBlock } from '@/components/CodeBlock';
 import styles from '../page.module.scss';
-import { getProjectByLang, getProjectPosts } from '@/lib/mdx';
+import { getProjectByLang, getProjectPosts, extractHeadings } from '@/lib/mdx';
 import { translations } from '@/i18n';
 import type { Lang } from '@/i18n';
+import { SITE_URL, SITE_NAME } from '@/lib/constants';
+import { createMdxComponents } from '@/lib/mdx-components';
 
 interface Props {
   params: Promise<{ lang: string; slug: string }>;
@@ -34,9 +32,7 @@ export async function generateMetadata(props: Props) {
       excerpt: '',
     };
   }
-  
-  const baseUrl = 'https://modern-amusements.vercel.app';
-  
+
   return {
     title: project.title,
     description: project.description,
@@ -44,15 +40,15 @@ export async function generateMetadata(props: Props) {
     openGraph: {
       type: 'website',
       locale: lang === 'de' ? 'de_DE' : 'en_US',
-      url: `${baseUrl}/${lang}/projects/${params.slug}`,
-      siteName: 'ModernAmusement Development',
+      url: `${SITE_URL}/${lang}/projects/${params.slug}`,
+      siteName: SITE_NAME,
       title: project.title,
       description: project.description,
       publishedTime: project.date,
       tags: project.tags,
       images: [
         {
-          url: `${baseUrl}/og-image.svg`,
+          url: `${SITE_URL}/og-image.svg`,
           width: 1200,
           height: 630,
           alt: project.title,
@@ -64,117 +60,22 @@ export async function generateMetadata(props: Props) {
       title: project.title,
       description: project.description,
       creator: '@modernamusements',
-      images: [`${baseUrl}/og-image.svg`],
+      images: [`${SITE_URL}/og-image.svg`],
     },
   };
 }
 
-function extractHeadings(content: string) {
-  const headingRegex = /^(#{2,4})\s+(.+)$/gm;
-  const headings: { level: number; text: string; id: string; thema: number; subIndex: number }[] = [];
-  let match;
-  let themaIndex = 0;
-  while ((match = headingRegex.exec(content)) !== null) {
-    const level = match[1].length;
-    const text = match[2].trim();
-    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    
-    if (level === 2) {
-      themaIndex++;
-      headings.push({ level, text, id, thema: themaIndex, subIndex: 0 });
-    } else if (level === 3 || level === 4) {
-      const lastH2 = headings.filter(h => h.level === 2).pop();
-      const subIndex = headings.filter(h => h.thema === lastH2?.thema && h.level > 2).length + 1;
-      headings.push({ level, text, id, thema: lastH2?.thema || 0, subIndex });
-    }
-  }
-  return headings;
-}
-
-const components = {
-  Mermaid: ({ chart, children }: { chart?: string; children?: React.ReactNode }) => {
-    const chartContent = chart || (typeof children === 'string' ? children : '');
-    return <Mermaid chart={chartContent} />;
-  },
-  CodeBlock: ({ children, className }: { children?: string; className?: string }) => <CodeBlock className={className}>{children}</CodeBlock>,
-  code: ({ children, className }: { children?: React.ReactNode; className?: string }) => {
-    const code = String(children).trim();
-    const hasMultipleLines = code.split('\n').length > 1;
-    const hasLanguage = className && className !== 'text';
-    
-    if (hasMultipleLines || hasLanguage) {
-      return <CodeBlock className={className || 'text'}>{code}</CodeBlock>;
-    }
-    
-    return <code className={className}>{children}</code>;
-  },
-  pre: ({ children }: { children?: React.ReactNode }) => {
-    if (!children) return <pre>{children}</pre>;
-    
-    let codeContent = '';
-    try {
-      const child = children as React.ReactElement<any>;
-      codeContent = child?.props?.children?.toString() || '';
-    } catch {
-      codeContent = String(children);
-    }
-    
-    let trimmed = codeContent.trim();
-    trimmed = trimmed.replace(/^```mermaid\s*/g, '').replace(/```$/g, '');
-    trimmed = trimmed.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-    
-    const isMermaid = trimmed.startsWith('mermaid') || 
-      trimmed.startsWith('graph ') || 
-      trimmed.startsWith('flowchart') ||
-      trimmed.startsWith('sequenceDiagram') ||
-      trimmed.startsWith('classDiagram') ||
-      trimmed.startsWith('stateDiagram') ||
-      trimmed.startsWith('erDiagram') ||
-      trimmed.startsWith('pie') ||
-      trimmed.startsWith('gantt') ||
-      trimmed.startsWith('subgraph');
-    
-    if (isMermaid) {
-      let cleanChart = trimmed.replace(/^mermaid\n*---[\s\S]*?---\n*/gm, '');
-      cleanChart = cleanChart.replace(/<br\s*\/?>/gi, ' ');
-      return <Mermaid chart={cleanChart} />;
-    }
-    
-    return <CodeBlock className="text">{codeContent}</CodeBlock>;
-  },
-  h2: ({ children }: { children?: React.ReactNode }) => {
-    const text = children?.toString() || '';
-    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    return <h2 id={id} className={styles.heading2}><a href={`#${id}`} className={styles.anchor}>#</a>{children}</h2>;
-  },
-  h3: ({ children }: { children?: React.ReactNode }) => {
-    const text = children?.toString() || '';
-    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    return <h3 id={id} className={styles.heading3}><a href={`#${id}`} className={styles.anchor}>#</a>{children}</h3>;
-  },
-  h4: ({ children }: { children?: React.ReactNode }) => {
-    const text = children?.toString() || '';
-    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    return <h4 id={id} className={styles.heading4}><a href={`#${id}`} className={styles.anchor}>#</a>{children}</h4>;
-  },
-  p: ({ children }: { children?: React.ReactNode }) => {
-    return <p>{children}</p>;
-  },
-  img: (props: any) => (
-    <Image 
-      src={props.src} 
-      alt={props.alt || ''} 
-      width={800} 
-      height={450}
-      className={styles.contentImage}
-    />
-  ),
-};
+const components = createMdxComponents({
+  heading2: styles.heading2,
+  heading3: styles.heading3,
+  heading4: styles.heading4,
+  anchor: styles.anchor,
+  contentImage: styles.contentImage,
+});
 
 export default async function ProjectPage(props: Props) {
   const params = await props.params;
   const lang = (params.lang && translations[params.lang as Lang]) ? params.lang as Lang : 'en';
-  const t = translations[lang].common;
   const tProjects = translations[lang].projects;
   
   const project = getProjectByLang(params.slug, params.lang);

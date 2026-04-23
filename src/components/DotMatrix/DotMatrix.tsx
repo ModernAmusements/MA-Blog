@@ -3,7 +3,6 @@
 import { useMemo, useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { Dot } from './Dot';
 import { messageToDots, getDecorativePattern, DEFAULT_MESSAGE } from './ascii';
-import { DotCell } from './imageConverter';
 import { ANIMATIONS, AnimationType, Animation } from './animations/presets';
 import type { DotMatrixConfig } from './types';
 import styles from './DotMatrix.module.scss';

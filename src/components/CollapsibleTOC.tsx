@@ -1,24 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import styles from './CollapsibleTOC.module.scss';
+import type { HeadingItem } from '@/lib/mdx';
 
-interface Heading {
-  level: number;
-  text: string;
-  id: string;
-  thema: number;
-  subIndex: number;
+interface SubHeadingMap {
+  [thema: number]: HeadingItem[];
 }
 
 interface TOCProps {
-  headings: Heading[];
+  headings: HeadingItem[];
 }
 
 export function CollapsibleTOC({ headings }: TOCProps) {
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
 
-  const themas = headings.filter(h => h.level === 2);
+  const themas = useMemo(() => headings.filter(h => h.level === 2), [headings]);
+
+  const subHeadingsMap = useMemo<SubHeadingMap>(() => {
+    const map: SubHeadingMap = {};
+    themas.forEach(thema => {
+      map[thema.thema] = headings.filter(h => h.thema === thema.thema && h.level > 2);
+    });
+    return map;
+  }, [headings, themas]);
 
   const toggle = (thema: number) => {
     setExpanded(prev => ({ ...prev, [thema]: !prev[thema] }));
@@ -29,7 +34,7 @@ export function CollapsibleTOC({ headings }: TOCProps) {
       <h4>Contents</h4>
       <ul>
         {themas.map((thema) => {
-          const subHeadings = headings.filter(h => h.thema === thema.thema && h.level > 2);
+          const subHeadings = subHeadingsMap[thema.thema] || [];
           const hasSubHeadings = subHeadings.length > 0;
           const isExpanded = expanded[thema.thema] ?? false;
 

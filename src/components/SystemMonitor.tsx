@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useMounted } from '@/hooks';
 import styles from './SystemMonitor.module.scss';
 
 interface StatItem {
@@ -62,15 +63,11 @@ const STATIC_VALUE = { value: 50, text: '50%' };
 
 export function SystemMonitor() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [mounted, setMounted] = useState(false);
   const [animKey, setAnimKey] = useState(0);
+  const mounted = useMounted();
 
   const currentStat = stats[currentIndex];
   const { value, text } = mounted ? currentStat.getValue() : STATIC_VALUE;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {

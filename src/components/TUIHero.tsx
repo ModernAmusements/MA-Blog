@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import styles from './TUIHero.module.scss';
+import { FolderIcon, OpenFolderIcon, FileIcon, PersonIcon, PaperplaneIcon, ChevronIcon } from '@/components/icons';
 
 interface TUINavItem {
   label: string;
@@ -30,34 +29,6 @@ interface TUIHeroProps {
   initialExpanded?: Set<number>;
 }
 
-const FolderIcon = () => (
-  <Image src="/images/icons/sf-symbols/folder.svg" alt="folder" width={16} height={14} className={styles.sfIcon} unoptimized />
-);
-
-const OpenFolderIcon = () => (
-  <Image src="/images/icons/sf-symbols/folder.svg" alt="open folder" width={16} height={14} className={styles.sfIcon} unoptimized />
-);
-
-const FileIcon = () => (
-  <Image src="/images/icons/sf-symbols/text.document.svg" alt="file" width={13} height={16} className={styles.sfIcon} unoptimized />
-);
-
-const PersonIcon = () => (
-  <Image src="/images/icons/sf-symbols/person.crop.circle.svg" alt="person" width={16} height={16} className={styles.sfIcon} unoptimized />
-);
-
-const PaperplaneIcon = () => (
-  <Image src="/images/icons/sf-symbols/paperplane.svg" alt="paperplane" width={16} height={16} className={styles.sfIcon} unoptimized />
-);
-
-const ChevronIcon = ({ isExpanded }: { isExpanded: boolean }) => (
-  <span className={`${styles.chevron} ${isExpanded ? styles.chevronDown : ''}`}>
-    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="9 18 15 12 9 6"></polyline>
-    </svg>
-  </span>
-);
-
 const getIcon = (item: TUINavItem, isExpanded: boolean) => {
   if (item.type === 'dir') {
     return isExpanded ? <OpenFolderIcon /> : <FolderIcon />;
@@ -74,7 +45,6 @@ const getIcon = (item: TUINavItem, isExpanded: boolean) => {
 export function TUIHero({ navItems, lang, heroText, exploreText, initialExpanded }: TUIHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [expandedDirs, setExpandedDirs] = useState<Set<number>>(initialExpanded || new Set());
-  const router = useRouter();
 
   const toggleExpand = (index: number) => {
     setExpandedDirs(prev => {

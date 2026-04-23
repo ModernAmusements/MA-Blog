@@ -8,7 +8,6 @@ import styles from './dotmatrix.module.scss';
 
 const ANIMATION_TYPES = Object.keys(ANIMATIONS) as AnimationType[];
 
-const GRID_SIZES = [8, 16, 32, 64, 128] as const;
 const GRID_PRESETS = [8, 16, 32, 64] as const;
 const COLORS = ['orange', 'white', 'green', 'red', 'black', 'neon-green', 'purple', 'pink'] as const;
 
@@ -52,7 +51,6 @@ export default function DotMatrixPlayground() {
   const [displayColor, setDisplayColor] = useState<'primary' | 'accent' | 'pink'>('primary');
   const [containerWidth, setContainerWidth] = useState(600);
 
-  const [editorGrid, setEditorGrid] = useState<boolean[][] | null>(null);
   const [editorGridSize, setEditorGridSize] = useState<8 | 16 | 32 | 64 | 128>(16);
   const [editorDotSizeInput, setEditorDotSizeInput] = useState(16);
 
@@ -544,7 +542,6 @@ const convert = async () => {
             <DotMatrixEditor
               initialSize={editorGridSize}
               dotSize={editorDotSizeInput}
-              onChange={setEditorGrid}
               maxWidth={600}
             />
           </div>

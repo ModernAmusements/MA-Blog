@@ -1,0 +1,15 @@
+.sfIcon {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.chevronDown {
+  transform: rotate(90deg);
+}

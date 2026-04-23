@@ -49,7 +49,7 @@ export async function convertImageToDotMatrix(
       ctx.fillStyle = padColor;
       ctx.fillRect(0, 0, options.gridSize, options.gridSize);
 
-      let srcX = 0, srcY = 0, srcW = img.width, srcH = img.height;
+      const srcX = 0, srcY = 0, srcW = img.width, srcH = img.height;
       
       if (fitMode === 'fit') {
         // Calculate aspect ratio preserving dimensions

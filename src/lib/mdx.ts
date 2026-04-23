@@ -164,3 +164,41 @@ export function getAllTags(posts: (Post | Project)[]): string[] {
   posts.forEach((post) => post.tags?.forEach((tag) => tags.add(tag)));
   return Array.from(tags);
 }
+
+export type ContentItem = Post | Project;
+
+export function filterByLanguage<T extends ContentItem>(items: T[], lang: string): T[] {
+  return lang === 'de'
+    ? items.filter(p => p.slug.endsWith('.de'))
+    : items.filter(p => !p.slug.endsWith('.de'));
+}
+
+export interface HeadingItem {
+  level: number;
+  text: string;
+  id: string;
+  thema: number;
+  subIndex: number;
+}
+
+export function extractHeadings(content: string): HeadingItem[] {
+  const headingRegex = /^(#{2,4})\s+(.+)$/gm;
+  const headings: HeadingItem[] = [];
+  let match;
+  let themaIndex = 0;
+  while ((match = headingRegex.exec(content)) !== null) {
+    const level = match[1].length;
+    const text = match[2].trim();
+    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    
+    if (level === 2) {
+      themaIndex++;
+      headings.push({ level, text, id, thema: themaIndex, subIndex: 0 });
+    } else if (level === 3 || level === 4) {
+      const lastH2 = headings.filter(h => h.level === 2).pop();
+      const subIndex = headings.filter(h => h.thema === lastH2?.thema && h.level > 2).length + 1;
+      headings.push({ level, text, id, thema: lastH2?.thema || 0, subIndex });
+    }
+  }
+  return headings;
+}

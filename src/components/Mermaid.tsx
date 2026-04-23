@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useMounted } from '@/hooks';
 
 interface MermaidProps {
   chart?: string;
@@ -9,11 +10,7 @@ interface MermaidProps {
 export function Mermaid({ chart }: MermaidProps) {
   const svgRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useMounted();
 
   useEffect(() => {
     if (!mounted || !chart || !svgRef.current) return;

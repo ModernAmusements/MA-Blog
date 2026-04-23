@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './page.module.scss';
-import { getBlogPosts, getProjectPosts } from '@/lib/mdx';
+import { getBlogPosts, getProjectPosts, filterByLanguage } from '@/lib/mdx';
 import { translations } from '@/i18n';
 import type { Lang } from '@/i18n';
 import { TerminalFrame } from '@/components/TerminalFrame';
@@ -25,13 +25,8 @@ function buildNavItems(lang: string): TUINavItem[] {
   const allProjects = getProjectPosts();
   const allPosts = getBlogPosts();
   
-  const projects = lang === 'de'
-    ? allProjects.filter(p => p.slug.endsWith('.de'))
-    : allProjects.filter(p => !p.slug.endsWith('.de'));
-  
-  const filteredPosts = lang === 'de' 
-    ? allPosts.filter(p => p.slug.endsWith('.de'))
-    : allPosts.filter(p => !p.slug.endsWith('.de'));
+  const projects = filterByLanguage(allProjects, lang);
+  const filteredPosts = filterByLanguage(allPosts, lang);
   
   const projectSubItems = projects.map((p) => ({
     label: p.title,
@@ -74,14 +69,9 @@ export default async function Home(props: Props) {
   const allPosts = getBlogPosts();
   const allProjects = getProjectPosts();
   
-  const posts = lang === 'de'
-    ? allPosts.filter(p => p.slug.endsWith('.de')).slice(0, 3)
-    : allPosts.filter(p => !p.slug.endsWith('.de')).slice(0, 3);
-    
-  const projects = lang === 'de'
-    ? allProjects.filter(p => p.slug.endsWith('.de')).slice(0, 2)
-    : allProjects.filter(p => !p.slug.endsWith('.de')).slice(0, 2);
-    
+  const posts = filterByLanguage(allPosts, lang).slice(0, 3);
+  const projects = filterByLanguage(allProjects, lang).slice(0, 2);
+  
   const navItems = buildNavItems(lang);
 
   const blogIndex = navItems.findIndex(item => item.path === `/${lang}/blog`);

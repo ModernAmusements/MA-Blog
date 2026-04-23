@@ -4,53 +4,13 @@ import { useForm, ValidationError } from '@formspree/react';
 import styles from './page.module.scss';
 import ctaStyles from '@/styles/cta.module.scss';
 import { useParams } from 'next/navigation';
+import { translations } from '@/i18n';
 
 export default function ContactPage() {
   const params = useParams();
   const lang = (params.lang === 'de') ? 'de' : 'en';
+  const t = translations[lang].contact;
 
-  const translations = {
-    en: {
-      subHeader: 'C++ • Swift • Python • TS',
-      title: 'Get in Touch',
-      description: 'Have a question or want to work together? Fill out the form or reach out directly.',
-      name: 'ModernAmusements Development',
-      author: 'Shady Nathan Tawfik',
-      tags: 'Algorithms | Performance',
-      email: 'Email',
-      emailPlaceholder: 'your@email.com',
-      message: 'Message',
-      messagePlaceholder: 'Your message...',
-      send: 'Send Message',
-      sending: 'Sending...',
-      success: 'Thanks for reaching out! I\'ll get back to you soon.',
-      newsletterTitle: 'Subscribe to Newsletter',
-      newsletterDescription: 'Get updates on new posts and projects delivered to your inbox.',
-      newsletterPlaceholder: 'your@email.com',
-      subscribe: 'Subscribe',
-    },
-    de: {
-      subHeader: 'C++ • Swift • Python • TS',
-      title: 'Kontakt',
-      description: 'Hast du eine Frage oder möchtest du zusammenarbeiten? Fülle das Formular aus oder erreiche mich direkt.',
-      name: 'ModernAmusements Development',
-      author: 'Shady Nathan Tawfik',
-      tags: 'Algorithmen | Performance',
-      email: 'E-Mail',
-      emailPlaceholder: 'deine@email.de',
-      message: 'Nachricht',
-      messagePlaceholder: 'Deine Nachricht...',
-      send: 'Nachricht senden',
-      sending: 'Wird gesendet...',
-      success: 'Danke für die Nachricht! Ich melde mich bald zurück.',
-      newsletterTitle: 'Newsletter abonnieren',
-      newsletterDescription: 'Erhalte Updates zu neuen Beiträgen und Projekten per E-Mail.',
-      newsletterPlaceholder: 'deine@email.de',
-      subscribe: 'Abonnieren',
-    },
-  };
-
-  const t = translations[lang as 'en' | 'de'] || translations.en;
   const [state, handleSubmit] = useForm("xzdkgrar");
 
   const handleNewsletter = async (e: React.FormEvent) => {
@@ -68,7 +28,7 @@ export default function ContactPage() {
             <p>{t.success}</p>
             <ul className={styles.info}>
               <li>{t.name}</li>
-              <li>{t.author}</li>
+              <li>Shady Nathan Tawfik</li>
               <li>{t.tags}</li>
             </ul>
           </div>
@@ -86,7 +46,7 @@ export default function ContactPage() {
           <p>{t.description}</p>
           <ul className={styles.info}>
             <li>{t.name}</li>
-            <li>{t.author}</li>
+            <li>Shady Nathan Tawfik</li>
             <li>{t.tags}</li>
           </ul>
         </div>
@@ -121,11 +81,11 @@ export default function ContactPage() {
       </div>
 
       <div className={styles.newsletter}>
-        <h2>{t.newsletterTitle}</h2>
-        <p>{t.newsletterDescription}</p>
+        <h2>{t.newsletter.title}</h2>
+        <p>{t.newsletter.description}</p>
         <form onSubmit={handleNewsletter}>
-          <input type="email" placeholder={t.newsletterPlaceholder} required />
-          <button type="submit" className={ctaStyles.secondary}>{t.subscribe}</button>
+          <input type="email" placeholder={t.newsletter.placeholder} required />
+          <button type="submit" className={ctaStyles.secondary}>{t.newsletter.subscribe}</button>
         </form>
       </div>
     </div>

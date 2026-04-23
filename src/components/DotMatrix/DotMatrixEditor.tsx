@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useTheme } from 'next-themes';
+import { useMounted } from '@/hooks';
 import styles from './DotMatrixEditor.module.scss';
 
 interface DotMatrixEditorProps {
@@ -56,12 +57,8 @@ export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onCh
   }
   
   const { theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const isLightMode = mounted && theme === 'light';
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     const handleGlobalMouseUp = () => setIsDrawing(false);
@@ -100,19 +97,6 @@ export function DotMatrixEditor({ initialSize = 16, dotSize: customDotSize, onCh
     setDrawMode(shouldDraw);
     handleDotClick(x, y, shouldDraw);
   }, [handleDotClick]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsDrawing(false);
-  }, []);
-
-  const handleContextMenu = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-  }, []);
-
-  const handleSizeChange = useCallback((newSize: 8 | 16 | 32) => {
-    setGridSize(newSize);
-    setGrid(Array(newSize).fill(null).map(() => Array(newSize).fill(false)));
-  }, []);
 
   const handleClear = useCallback(() => {
     setGrid(Array(gridSize).fill(null).map(() => Array(gridSize).fill(false)));

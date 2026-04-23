@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import type { Metadata } from 'next';
 import styles from './page.module.scss';
-import { getProjectPosts, getAllTags } from '@/lib/mdx';
+import { getProjectPosts, getAllTags, filterByLanguage } from '@/lib/mdx';
 import { translations } from '@/i18n';
 import type { Lang } from '@/i18n';
+import { SITE_URL, SITE_NAME } from '@/lib/constants';
 
 interface Props {
   params: Promise<{ lang: string }>;
@@ -15,24 +15,23 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
   const lang = params.lang === 'de' ? 'de' : 'en';
   const t = translations[lang].projects;
-  const baseUrl = 'https://modern-amusements.vercel.app';
-  
+
   return {
     title: t.title,
     description: t.description,
     openGraph: {
       type: 'website',
       locale: lang === 'de' ? 'de_DE' : 'en_US',
-      url: `${baseUrl}/${lang}/projects`,
-      siteName: 'ModernAmusement Development',
+      url: `${SITE_URL}/${lang}/projects`,
+      siteName: SITE_NAME,
       title: t.title,
       description: t.description,
       images: [
         {
-          url: `${baseUrl}/og-image.svg`,
+          url: `${SITE_URL}/og-image.svg`,
           width: 1200,
           height: 630,
-          alt: 'ModernAmusement Development Projects',
+          alt: `${SITE_NAME} Projects`,
         },
       ],
     },
@@ -41,7 +40,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       title: t.title,
       description: t.description,
       creator: '@modernamusements',
-      images: [`${baseUrl}/og-image.svg`],
+      images: [`${SITE_URL}/og-image.svg`],
     },
   };
 }
@@ -51,12 +50,10 @@ export default async function ProjectsPage(props: Props) {
   const searchParams = await props.searchParams;
   const lang = (params.lang && translations[params.lang as Lang]) ? params.lang as Lang : 'en';
   const t = translations[lang].projects;
-  
+
   const allProjects = getProjectPosts();
-  const projects = lang === 'de'
-    ? allProjects.filter(p => p.slug.endsWith('.de'))
-    : allProjects.filter(p => !p.slug.endsWith('.de'));
-    
+  const projects = filterByLanguage(allProjects, lang);
+
   const allTags = getAllTags(projects);
   const selectedTag = searchParams.tag;
 
