@@ -29,12 +29,17 @@
 
 .secondary {
   background: transparent;
-  border: 1px solid var(--text);
+  border: 1px solid var(--border);
   color: var(--text);
 
   &:hover {
-    background: var(--text);
-    color: var(--bg);
+    background: var(--border);
+    color: var(--text);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
@@ -43,7 +48,7 @@
   color: var(--text);
 
   &:hover {
-    background: var(--hover-bg);
+    background: var(--card-bg);
   }
 }
 
