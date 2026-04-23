@@ -1,7 +1,7 @@
 .sfIcon {
   display: inline-block;
   vertical-align: middle;
-  color: var(--text);
+  color: currentColor;
 }
 
 .chevron {
@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease;
-  color: var(--text);
+  color: currentColor;
 }
 
 .chevronDown {
