@@ -14,6 +14,7 @@ interface HeaderProps {
 const navItems: { path: string; key: string; disabled?: boolean }[] = [
   { path: '/blog', key: 'blog' },
   { path: '/projects', key: 'projects' },
+  { path: '/brand', key: 'brand' },
   { path: '/about', key: 'about', disabled: true },
   { path: '/contact', key: 'contact' },
 ];
@@ -22,9 +23,9 @@ export function Header({ lang = 'en' }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   
-  const labels: Record<string, { blog: string; projects: string; about: string; contact: string; menu: string }> = {
-    en: { blog: 'Blog', projects: 'Projects', about: 'About', contact: 'Contact', menu: 'Menu' },
-    de: { blog: 'Blog', projects: 'Projekte', about: 'Über mich', contact: 'Kontakt', menu: 'Menü' },
+  const labels: Record<string, { blog: string; projects: string; brand: string; about: string; contact: string; menu: string }> = {
+    en: { blog: 'Blog', projects: 'Projects', brand: 'Brand', about: 'About', contact: 'Contact', menu: 'Menu' },
+    de: { blog: 'Blog', projects: 'Projekte', brand: 'Brand', about: 'Über mich', contact: 'Kontakt', menu: 'Menü' },
   };
 
   const t = labels[lang] || labels.en;
