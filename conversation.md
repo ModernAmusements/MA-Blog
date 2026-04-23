@@ -1,60 +1,37 @@
-# German Police Shootings Project (April 14, 2026)
+# TOC Fix Session (April 23, 2026)
 
 ## Summary
-Created new blog post and project for visualizing police firearm incidents in Germany from 1976-2025 using Leaflet.js, SVG charts, and vanilla JavaScript.
 
-## New Blog Posts
-- `german-police-shootings.mdx` (English)
-- `german-police-shootings.de.mdx` (German translation)
+Fixed broken Table of Contents that was showing incorrect numbering and chevrons on wrong items. Also added footer padding and fixed Mermaid diagram detection.
 
-## New Projects
-- `german-police-shootings.mdx` (English)
-- `german-police-shootings.de.mdx` (German translation)
+## Issues Fixed
 
-## Features
-- Interactive Leaflet.js map with OpenStreetMap tiles
-- Marker clustering for dense areas
-- SVG pie charts (categories, weapons, locations, armed status)
-- Dynamic filtering (year, category)
-- Search functionality
-- Chronological timeline
-- Fallback data mechanism (CSV + embedded JSON)
+### 1. TOC Numbering and Chevrons
+- Sub-headings were showing wrong numbers (e.g., 7.3 instead of 7.1)
+- Some items without sub-headings were showing chevrons
+- Root cause: changes to heading extraction logic in mdx.ts
 
-## Images Used
-- `public/images/projects/german-police-shootings/`:
-  - police_shootings_overview.png
-  - police_shootings_map.png
-  - police_shootings_map_popup.png
-  - Charts.png
+**Fix:** Restored TOC component and mdx.ts to working state from commit a6b7360
+- TOC now shows `thema.subIndex` format (1.1, 1.2, 2.1, 2.2)
+- Only H2s with actual sub-headings get expand/collapse chevron
 
-## Links Added
-- Live Demo: https://police-shootings-germany.vercel.app/
-- Repository: https://github.com/ModernAmusements/Police-Shootings-Germany
-- Dataset: https://www.kaggle.com/datasets/nathanamusement/german-police-shootings-1976-2026
-- Write-up: https://www.kaggle.com/writeups/nathanamusement/documentation-of-police-firearms-deployments-in-ge
+### 2. Footer Padding
+- Added `padding-bottom: 4rem` to footer for better spacing
 
-## Previous Work (April 13, 2026)
+### 3. Mermaid Detection
+- Changed detection from `.includes()` to `.startsWith()` to prevent false positives
+- JavaScript code blocks with function names like `drawCategoryPie` were being detected as Mermaid
 
-### LiDARSight Blog Post
-Created new blog post "LiDARSight" about building 6DoF head tracking for X-Plane 12 using iPhone TrueDepth camera.
-
-## Assets Used (LiDARSight)
-- `public/images/projects/LiDARSight/`:
-  - LiDARSight_Alpha.mov
-  - LiDARSight_Architecture.png
-  - protocols.png
-  - LiDAR_Settings.jpg
-  - Connection_State.jpg
-
-## Fixes Made
-1. Video tag: changed from `<source>` to `src` attribute
-2. Fixed `playsinline` → `playsInline` (React camelCase)
-3. Removed parentheses from mermaid node labels (caused parse errors)
-4. Simplified mermaid syntax (no `<br/>`, no special chars)
-
-## Typography Rules Used
-- Video: `<video controls width="100%" src="...">`
-- Mermaid node labels: plain text only, no `<br/>`, no `()`, no `{}`
+## Files Changed
+- `src/components/CollapsibleTOC.tsx` - restored to working version
+- `src/lib/mdx.ts` - restored heading extraction logic  
+- `src/components/Footer.module.scss` - added padding-bottom
+- `src/lib/mdx-components.tsx` - fixed Mermaid detection
 
 ## Committed
-- Pushed to origin/main on April 13, 2026
+- `17860f6` fix: restore TOC to working state, add footer padding, fix mermaid detection
+
+## Previous Work (April 20, 2026)
+- Created brand guidelines page at `/brand`
+- Added pink color (#FF9CEA) to DotMatrix
+- Created blog publishing workflow for Medium and Twitter/X

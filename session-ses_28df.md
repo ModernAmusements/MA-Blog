@@ -1,97 +1,69 @@
-# Session - 2026-04-20
+# Session - 2026-04-23
 
-**Session ID:** ses_28df
-**Date:** 2026-04-20
+**Session ID:** ses_28df (updated)
+**Date:** 2026-04-23
 
 ---
 
 ## Summary
 
-Added pink color to DotMatrix, created automated blog publishing workflow for Medium and Twitter/X.
+Fixed TOC issues, added footer padding, fixed Mermaid detection in MDX.
 
 ---
 
-## 1. Pink Color Addition
+## 1. TOC Fix
 
-Added pink accent color (#FF9CEA) to DotMatrix component:
+Restored TOC component and heading extraction logic to working state from commit a6b7360:
+- TOC now shows sub-numbers as `thema.subIndex` format (e.g., 7.1, 7.2)
+- Fixed heading extraction in mdx.ts to properly track which H2 each sub-heading belongs to
+- Only H2s with sub-headings show chevron for expand/collapse
 
-- `DotMatrix.tsx`: Added 'pink' to color type and mapping
-- `DotMatrix.module.scss`: Added .colorPink CSS class
-- `page.tsx`: Updated display color dropdown with 3 options (Primary, Accent, Pink)
+### Files Changed
+- `src/components/CollapsibleTOC.tsx` - restored to working version
+- `src/lib/mdx.ts` - restored heading extraction logic
 
 ---
 
-## 2. Blog Publishing Workflow
+## 2. Footer Padding
 
-Created automated workflow to post blog content to Medium and Twitter/X.
+Added bottom padding to footer for better spacing:
 
-### Files Created
+```scss
+// Before
+padding-top: 2rem;
 
-| File | Description |
-|------|-------------|
-| `scripts/publish/parser.js` | Parses MDX files, extracts frontmatter, converts to HTML for Medium, generates Twitter threads |
-| `scripts/publish/medium.js` | Medium API integration (publish posts, update) |
-| `scripts/publish/twitter.js` | Twitter/X API v2 integration (post tweet, thread) |
-| `scripts/publish/deploy.js` | Main CLI for deploying blog posts |
-| `.env.example` | Template for API keys |
-
-### Usage
-
-```bash
-# List all blog posts
-node scripts/publish/deploy.js list
-
-# Deploy to all platforms (draft)
-node scripts/publish/deploy.js deploy <slug>
-
-# Deploy to Medium only
-node scripts/publish/deploy.js deploy <slug> --medium
-
-# Deploy to Twitter only
-node scripts/publish/deploy.js deploy <slug> --platform twitter
-
-# Deploy publicly (not draft)
-node scripts/publish/deploy.js deploy <slug> --status public
-
-# Dry run (preview without posting)
-DRY_RUN=true node scripts/publish/deploy.js deploy <slug>
-```
-
-### Posted Blogs
-
-- `dot-matrix-generator` - 16 tweets
-- `israel-hamas-conflict-timeline` - 15 tweets
-
-### Issue Found
-
-Twitter API requires **OAuth 1.0a User Context** authentication, not Bearer token. To post tweets, need:
-
-1. API Key (Consumer Key)
-2. API Secret (Consumer Secret)
-3. Access Token
-4. Access Token Secret
-
-Current error:
-```
-"Authenticating with OAuth 2.0 Application-Only is forbidden for this endpoint"
+// After
+padding: 2rem 0 4rem;
 ```
 
 ---
 
-## Next Steps
+## 3. Mermaid Detection Fix
 
-1. Update Twitter script to use OAuth 1.0a with all 4 keys
-2. Add Medium token to actually post there
-3. Add image support for Twitter posts
+Fixed Mermaid diagram detection to use `startsWith` instead of `includes` to avoid false positives when JavaScript code contains words like "pie", "flowchart", etc.
+
+```typescript
+// Before
+const MERMAID_PATTERNS = ['flowchart', 'sequenceDiagram', ...];
+return MERMAID_PATTERNS.some(pattern => trimmed.includes(pattern));
+
+// After  
+const MERMAID_PATTERNS = ['flowchart', 'sequencediagram', ...];
+return MERMAID_PATTERNS.some(pattern => trimmed.startsWith(pattern));
+```
+
+Also added trailing space to patterns like 'pie ' to avoid partial word matches.
 
 ---
 
-## Previous Session (2026-04-16)
+## Commits
 
-- Animation fix: disabled CSS pulse when grid animation playing
-- Added neon-green (#4BFF00) and purple (#992EFE) colors
-- Replaced pad color with display color dropdown (primary/accent)
-- Added pink (#FF9CEA) accent color
+- `17860f6` fix: restore TOC to working state, add footer padding, fix mermaid detection
 
 ---
 
+## Previous Session (2026-04-20)
+
+- Added pink color (#FF9CEA) to DotMatrix
+- Created blog publishing workflow for Medium and Twitter/X
+- Found Twitter API requires OAuth 1.0a authentication
