@@ -171,7 +171,6 @@ function sayHello() {
               <span className={styles.colorHex}>Error states</span>
             </div>
           </div>
-          </div>
           <div className={styles.colorItem}>
             <div className={styles.colorSwatch} style={{ background: 'var(--muted)' }} />
             <div className={styles.colorInfo}>
@@ -189,14 +188,6 @@ function sayHello() {
             </div>
           </div>
           <div className={styles.colorItem}>
-            <div className={styles.colorSwatch} style={{ background: 'var(--error)' }} />
-            <div className={styles.colorInfo}>
-              <span className={styles.colorName}>Error</span>
-              <code>var(--error)</code>
-              <span className={styles.colorHex}>#ef4444</span>
-            </div>
-          </div>
-          <div className={styles.colorItem}>
             <div className={styles.colorSwatch} style={{ background: 'var(--card-bg)' }} />
             <div className={styles.colorInfo}>
               <span className={styles.colorName}>Card Background</span>
@@ -205,11 +196,11 @@ function sayHello() {
             </div>
           </div>
           <div className={styles.colorItem}>
-            <div className={styles.colorSwatch} style={{ background: '#f97316' }} />
+            <div className={`${styles.colorSwatch} ${styles.accentSwatch}`} />
             <div className={styles.colorInfo}>
               <span className={styles.colorName}>Primary Orange</span>
-              <code>#f97316</code>
-              <span className={styles.colorHex}>Used in DotMatrix</span>
+              <code>var(--accent)</code>
+              <span className={styles.colorHex}>#ff6600</span>
             </div>
           </div>
           <div className={styles.colorItem}>
