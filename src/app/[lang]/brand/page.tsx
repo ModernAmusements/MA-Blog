@@ -17,7 +17,6 @@ interface Props {
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
   const lang = params.lang === 'de' ? 'de' : 'en';
-  const t = translations[lang];
 
   return {
     title: 'Brand Guidelines',
@@ -373,7 +372,7 @@ function sayHello() {
         <div className={styles.borderExamples}>
           <div className={styles.borderItem}>
             <span className={styles.typeLabel}>Default Border</span>
-            <div className={styles.borderBox} style={{ border: '1px solid var(--border)' }} />
+            <div className={styles.borderBox} />
           </div>
           <div className={styles.borderItem}>
             <span className={styles.typeLabel}>Accent Border</span>
