@@ -147,13 +147,30 @@ function sayHello() {
               <span className={styles.colorHex}>#ffffff / #0a0a0a</span>
             </div>
           </div>
-          <div className={styles.colorItem}>
+<div className={styles.colorItem}>
             <div className={styles.colorSwatch} style={{ background: 'var(--accent)' }} />
             <div className={styles.colorInfo}>
-              <span className={styles.colorName}>Accent</span>
+              <span className={styles.colorName}>Primary Orange</span>
               <code>var(--accent)</code>
-              <span className={styles.colorHex}>#4BFF00</span>
+              <span className={styles.colorHex}>#ff6600</span>
             </div>
+          </div>
+          <div className={styles.colorItem}>
+            <div className={`${styles.colorSwatch} ${styles.accentSwatch}`} />
+            <div className={styles.colorInfo}>
+              <span className={styles.colorName}>Neon Green Accent</span>
+              <code>#4BFF00</code>
+              <span className={styles.colorHex}>Alt accent color</span>
+            </div>
+          </div>
+          <div className={styles.colorItem}>
+            <div className={`${styles.colorSwatch} ${styles.errorSwatch}`} />
+            <div className={styles.colorInfo}>
+              <span className={styles.colorName}>Error Red</span>
+              <code>#ef4444</code>
+              <span className={styles.colorHex}>Error states</span>
+            </div>
+          </div>
           </div>
           <div className={styles.colorItem}>
             <div className={styles.colorSwatch} style={{ background: 'var(--muted)' }} />
