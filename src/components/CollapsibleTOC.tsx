@@ -61,7 +61,7 @@ export function CollapsibleTOC({ headings }: TOCProps) {
                   {subHeadings.map((sub, idx) => (
                     <li key={idx} className={sub.level === 3 ? styles.tocLevel3 : styles.tocLevel4}>
                       <a href={`#${sub.id}`}>
-                        <span className={styles.tocNumber}>{sub.subIndex}</span> {sub.text}
+                        <span className={styles.tocNumber}>{sub.thema}.{sub.subIndex}</span> {sub.text}
                       </a>
                     </li>
                   ))}

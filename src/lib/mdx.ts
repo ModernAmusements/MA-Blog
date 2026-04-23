@@ -195,8 +195,9 @@ export function extractHeadings(content: string): HeadingItem[] {
       themaIndex++;
       headings.push({ level, text, id, thema: themaIndex, subIndex: 0 });
     } else if (level === 3 || level === 4) {
-      const subIndex = headings.filter(h => h.thema === themaIndex && h.level > 2).length + 1;
-      headings.push({ level, text, id, thema: themaIndex, subIndex });
+      const lastH2 = headings.filter(h => h.level === 2).pop();
+      const subIndex = headings.filter(h => h.thema === lastH2?.thema && h.level > 2).length + 1;
+      headings.push({ level, text, id, thema: lastH2?.thema || 0, subIndex });
     }
   }
   return headings;

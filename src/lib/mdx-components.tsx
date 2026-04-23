@@ -13,13 +13,13 @@ interface SharedStyles {
 }
 
 const MERMAID_PATTERNS = [
-  'flowchart', 'sequenceDiagram', 'classDiagram', 'stateDiagram',
-  'erDiagram', 'gantt', 'pie', 'graph ', 'subgraph', 'mermaid'
+  'flowchart', 'sequencediagram', 'classdiagram', 'statediagram',
+  'erdiagram', 'gantt', 'pie ', 'graph ', 'subgraph ', 'mermaid'
 ];
 
 function isMermaidContent(content: string): boolean {
   const trimmed = content.trim().toLowerCase();
-  return MERMAID_PATTERNS.some(pattern => trimmed.includes(pattern));
+  return MERMAID_PATTERNS.some(pattern => trimmed.startsWith(pattern));
 }
 
 function extractMermaidChart(content: string): string {
