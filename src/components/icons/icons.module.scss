@@ -1,20 +1,7 @@
 .sfIcon {
   display: inline-block;
   vertical-align: middle;
-  color: inherit;
-  filter: brightness(0) invert(1);
-
-  [data-theme="light"] & {
-    filter: none;
-  }
-}
-
-[data-theme="dark"] .sfIcon {
-  filter: brightness(0) invert(1);
-}
-
-[data-theme="light"] .sfIcon {
-  filter: none;
+  color: var(--text);
 }
 
 .chevron {
