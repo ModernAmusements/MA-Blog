@@ -1,69 +1,62 @@
-# Session - 2026-04-23
+# Session - 2026-04-26
 
 **Session ID:** ses_28df (updated)
-**Date:** 2026-04-23
+**Date:** 2026-04-26
 
 ---
 
 ## Summary
 
-Fixed TOC issues, added footer padding, fixed Mermaid detection in MDX.
+Replaced Formspree with SendGrid for contact form emails, removed newsletter section.
 
 ---
 
-## 1. TOC Fix
+## Changes Made
 
-Restored TOC component and heading extraction logic to working state from commit a6b7360:
-- TOC now shows sub-numbers as `thema.subIndex` format (e.g., 7.1, 7.2)
-- Fixed heading extraction in mdx.ts to properly track which H2 each sub-heading belongs to
-- Only H2s with sub-headings show chevron for expand/collapse
+### 1. Contact Form Now Uses SendGrid
 
-### Files Changed
-- `src/components/CollapsibleTOC.tsx` - restored to working version
-- `src/lib/mdx.ts` - restored heading extraction logic
+- Removed Formspree (`@formspree/react`)
+- Contact form now POSTs to `/api/contact` which sends email via SendGrid
+- Added name field to contact form
+- Added proper error/success states
+- Reply-To header set to sender's email for easy replies
 
----
+### 2. Removed Newsletter Section
 
-## 2. Footer Padding
+- Deleted `/api/newsletter/route.ts`
+- Removed newsletter form from contact page
+- Removed newsletter translations from en.json and de.json
+- Removed newsletter SCSS styles
 
-Added bottom padding to footer for better spacing:
+### 3. Updated Environment Variables
 
-```scss
-// Before
-padding-top: 2rem;
-
-// After
-padding: 2rem 0 4rem;
+Added to `.env`:
+```
+SENDGRID_API_KEY=SG.xxx
+SENDGRID_FROM_EMAIL=shadynathantawfik@gmail.com
+SENDGRID_FROM_NAME=Modern Amusements
+CONTACT_TO_EMAIL=shadynathantawfik@gmail.com
 ```
 
 ---
 
-## 3. Mermaid Detection Fix
+## Email Deliverability
 
-Fixed Mermaid diagram detection to use `startsWith` instead of `includes` to avoid false positives when JavaScript code contains words like "pie", "flowchart", etc.
-
-```typescript
-// Before
-const MERMAID_PATTERNS = ['flowchart', 'sequenceDiagram', ...];
-return MERMAID_PATTERNS.some(pattern => trimmed.includes(pattern));
-
-// After  
-const MERMAID_PATTERNS = ['flowchart', 'sequencediagram', ...];
-return MERMAID_PATTERNS.some(pattern => trimmed.startsWith(pattern));
-```
-
-Also added trailing space to patterns like 'pie ' to avoid partial word matches.
+Researched Gmail/Yahoo 2024 requirements:
+- SPF/DKIM/DMARC needed for best inbox delivery
+- Currently using Gmail sender which has lower deliverability
+- Added to roadmap for future improvement
 
 ---
 
 ## Commits
 
-- `17860f6` fix: restore TOC to working state, add footer padding, fix mermaid detection
+- `8a3ab68` refactor: replace Formspree with SendGrid for contact form, remove newsletter
 
 ---
 
-## Previous Session (2026-04-20)
+## Previous Session (2026-04-23)
 
-- Added pink color (#FF9CEA) to DotMatrix
-- Created blog publishing workflow for Medium and Twitter/X
-- Found Twitter API requires OAuth 1.0a authentication
+- Fixed TOC issues (sub-numbering and chevrons)
+- Added footer padding
+- Fixed Mermaid diagram detection

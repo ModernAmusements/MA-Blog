@@ -3,7 +3,6 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -76,6 +75,12 @@
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin-right: 0.5rem;
+}
+
+.sfIcon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.5rem;
 }
 
 @keyframes spin {

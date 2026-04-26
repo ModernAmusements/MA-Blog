@@ -51,6 +51,8 @@
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
     "tags": "Algorithms | Performance",
+    "tagsLabel": "Technologies",
+    "socialsLabel": "Find me online",
     "description": "Have a question or want to work together? Fill out the form or reach out directly.",
     "email": "Email",
     "emailPlaceholder": "your@email.com",
@@ -58,7 +60,36 @@
     "messagePlaceholder": "Your message...",
     "send": "Send Message",
     "sending": "Sending...",
-    "success": "Thanks for reaching out! I'll get back to you soon."
+    "success": "Message sent successfully!",
+    "successSubtitle": "I'll get back to you within 24 hours.",
+    "status": "Currently employed",
+    "statusNote": "Available for interesting projects",
+    "responseTime": "Usually replies within 24 hours",
+    "copyEmail": "Copy email",
+    "emailCopied": "Email copied!",
+    "faqTitle": "FAQ",
+    "faqItems": [
+      {
+        "question": "What are you working on?",
+        "answer": "I'm currently employed as a Senior Data Scientist at Opencode, working on various data science and fullstack projects. My focus is on building scalable solutions and maintaining clean, well-documented code."
+      },
+      {
+        "question": "What's your development workflow?",
+        "answer": "I follow a structured Git workflow with feature branches, handle merge conflicts efficiently, and maintain clean commit histories. I'm experienced with Agile methodologies, breaking down tasks into manageable Jira tickets and tracking progress through sprints."
+      },
+      {
+        "question": "What technologies do you use?",
+        "answer": "I primarily work with C++, Swift, Python, and TypeScript for web and mobile development. On the backend, I use Node.js and Python frameworks. For data science, I leverage pandas, scikit-learn, and various ML frameworks."
+      },
+      {
+        "question": "Are you available for freelance work?",
+        "answer": "I'm always open to discussing interesting projects. Send me a message and we can talk about possibilities."
+      },
+      {
+        "question": "What's your experience with code quality?",
+        "answer": "I emphasize writing clean, maintainable code with comprehensive testing. I'm familiar with CI/CD pipelines, code reviews, and implementing best practices for performance optimization and accessibility."
+      }
+    ]
   },
   "footer": {
     "builtWith": "Built with Next.js",

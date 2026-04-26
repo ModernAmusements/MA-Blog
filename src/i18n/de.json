@@ -51,6 +51,8 @@
     "nameLabel": "Name",
     "namePlaceholder": "Dein Name",
     "tags": "Algorithmen | Performance",
+    "tagsLabel": "Technologien",
+    "socialsLabel": "Finde mich online",
     "description": "Hast du eine Frage oder möchtest du zusammenarbeiten? Fülle das Formular aus oder erreiche mich direkt.",
     "email": "E-Mail",
     "emailPlaceholder": "deine@email.de",
@@ -58,7 +60,36 @@
     "messagePlaceholder": "Deine Nachricht...",
     "send": "Nachricht senden",
     "sending": "Wird gesendet...",
-    "success": "Danke für die Nachricht! Ich melde mich bald zurück."
+    "success": "Nachricht erfolgreich gesendet!",
+    "successSubtitle": "Ich melde mich innerhalb von 24 Stunden.",
+    "status": "Derzeit angestellt",
+    "statusNote": "Verfügbar für interessante Projekte",
+    "responseTime": "Antwortet meist innerhalb von 24 Stunden",
+    "copyEmail": "E-Mail kopieren",
+    "emailCopied": "E-Mail kopiert!",
+    "faqTitle": "FAQ",
+    "faqItems": [
+      {
+        "question": "Woran arbeitest du?",
+        "answer": "Ich bin derzeit als Senior Data Scientist bei Opencode angestellt und arbeite an verschiedenen Data-Science- und Fullstack-Projekten. Mein Fokus liegt auf skalierbaren Lösungen und sauberem, gut dokumentiertem Code."
+      },
+      {
+        "question": "Wie ist dein Entwicklungs-Workflow?",
+        "answer": "Ich folge einem strukturierten Git-Workflow mit Feature-Branches, löse Merge-Konflikte effizient und halte saubere Commit-Historien. Ich habe Erfahrung mit Agile-Methoden, dem Aufteilen von Aufgaben in handhabbare Jira-Tickets und dem Verfolgen des Fortschritts durch Sprints."
+      },
+      {
+        "question": "Welche Technologien nutzt du?",
+        "answer": "Ich arbeite hauptsächlich mit C++, Swift, Python und TypeScript für Web- und Mobile-Entwicklung. Im Backend nutze ich Node.js und Python-Frameworks. Für Data Science verwende ich pandas, scikit-learn und verschiedene ML-Frameworks."
+      },
+      {
+        "question": "Bist du für Freelance-Arbeit verfügbar?",
+        "answer": "Ich bin immer offen für interessante Projekte. Schick mir eine Nachricht und wir können über Möglichkeiten sprechen."
+      },
+      {
+        "question": "Was ist deine Erfahrung mit Code-Qualität?",
+        "answer": "Ich lege Wert auf sauberen, wartbaren Code mit umfassenden Tests. Ich bin vertraut mit CI/CD-Pipelines, Code-Reviews und der Implementierung von Best Practices für Performance-Optimierung und Barrierefreiheit."
+      }
+    ]
   },
   "footer": {
     "builtWith": "Erstellt mit Next.js",

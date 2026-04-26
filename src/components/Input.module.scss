@@ -14,7 +14,6 @@
 .textarea {
   padding: 0.75rem;
   border: 1px solid var(--border);
-  border-radius: 6px;
   background: var(--bg);
   color: var(--text);
   font-size: 1rem;
@@ -27,6 +26,7 @@
 
   &::placeholder {
     color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
   }
 }
 
