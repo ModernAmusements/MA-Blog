@@ -48,6 +48,8 @@
     "title": "Kontakt",
     "subHeader": "C++ • Swift • Python • TS",
     "name": "ModernAmusements Development",
+    "nameLabel": "Name",
+    "namePlaceholder": "Dein Name",
     "tags": "Algorithmen | Performance",
     "description": "Hast du eine Frage oder möchtest du zusammenarbeiten? Fülle das Formular aus oder erreiche mich direkt.",
     "email": "E-Mail",
@@ -56,13 +58,7 @@
     "messagePlaceholder": "Deine Nachricht...",
     "send": "Nachricht senden",
     "sending": "Wird gesendet...",
-    "success": "Danke für die Nachricht! Ich melde mich bald zurück.",
-    "newsletter": {
-      "title": "Newsletter abonnieren",
-      "description": "Erhalte Updates zu neuen Beiträgen und Projekten per E-Mail.",
-      "placeholder": "deine@email.de",
-      "subscribe": "Abonnieren"
-    }
+    "success": "Danke für die Nachricht! Ich melde mich bald zurück."
   },
   "footer": {
     "builtWith": "Erstellt mit Next.js",

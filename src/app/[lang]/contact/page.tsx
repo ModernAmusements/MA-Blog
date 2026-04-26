@@ -1,9 +1,9 @@
 'use client';
 
-import { useForm, ValidationError } from '@formspree/react';
 import styles from './page.module.scss';
 import ctaStyles from '@/styles/cta.module.scss';
 import { useParams } from 'next/navigation';
+import { useState } from 'react';
 import { translations } from '@/i18n';
 
 export default function ContactPage() {
@@ -11,21 +11,53 @@ export default function ContactPage() {
   const lang = (params.lang === 'de') ? 'de' : 'en';
   const t = translations[lang].contact;
 
-  const [state, handleSubmit] = useForm("xzdkgrar");
+  const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleNewsletter = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert('Newsletter signup coming soon!');
+    setFormState('submitting');
+    setErrorMessage('');
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const data = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      message: formData.get('message') as string,
+    };
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        setFormState('success');
+        form.reset();
+      } else {
+        const result = await res.json();
+        setErrorMessage(result.error || 'Something went wrong');
+        setFormState('error');
+      }
+    } catch {
+      setErrorMessage('Something went wrong. Please try again.');
+      setFormState('error');
+    }
   };
 
-  if (state.succeeded) {
+  if (formState === 'success') {
     return (
       <div className={styles.contact}>
         <div className={styles.layout}>
           <div className={styles.heroPane}>
             <div className={styles.subHeader}>{t.subHeader}</div>
             <h1>{t.title}</h1>
-            <p>{t.success}</p>
+            <div className={styles.successMessage}>
+              <p>{t.success}</p>
+            </div>
             <ul className={styles.info}>
               <li>{t.name}</li>
               <li>Shady Nathan Tawfik</li>
@@ -53,15 +85,24 @@ export default function ContactPage() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
+            <label htmlFor="name">{t.nameLabel}</label>
+            <input
+              id="name"
+              type="text"
+              name="name"
+              required
+              placeholder={t.namePlaceholder}
+            />
+          </div>
+          <div className={styles.field}>
             <label htmlFor="email">{t.email}</label>
             <input
               id="email"
-              type="email" 
+              type="email"
               name="email"
               required
               placeholder={t.emailPlaceholder}
             />
-            <ValidationError prefix="Email" field="email" errors={state.errors} className={styles.validationError} />
           </div>
           <div className={styles.field}>
             <label htmlFor="message">{t.message}</label>
@@ -72,20 +113,13 @@ export default function ContactPage() {
               rows={6}
               placeholder={t.messagePlaceholder}
             />
-            <ValidationError prefix="Message" field="message" errors={state.errors} className={styles.validationError} />
           </div>
-          <button type="submit" className={ctaStyles.primary} disabled={state.submitting}>
-            {state.submitting ? t.sending : t.send}
+          {formState === 'error' && (
+            <div className={styles.errorMessage}>{errorMessage}</div>
+          )}
+          <button type="submit" className={ctaStyles.primary} disabled={formState === 'submitting'}>
+            {formState === 'submitting' ? t.sending : t.send}
           </button>
-        </form>
-      </div>
-
-      <div className={styles.newsletter}>
-        <h2>{t.newsletter.title}</h2>
-        <p>{t.newsletter.description}</p>
-        <form onSubmit={handleNewsletter}>
-          <input type="email" placeholder={t.newsletter.placeholder} required />
-          <button type="submit" className={ctaStyles.secondary}>{t.newsletter.subscribe}</button>
         </form>
       </div>
     </div>

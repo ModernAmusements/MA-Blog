@@ -48,6 +48,8 @@
     "title": "Get in Touch",
     "subHeader": "C++ • Swift • Python • TS",
     "name": "ModernAmusements Development",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
     "tags": "Algorithms | Performance",
     "description": "Have a question or want to work together? Fill out the form or reach out directly.",
     "email": "Email",
@@ -56,13 +58,7 @@
     "messagePlaceholder": "Your message...",
     "send": "Send Message",
     "sending": "Sending...",
-    "success": "Thanks for reaching out! I'll get back to you soon.",
-    "newsletter": {
-      "title": "Subscribe to Newsletter",
-      "description": "Get updates on new posts and projects delivered to your inbox.",
-      "placeholder": "your@email.com",
-      "subscribe": "Subscribe"
-    }
+    "success": "Thanks for reaching out! I'll get back to you soon."
   },
   "footer": {
     "builtWith": "Built with Next.js",
