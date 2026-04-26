@@ -7,7 +7,7 @@
 
 ## Summary
 
-Replaced Formspree with SendGrid for contact form emails, removed newsletter section.
+Replaced Formspree with SendGrid for contact form emails, redesigned contact page with brand UI, added new features.
 
 ---
 
@@ -21,14 +21,39 @@ Replaced Formspree with SendGrid for contact form emails, removed newsletter sec
 - Added proper error/success states
 - Reply-To header set to sender's email for easy replies
 
-### 2. Removed Newsletter Section
+### 2. Redesigned Contact Page with Brand UI
 
-- Deleted `/api/newsletter/route.ts`
-- Removed newsletter form from contact page
-- Removed newsletter translations from en.json and de.json
-- Removed newsletter SCSS styles
+Applied brand styling to contact page:
+- Terminal frame layout with header bars
+- No border-radius (per brand guidelines)
+- JetBrains Mono font for placeholders
+- Two-column layout: Form + Info sidebar
 
-### 3. Updated Environment Variables
+### 3. New Features Added
+
+- **Availability status** - "Currently employed" badge with briefcase icon
+- **Response time note** - Clock icon with "Usually replies within 24 hours"
+- **Copy email button** - Click to copy email with checkmark confirmation
+- **FAQ section** - 5 detailed questions about workflow, technologies, code quality
+- **Branded success state** - Check icon in bordered box
+
+### 4. Icon Fixes
+
+- Converted all icons to inline SVGs (fixed hydration mismatch)
+- Added new icons: ClipboardIcon, CheckIcon, ClockIcon, BriefcaseIcon
+
+### 5. FAQ Content
+
+Detailed FAQ covering:
+1. Current role and focus
+2. Development workflow (Git, feature branches, merge conflicts, Jira, Agile)
+3. Technologies used
+4. Freelance availability
+5. Code quality and best practices
+
+---
+
+## Environment Variables
 
 Added to `.env`:
 ```
@@ -40,18 +65,9 @@ CONTACT_TO_EMAIL=shadynathantawfik@gmail.com
 
 ---
 
-## Email Deliverability
-
-Researched Gmail/Yahoo 2024 requirements:
-- SPF/DKIM/DMARC needed for best inbox delivery
-- Currently using Gmail sender which has lower deliverability
-- Added to roadmap for future improvement
-
----
-
 ## Commits
 
-- `8a3ab68` refactor: replace Formspree with SendGrid for contact form, remove newsletter
+- `9a00d98` enhance: redesign contact page with brand UI and new features
 
 ---
 

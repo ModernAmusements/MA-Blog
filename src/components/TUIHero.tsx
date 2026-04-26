@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import styles from './TUIHero.module.scss';
 import { FolderIcon, OpenFolderIcon, FileIcon, PersonIcon, PaperplaneIcon, ChevronIcon } from '@/components/icons';
 
@@ -43,6 +44,7 @@ const getIcon = (item: TUINavItem, isExpanded: boolean) => {
 };
 
 export function TUIHero({ navItems, lang, heroText, exploreText, initialExpanded }: TUIHeroProps) {
+  const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
   const [expandedDirs, setExpandedDirs] = useState<Set<number>>(initialExpanded || new Set());
 
@@ -127,22 +129,31 @@ export function TUIHero({ navItems, lang, heroText, exploreText, initialExpanded
             <ul>
               {navItems.map((item, index) => (
                 <li key={item.path || `dir-${index}`}>
-                  <div 
-                    className={`${styles.itemRow} ${index === activeIndex ? styles.active : ''}`}
-                    onClick={() => { 
-                      setActiveIndex(index); 
-                      if (item.type === 'dir' && item.path) toggleExpand(index);
+                  {item.type === 'file' ? (
+                    <Link href={item.path} className={`${styles.itemRow} ${index === activeIndex ? styles.active : ''}`} onClick={() => setActiveIndex(index)}>
+                      <span className={styles.chevronContainer}></span>
+                      <span className={styles.icon}>{getIcon(item, false)}</span>
+                      <span className={styles.name}>{item.label}</span>
+                      <span className={styles.meta}>{item.size}</span>
+                    </Link>
+                  ) : (
+                    <div className={`${styles.itemRow} ${index === activeIndex ? styles.active : ''}`} onClick={() => {
+                      setActiveIndex(index);
+                      if (item.subItems && item.subItems.length > 0) {
+                        toggleExpand(index);
+                      }
                     }}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                    tabIndex={0}
-                  >
-                    <span className={styles.chevronContainer}>
-                      <ChevronIcon isExpanded={expandedDirs.has(index)} />
-                    </span>
-                    <span className={styles.icon}>{getIcon(item, expandedDirs.has(index))}</span>
-                    <span className={styles.name}>{item.label}</span>
-                    <span className={styles.meta}>{item.type === 'dir' ? '[DIR]' : item.size}</span>
-                  </div>
+                      onKeyDown={(e) => handleKeyDown(e, index)}
+                      tabIndex={0}
+                    >
+                      <span className={styles.chevronContainer}>
+                        <ChevronIcon isExpanded={expandedDirs.has(index)} />
+                      </span>
+                      <span className={styles.icon}>{getIcon(item, expandedDirs.has(index))}</span>
+                      <span className={styles.name}>{item.label}</span>
+                      <span className={styles.meta}>{item.type === 'dir' ? '[DIR]' : item.size}</span>
+                    </div>
+                  )}
                   {item.subItems && expandedDirs.has(index) && (
                     <ul className={styles.subList}>
                       {item.subItems.map((sub, subIndex) => (

@@ -15,7 +15,7 @@ const navItems: { path: string; key: string; disabled?: boolean }[] = [
   { path: '/blog', key: 'blog' },
   { path: '/projects', key: 'projects' },
   { path: '/brand', key: 'brand' },
-  { path: '/about', key: 'about', disabled: true },
+  { path: '/about', key: 'about' },
   { path: '/contact', key: 'contact' },
 ];
 

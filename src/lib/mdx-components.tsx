@@ -39,7 +39,7 @@ function createHeadingComponent(Tag: 'h2' | 'h3' | 'h4', className?: string) {
   return function Heading({ children }: { children?: React.ReactNode }) {
     const text = children?.toString() || '';
     const id = slugify(text);
-    return <Tag id={id} className={className}><a href={`#${id}`}>#</a>{children}</Tag>;
+    return <Tag id={id} className={className}>{children}</Tag>;
   };
 }
 

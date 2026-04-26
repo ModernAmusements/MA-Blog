@@ -1,47 +1,264 @@
 .about {
-  padding-top: 1rem;
   padding-bottom: 3rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
 
   h1 {
-    margin-bottom: 2rem;
+    font-size: 2rem;
+    margin: 0;
   }
 }
 
-@media (max-width: 1445px) {
-  .about {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
+.twoColumn {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  align-items: start;
 }
 
-.content {
-  max-width: 650px;
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
 
-  p {
-    margin-bottom: 1.5rem;
-    font-size: 1.1rem;
-    line-height: 1.8;
-  }
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.terminalFrame {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.terminalHeader {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.status {
+  color: var(--accent);
+}
+
+.terminalContent {
+  padding: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.profileSection {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.profileInfo {
+  flex: 1;
 
   h2 {
-    margin-top: 2.5rem;
-    margin-bottom: 1rem;
     font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .highlight {
+    color: var(--text);
+    font-weight: 500;
   }
 }
 
-.skills {
-  list-style: none;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 2rem;
+.profileImage {
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  flex-shrink: 0;
 
-  li {
-    padding: 0.5rem 1rem;
-    background: var(--code-bg);
-   
-    font-size: 0.95rem;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.timelineItem {
+  display: flex;
+  gap: 1rem;
+}
+
+.timelineIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: var(--accent);
+  }
+}
+
+.timelineContent {
+  flex: 1;
+}
+
+.timelineHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.25rem;
+
+  h3 {
+    font-size: 1rem;
+    margin: 0;
+  }
+}
+
+.timelinePeriod {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.timelineCompany {
+  font-size: 0.875rem;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+}
+
+.timelineDesc {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+.skillsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skill {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+.projectsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.project {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 1024px) {
+  .twoColumn {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .profileSection {
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+
+  .profileImage {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 1rem;
+  }
+
+  .sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .terminalContent {
+    padding: 1rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .timelineHeader {
+    flex-direction: column;
+    gap: 0.25rem;
   }
 }

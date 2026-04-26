@@ -35,14 +35,179 @@
   },
   "about": {
     "title": "Über mich",
+    "experience": "Erfahrung",
+    "experienceYears": "Jahre Erfahrung",
+    "projects": "Projekte",
+    "bigProjects": "Bekannte Projekte",
+    "currentRole": "Aktuelle Position",
+    "currentRoleTitle": "Senior Data Scientist bei Opencode",
+    "currentRoleDesc": "Entwicklung von datengetriebenen Lösungen und Fullstack-Anwendungen mit Fokus auf sauberen Code und Performance.",
     "skills": "Fähigkeiten",
     "notCoding": "Wenn ich nicht programmiere",
-    "content": [
-      "Hallo, ich bin Entwickler aus [Dein Ort]. Ich spezialisiere mich auf die Entwicklung von Webanwendungen mit Fokus auf Performance, Barrierefreiheit und sauberem Code.",
-      "Meine Reise in der Entwicklung begann, als ich meine erste Website im Studium erstellt habe. Seitdem habe ich an verschiedenen Projekten gearbeitet, von Websites für kleine Unternehmen bis hin zu Enterprise-Anwendungen."
+    "aboutMe": "Über mich",
+    "aboutMeText": "Ich bin Entwickler aus Bielefeld, Deutschland, spezialisiert auf Webanwendungen und Data-Science-Lösungen. Mit fast 9 Jahren professioneller Erfahrung habe ich mit Agenturen, Startups und Unternehmen in ganz Europa gearbeitet.",
+    "aboutMeText2": "Meine Reise begann mit kleinen Websites für Freunde und wuchs zu Projekten mit großen Marken. Ich gedeihe beim Lösen komplexer Probleme, ob bei Jira-Tickets, Feature-Branches oder Datenbankoptimierung.",
+    "aboutMeText3": "Derzeit angestellt als Senior Data Scientist bei Opencode, offen für interessante Freelance-Projekte.",
+    "notCodingContent": "Wenn ich nicht programmiere, erkunde ich neue Technologien, arbeite an Open-Source-Projekten oder genieße kreative Beschäftigungen zum Entspannen.",
+    "skillsList": ["TypeScript", "JavaScript", "React", "Next.js", "Node.js", "Python", "Swift", "C++", "SQL", "Docker", "AWS"],
+    "techStack": "Tech Stack",
+    "workExperience": "Berufserfahrung",
+    "education": "Bildung",
+    "timeline": [
+      {
+        "company": "Opencode",
+        "role": "Senior Data Scientist",
+        "type": "work",
+        "period": "2025 - heute",
+        "location": "Deutschland",
+        "description": "Entwicklung von datengetriebenen Lösungen und Fullstack-Anwendungen."
+      },
+      {
+        "company": "u + I interact",
+        "role": "Software-Entwickler",
+        "type": "work",
+        "period": "2024 - 2025",
+        "location": "Deutschland",
+        "description": "Softwareentwicklung für interaktive Medienprojekte."
+      },
+      {
+        "company": "epunks",
+        "role": "Software-Entwickler",
+        "type": "work",
+        "period": "2023",
+        "location": "Deutschland",
+        "description": "Softwareentwicklung und Systemarchitektur."
+      },
+      {
+        "company": "Hardlait Paris",
+        "role": "Web-Entwickler",
+        "type": "work",
+        "period": "2022",
+        "location": "Paris",
+        "description": "Webentwicklung für internationale Kunden."
+      },
+      {
+        "company": "Clark",
+        "role": "Webentwicklung Praktikum",
+        "type": "internship",
+        "period": "2018",
+        "location": "Deutschland",
+        "description": "Praktikum in Webentwicklung."
+      },
+      {
+        "company": "neue fische",
+        "role": "Software-Entwickler (Bildung)",
+        "type": "education",
+        "period": "2021",
+        "location": "Köln",
+        "description": "Softwareentwicklungs-Bootcamp und Zertifizierung."
+      },
+      {
+        "company": "Humboldt-Universität",
+        "role": "Entwickler",
+        "type": "work",
+        "period": "2021",
+        "location": "Berlin",
+        "description": "Akademische Forschungs- und Entwicklungsprojekte."
+      },
+      {
+        "company": "FH Bielefeld",
+        "role": "Bachelor Grafik und Kommunikation",
+        "type": "education",
+        "period": "2020",
+        "location": "Bielefeld",
+        "description": "Bachelor-Abschluss in Grafikdesign und Kommunikation."
+      },
+      {
+        "company": "Zahnarzt Helden",
+        "role": "Web-Entwickler",
+        "type": "work",
+        "period": "2020",
+        "location": "Deutschland",
+        "description": "Webentwicklung für Zahnarztpraxis-Website."
+      },
+      {
+        "company": "bagzz Berlin",
+        "role": "Software-Entwickler",
+        "type": "work",
+        "period": "2020",
+        "location": "Berlin",
+        "description": "Softwareentwicklung für private Projekte."
+      },
+      {
+        "company": "Alasco GmbH",
+        "role": "Webentwicklung Praktikum",
+        "type": "internship",
+        "period": "2017",
+        "location": "Deutschland",
+        "description": "Praktikum in Webentwicklung."
+      },
+      {
+        "company": "Ironhack Berlin",
+        "role": "Full-Stack-Entwickler (Bildung)",
+        "type": "education",
+        "period": "2017",
+        "location": "Berlin",
+        "description": "Full-Stack-Entwicklungs-Bootcamp."
+      },
+      {
+        "company": "tva-studio",
+        "role": "Full-Stack-Entwickler",
+        "type": "work",
+        "period": "2020",
+        "location": "Köln",
+        "description": "Full-Stack-Webentwicklung für Kunden."
+      },
+      {
+        "company": "Watergate Berlin",
+        "role": "UI/UX-Webentwickler",
+        "type": "work",
+        "period": "2020",
+        "location": "Berlin",
+        "description": "UI/UX-Entwicklung für private Projekte."
+      },
+      {
+        "company": "RTL Group",
+        "role": "Cybersicherheit-Praktikant",
+        "type": "internship",
+        "period": "2020",
+        "location": "Köln",
+        "description": "Praktikum und Schulung in Cybersicherheit."
+      },
+      {
+        "company": "Uni Bielefeld",
+        "role": "Bachelor Physik",
+        "type": "education",
+        "period": "2017",
+        "location": "Bielefeld",
+        "description": "Bachelor-Abschluss in Physik."
+      },
+      {
+        "company": "Max-Planck Gymnasium",
+        "role": "Abitur",
+        "type": "education",
+        "period": "2012",
+        "location": "Deutschland",
+        "description": "Abitur."
+      }
     ],
-    "skillsList": ["JavaScript / TypeScript", "React / Next.js", "Node.js", "Python", "CSS / SCSS", "PostgreSQL", "Docker", "AWS"],
-    "notCodingContent": "Du findest mich beim Erkunden neuer Technologien, beim Beitrag zu Open Source oder bei Outdoor-Aktivitäten. Ich bin immer offen für Kontakte mit anderen Entwicklern und neue Erfahrungen."
+    "projectList": [
+      "Zahnarzt Helden",
+      "Hardlait",
+      "fff-corp",
+      "tva-studio",
+      "Wertschätzer Hotel",
+      "Rodenberg",
+      "AUG Websites",
+      "Peters",
+      "Danneman",
+      "TS Aluminium",
+      "Furminator",
+      "Arvato",
+      "Hagedorn",
+      "Theater Bielefeld",
+      "+ Und mehr"
+    ]
   },
   "contact": {
     "title": "Kontakt",

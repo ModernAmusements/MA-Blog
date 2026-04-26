@@ -35,14 +35,179 @@
   },
   "about": {
     "title": "About Me",
+    "experience": "Experience",
+    "experienceYears": "Years of Experience",
+    "projects": "Projects",
+    "bigProjects": "Notable Projects",
+    "currentRole": "Current Role",
+    "currentRoleTitle": "Senior Data Scientist at Opencode",
+    "currentRoleDesc": "Building data-driven solutions and fullstack applications with a focus on clean code and performance.",
     "skills": "Skills",
     "notCoding": "When I'm Not Coding",
-    "content": [
-      "Hi, I'm a developer based in [Your Location]. I specialize in building web applications with a focus on performance, accessibility, and clean code.",
-      "My journey in development started when I built my first website in college. Since then, I've worked on a variety of projects ranging from small business websites to enterprise applications."
+    "aboutMe": "About Me",
+    "aboutMeText": "I'm a developer based in Bielefeld, Germany, specializing in building web applications and data science solutions. With nearly 9 years of professional experience, I've worked with agencies, startups, and enterprises across Europe.",
+    "aboutMeText2": "My journey started with small websites for friends and grew into working with major brands. I thrive in solving complex problems, whether it's handling Jira tickets, managing feature branches, or optimizing database queries.",
+    "aboutMeText3": "Currently employed as Senior Data Scientist at Opencode while staying open to interesting freelance projects.",
+    "notCodingContent": "When I'm not coding, you can find me exploring new technologies, contributing to open source, or enjoying the creative outlets that help me unwind.",
+    "skillsList": ["TypeScript", "JavaScript", "React", "Next.js", "Node.js", "Python", "Swift", "C++", "SQL", "Docker", "AWS"],
+    "techStack": "Tech Stack",
+    "workExperience": "Work Experience",
+    "education": "Education",
+    "timeline": [
+      {
+        "company": "Opencode",
+        "role": "Senior Data Scientist",
+        "type": "work",
+        "period": "2025 - Present",
+        "location": "Germany",
+        "description": "Building data-driven solutions and fullstack applications."
+      },
+      {
+        "company": "u + I interact",
+        "role": "Software Developer",
+        "type": "work",
+        "period": "2024 - 2025",
+        "location": "Germany",
+        "description": "Software development for interactive media projects."
+      },
+      {
+        "company": "epunks",
+        "role": "Software Developer",
+        "type": "work",
+        "period": "2023",
+        "location": "Germany",
+        "description": "Software development and system architecture."
+      },
+      {
+        "company": "Hardlait Paris",
+        "role": "Web Developer",
+        "type": "work",
+        "period": "2022",
+        "location": "Paris",
+        "description": "Web development for international client."
+      },
+      {
+        "company": "Clark",
+        "role": "Web Development Internship",
+        "type": "internship",
+        "period": "2018",
+        "location": "Germany",
+        "description": "Web development internship."
+      },
+      {
+        "company": "neue fische",
+        "role": "Software Developer (Education)",
+        "type": "education",
+        "period": "2021",
+        "location": "Cologne",
+        "description": "Software development bootcamp and certification."
+      },
+      {
+        "company": "Humboldt-Universität",
+        "role": "Developer",
+        "type": "work",
+        "period": "2021",
+        "location": "Berlin",
+        "description": "Academic research and development projects."
+      },
+      {
+        "company": "FH Bielefeld",
+        "role": "Bachelor Grafik und Kommunikation",
+        "type": "education",
+        "period": "2020",
+        "location": "Bielefeld",
+        "description": "Bachelor's degree in Graphic Design and Communication."
+      },
+      {
+        "company": "Zahnarzt Helden",
+        "role": "Web Developer",
+        "type": "work",
+        "period": "2020",
+        "location": "Germany",
+        "description": "Web development for dental practice website."
+      },
+      {
+        "company": "bagzz Berlin",
+        "role": "Software Developer",
+        "type": "work",
+        "period": "2020",
+        "location": "Berlin",
+        "description": "Software development for private projects."
+      },
+      {
+        "company": "Alasco GmbH",
+        "role": "Web Development Internship",
+        "type": "internship",
+        "period": "2017",
+        "location": "Germany",
+        "description": "Web development internship."
+      },
+      {
+        "company": "Ironhack Berlin",
+        "role": "Full-Stack Developer (Education)",
+        "type": "education",
+        "period": "2017",
+        "location": "Berlin",
+        "description": "Full-stack development bootcamp."
+      },
+      {
+        "company": "tva-studio",
+        "role": "Full-Stack Developer",
+        "type": "work",
+        "period": "2020",
+        "location": "Cologne",
+        "description": "Full-stack web development for clients."
+      },
+      {
+        "company": "Watergate Berlin",
+        "role": "UI/UX Web Developer",
+        "type": "work",
+        "period": "2020",
+        "location": "Berlin",
+        "description": "UI/UX development for private projects."
+      },
+      {
+        "company": "RTL Group",
+        "role": "Cybersecurity Intern",
+        "type": "internship",
+        "period": "2020",
+        "location": "Cologne",
+        "description": "Cybersecurity internship and training."
+      },
+      {
+        "company": "Uni Bielefeld",
+        "role": "Bachelor Physik",
+        "type": "education",
+        "period": "2017",
+        "location": "Bielefeld",
+        "description": "Bachelor's degree in Physics."
+      },
+      {
+        "company": "Max-Planck Gymnasium",
+        "role": "Abitur",
+        "type": "education",
+        "period": "2012",
+        "location": "Germany",
+        "description": "High school diploma."
+      }
     ],
-    "skillsList": ["JavaScript / TypeScript", "React / Next.js", "Node.js", "Python", "CSS / SCSS", "PostgreSQL", "Docker", "AWS"],
-    "notCodingContent": "You can find me exploring new technologies, contributing to open source, or enjoying outdoor activities. I'm always open to connecting with other developers and learning new things."
+    "projectList": [
+      "Zahnarzt Helden",
+      "Hardlait",
+      "fff-corp",
+      "tva-studio",
+      "Wertschätzer Hotel",
+      "Rodenberg",
+      "AUG Websites",
+      "Peters",
+      "Danneman",
+      "TS Aluminium",
+      "Furminator",
+      "Arvato",
+      "Hagedorn",
+      "Theater Bielefeld",
+      "+ Many more"
+    ]
   },
   "contact": {
     "title": "Get in Touch",
