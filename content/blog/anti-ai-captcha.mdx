@@ -7,6 +7,8 @@ tags: ['ai', 'captcha', 'security', 'machine-learning', 'human-behavior']
 
 The internet is under threat from increasingly sophisticated AI systems that can bypass traditional CAPTCHA systems. The Behavioral Maze CAPTCHA project represents a revolutionary approach to bot detection that leverages human behavioral analysis and pathfinding algorithms to create the most secure anti-bot solution yet.
 
+![Maze Example 1](/images/captcha/2.png)
+
 ## The Problem with Traditional CAPTCHAs
 
 Traditional CAPTCHA systems like reCAPTCHA use image recognition or text challenges that AI systems can eventually learn to solve. As AI becomes more advanced, these systems become increasingly vulnerable to bot attacks, leading to spam, fake accounts, and compromised online services.
@@ -22,6 +24,8 @@ The project is building the largest dataset of human maze-solving behavior in ex
 - **Real-time Data Collection**: Every human interaction with the CAPTCHA system is captured
 - **Behavioral Analysis**: Tracking solve times, path efficiency, mouse movement patterns, and wall touch frequencies
 - **Human Variability**: Capturing the natural hesitation, varied speeds, and occasional mistakes that distinguish human from AI behavior
+
+![Maze Example 3](/images/captcha/4.png)
 
 ### Multifaceted Approach
 
@@ -41,12 +45,52 @@ The system uses advanced pathfinding algorithms and behavioral analysis:
 - **Real-time Performance Comparison**
 - **Solve Time Ranking** (fastest algorithms first)
 
+```mermaid
+graph TD
+    A[Start] --> B[Select Algorithm]
+    B --> C[BFS]
+    B --> D[A*]
+    B --> E[DFS]
+    B --> F[Greedy]
+    B --> G[Dijkstra]
+    B --> H[Random Walk]
+    C --> I[Compare Times]
+    D --> I
+    E --> I
+    F --> I
+    G --> I
+    H --> I
+    I --> J[Rank Algorithms]
+    J --> K[Display Results]
+```
+
 ### Behavioral Detection Features
 
 1. **Path Efficiency Analysis**: Human paths are naturally less efficient than optimal AI solutions
 2. **Solve Time Patterns**: Realistic human solve times (8-20 seconds)
 3. **Mouse Movement Tracking**: Human-like cursor behavior detection
 4. **Wall Tolerance**: Natural wall touch patterns (max 3 touches per 10 steps)
+
+```mermaid
+flowchart LR
+    A[User Solve Maze] --> B{Analyze Behavior}
+    
+    B --> C[Path Efficiency]
+    B --> D[Solve Time]
+    B --> E[Mouse Movement]
+    B --> F[Wall Touches]
+    
+    C --> G{Score}
+    D --> G
+    E --> G
+    F --> G
+    
+    G -->|Score < 0.5| H[Human]
+    G -->|Score >= 0.5| I[Bot]
+    
+    H --> J[Allow Access]
+    I --> K[Block / Challenge]
+```
 
 ## Why This Approach is Superior
 
@@ -57,6 +101,29 @@ The system collects the biggest dataset of human path drawing behavior:
 1. **Comprehensive Coverage**: 20+ behavioral features captured per interaction
 2. **Real-World Validation**: Data from actual human users, not synthetic patterns  
 3. **Growing Dataset**: Each interaction contributes to the largest human behavior dataset
+
+```mermaid
+graph TD
+    A[User Interaction] --> B[Data Capture]
+    B --> C[Feature Extraction]
+    
+    C --> D[Path Shape]
+    C --> E[Timing Pattern]
+    C --> F[Movement Curve]
+    C --> G[Error Rate]
+    C --> H[ hesitation]
+    C --> I[Speed Variation]
+    
+    D --> J[Feature Vector]
+    E --> J
+    F --> J
+    G --> J
+    H --> J
+    I --> J
+    
+    J --> K[Dataset Storage]
+    K --> L[Training Data]
+```
 
 ### AI Safety Features
 
@@ -73,6 +140,8 @@ This project represents a critical step toward protecting the internet from AI t
 - **Bot Detection**: Prevents automated spam and fake account creation
 - **Content Protection**: Protects websites from AI-generated content manipulation  
 - **Real-time Defense**: Provides instant protection against bot attacks
+
+![Maze Example 2](/images/captcha/3.png)
 
 ### Research Applications
 
@@ -130,12 +199,6 @@ Here is the interactive maze CAPTCHA in action:
 <video controls width="100%" src="/images/captcha/1.mp4"></video>
 
 ## Maze Examples
-
-![Maze Example 1](/images/captcha/2.png)
-
-![Maze Example 2](/images/captcha/3.png)
-
-![Maze Example 3](/images/captcha/4.png)
 
 ![Maze Example 4](/images/captcha/5.png)
 

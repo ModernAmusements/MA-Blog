@@ -7,6 +7,8 @@ tags: ['ai', 'captcha', 'security', 'machine-learning', 'human-behavior']
 
 Das Internet wird von immer raffinierteren KI-Systemen bedroht, die traditionelle CAPTCHA-Systeme umgehen können. Das Behavioral Maze CAPTCHA Projekt repräsentiert einen revolutionären Ansatz zur Bot-Erkennung, der menschliche Verhaltensanalyse und Pfadfindungsalgorithmen nutzt, um die sicherste Anti-Bot-Lösung zu entwickeln.
 
+![Labyrinth Beispiel 1](/images/captcha/2.png)
+
 ## Das Problem mit traditionellen CAPTCHAs
 
 Traditionelle CAPTCHA-Systeme wie reCAPTCHA nutzen Bilderkennung oder Text-Herausforderungen, die KI-Systeme letztendlich lernen können zu lösen. Mit fortschreitender KI werden diese Systeme zunehmend anfällig für Bot-Angriffe, was zu Spam, gefälschten Konten und kompromittierten Online-Diensten führt.
@@ -22,6 +24,8 @@ Das Projekt baut den größten Datensatz für menschliches Labyrinth-Lösungsver
 - **Echtzeit-Datenerfassung**: Jede menschliche Interaktion mit dem CAPTCHA-System wird erfasst
 - **Verhaltensanalyse**: Verfolgung von Lösungszeiten, Pfadeffizienz, Mausbewegungsmustern und Wandberührungs-Häufigkeiten
 - **Menschliche Variabilität**: Erfassung von natürlicher Zögern, variierenden Geschwindigkeiten und gelegentlichen Fehlern, die Menschen von KI unterscheiden
+
+![Labyrinth Beispiel 3](/images/captcha/4.png)
 
 ### Vielschichtiger Ansatz
 
@@ -41,12 +45,52 @@ Das System nutzt fortschrittliche Pfadfindungsalgorithmen und Verhaltensanalyse:
 - **Echtzeit-Leistungsvergleich**
 - **Lösungszeit-Ranking** (schnellste Algorithmen zuerst)
 
+```mermaid
+graph TD
+    A[Start] --> B[Algorithmus wählen]
+    B --> C[BFS]
+    B --> D[A*]
+    B --> E[DFS]
+    B --> F[Greedy]
+    B --> G[Dijkstra]
+    B --> H[Random Walk]
+    C --> I[Zeiten vergleichen]
+    D --> I
+    E --> I
+    F --> I
+    G --> I
+    H --> I
+    I --> J[Algorithmen rangieren]
+    J --> K[Ergebnisse anzeigen]
+```
+
 ### Verhaltens-Erkennungsfunktionen
 
 1. **Pfadeffizienzanalyse**: Menschliche Pfade sind natürlich weniger effizient als optimale KI-Lösungen
 2. **Lösungszeitmuster**: Realistische menschliche Lösungszeiten (8-20 Sekunden)
 3. **Mausbewegungsverfolgung**: Menschliche Cursor-Verhaltenserkennung
 4. **Wandtoleranz**: Natürliche Wandberührungsmuster (max. 3 Berührungen pro 10 Schritte)
+
+```mermaid
+flowchart LR
+    A[User löst Labyrinth] --> B{Verhalten analysieren}
+    
+    B --> C[Pfadeffizienz]
+    B --> D[Lösungszeit]
+    B --> E[Mausbewegung]
+    B --> F[Wandberührungen]
+    
+    C --> G{Bewertung}
+    D --> G
+    E --> G
+    F --> G
+    
+    G -->|Bewertung < 0.5| H[Mensch]
+    G -->|Bewertung >= 0.5| I[Bot]
+    
+    H --> J[Zugang gewähren]
+    I --> K[Blockieren / Herausfordern]
+```
 
 ## Warum dieser Ansatz überlegen ist
 
@@ -57,6 +101,29 @@ Das System sammelt den größten Datensatz für menschliches Pfadzeichnungsverha
 1. **Umfassende Abdeckung**: 20+ Verhaltensmerkmale pro Interaktion erfasst
 2. **Echtwelt-Validierung**: Daten von echten menschlichen Nutzern, nicht synthetische Muster  
 3. **Wachsender Datensatz**: Jede Interaktion trägt zum größten menschlichen Verhaltensdatensatz bei
+
+```mermaid
+graph TD
+    A[Nutzer-Interaktion] --> B[Datenerfassung]
+    B --> C[Merkmalsextraktion]
+    
+    C --> D[Pfadform]
+    C --> E[Zeitmuster]
+    C --> F[Bewegungskurve]
+    C --> G[Fehlerrate]
+    C --> H[Zögern]
+    C --> I[Geschwindigkeitsvariation]
+    
+    D --> J[Merkmalsvektor]
+    E --> J
+    F --> J
+    G --> J
+    H --> J
+    I --> J
+    
+    J --> K[Datenspeicherung]
+    K --> L[Trainingsdaten]
+```
 
 ### KI-Sicherheitsfunktionen
 
@@ -73,6 +140,8 @@ Dieses Projekt repräsentiert einen kritischen Schritt zum Schutz des Internets 
 - **Bot-Erkennung**: Verhindert automatisierten Spam und gefälschte Kontenerstellung
 - **Inhaltsschutz**: Schützt Websites vor KI-generierter Inhaltsmanipulation  
 - **Echtzeit-Verteidigung**: Bietet sofortigen Schutz gegen Bot-Angriffe
+
+![Labyrinth Beispiel 2](/images/captcha/3.png)
 
 ### Forschung-Anwendungen
 
@@ -130,12 +199,6 @@ Hier ist der interaktive Maze CAPTCHA in Aktion:
 <video controls width="100%" src="/images/captcha/1.mp4"></video>
 
 ## Labyrinth-Beispiele
-
-![Labyrinth Beispiel 1](/images/captcha/2.png)
-
-![Labyrinth Beispiel 2](/images/captcha/3.png)
-
-![Labyrinth Beispiel 3](/images/captcha/4.png)
 
 ![Labyrinth Beispiel 4](/images/captcha/5.png)
 
