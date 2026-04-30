@@ -1,78 +1,49 @@
-# Session - 2026-04-26
+# Session - 2026-04-30
 
-**Session ID:** ses_28df (updated)
-**Date:** 2026-04-26
+**Session ID:** ses_28df (continued)
+**Date:** 2026-04-30
 
 ---
 
 ## Summary
 
-Replaced Formspree with SendGrid for contact form emails, redesigned contact page with brand UI, added new features.
+Fixed previous agent issues and completed the blog post "Behavioral Maze CAPTCHA" in EN + DE with Mermaid diagram, video, and images.
 
 ---
 
 ## Changes Made
 
-### 1. Contact Form Now Uses SendGrid
+### 1. New Blog Post: anti-ai-captcha
 
-- Removed Formspree (`@formspree/react`)
-- Contact form now POSTs to `/api/contact` which sends email via SendGrid
-- Added name field to contact form
-- Added proper error/success states
-- Reply-To header set to sender's email for easy replies
+Created EN + DE versions at `content/blog/anti-ai-captcha.mdx` and `content/blog/anti-ai-captcha.de.mdx`:
+- Title: `Behavioral Maze CAPTCHA` (simplified, no colon to avoid YAML parsing issue)
+- Mermaid flowchart showing implementation architecture
+- Video embed at `/images/captcha/1.mp4`
+- 4 images at `public/images/captcha/2-5.png` (maze examples section)
 
-### 2. Redesigned Contact Page with Brand UI
+### 2. Bug Fixes
 
-Applied brand styling to contact page:
-- Terminal frame layout with header bars
-- No border-radius (per brand guidelines)
-- JetBrains Mono font for placeholders
-- Two-column layout: Form + Info sidebar
+- Deleted malformed filename ` session- ses_28df. md` (spaces in name)
+- Added missing images to blog post (2-5.png)
+- German blog post was missing, created `anti-ai-captcha.de.mdx`
 
-### 3. New Features Added
+### 2. DotMatrix Grid Size Slider Removed
 
-- **Availability status** - "Currently employed" badge with briefcase icon
-- **Response time note** - Clock icon with "Usually replies within 24 hours"
-- **Copy email button** - Click to copy email with checkmark confirmation
-- **FAQ section** - 5 detailed questions about workflow, technologies, code quality
-- **Branded success state** - Check icon in bordered box
-
-### 4. Icon Fixes
-
-- Converted all icons to inline SVGs (fixed hydration mismatch)
-- Added new icons: ClipboardIcon, CheckIcon, ClockIcon, BriefcaseIcon
-
-### 5. FAQ Content
-
-Detailed FAQ covering:
-1. Current role and focus
-2. Development workflow (Git, feature branches, merge conflicts, Jira, Agile)
-3. Technologies used
-4. Freelance availability
-5. Code quality and best practices
+Removed range slider for grid size, kept only the preset buttons (8, 16, 32, 64) in `src/app/[lang]/dotmatrix/page.tsx`.
 
 ---
 
-## Environment Variables
+## Notes
 
-Added to `.env`:
-```
-SENDGRID_API_KEY=SG.xxx
-SENDGRID_FROM_EMAIL=shadynathantawfik@gmail.com
-SENDGRID_FROM_NAME=Modern Amusements
-CONTACT_TO_EMAIL=shadynathantawfik@gmail.com
-```
+- YAML frontmatter with colons in values must be quoted (e.g., `title: "Foo: Bar"`) OR use em dash instead
+- gray-matter (YAML parser) doesn't handle unquoted colons in values
+- Blog post slug: `anti-ai-captcha` (renders at `/blog/anti-ai-captcha` and `/blog/anti-ai-captcha.de`)
 
 ---
 
-## Commits
+## Previous Session (2026-04-26)
 
-- `9a00d98` enhance: redesign contact page with brand UI and new features
-
----
-
-## Previous Session (2026-04-23)
-
-- Fixed TOC issues (sub-numbering and chevrons)
-- Added footer padding
-- Fixed Mermaid diagram detection
+- Contact form now uses SendGrid (removed Formspree)
+- Contact page redesigned with terminal/brand UI
+- Added availability status, response time note, copy email button
+- Added 5 FAQ questions

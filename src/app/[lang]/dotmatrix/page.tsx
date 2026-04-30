@@ -335,29 +335,18 @@ const convert = async () => {
                 </label>
               </label>
 
-              <label className={styles.gridSizeLabel}>
-                Grid Size: {gridSize}×{gridSize}
-                <input
-                  type="range"
-                  min="8"
-                  max="128"
-                  step="8"
-                  value={gridSize}
-                  onChange={(e) => handleGridSizeChange(Number(e.target.value))}
-                />
-                <div className={styles.presetButtons}>
-                  {GRID_PRESETS.map(size => (
-                    <button
-                      key={size}
-                      type="button"
-                      className={gridSize === size ? styles.presetActive : ''}
-                      onClick={() => handleGridSizeChange(size)}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </label>
+              <div className={styles.presetButtons}>
+                {GRID_PRESETS.map(size => (
+                  <button
+                    key={size}
+                    type="button"
+                    className={gridSize === size ? styles.presetActive : ''}
+                    onClick={() => handleGridSizeChange(size)}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
 
               <label className={styles.dotSizeLabel}>
                 Dot Size: {imageDotSize}px
