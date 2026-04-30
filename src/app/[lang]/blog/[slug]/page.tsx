@@ -32,6 +32,15 @@ export async function generateMetadata(props: Props) {
     };
   }
 
+  const images = [
+    {
+      url: '/og-image.svg',
+      width: 1200,
+      height: 630,
+      alt: post.title,
+    },
+  ];
+
   return {
     title: post.title,
     description: post.description,
@@ -45,12 +54,14 @@ export async function generateMetadata(props: Props) {
       publishedTime: post.date,
       tags: post.tags,
       authors: ['Shady Nathan Tawfik'],
+      images,
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title: post.title,
       description: post.description,
       creator: '@modernamusements',
+      images: ['/og-image.svg'],
     },
   };
 }
