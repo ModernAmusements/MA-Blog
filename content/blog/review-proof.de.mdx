@@ -5,11 +5,9 @@ date: 2026-05-11
 tags: ['python', 'web-scraping', 'playwright', 'medizinische-daten', 'bielefeld', 'datensammlung']
 ---
 
-Dieses Projekt ist ein Python-basiertes Web-Scraping-System zur Erfassung umfassender Daten über Ärzte und Gesundheitseinrichtungen in Bielefeld, Deutschland. Der Scraper nutzt Playwright (eine moderne Browser-Automatisierungsbibliothek), um mit Google Search zu interagieren und Geschäftsinformationen zu extrahieren, darunter Bewertungen, Rezensionsanzahlen, Adressen und DSGVO-bezogeneLöschhinweise.
+Dieses Projekt ist ein Python-basiertes Web-Scraping-System zur Erfassung umfassender Daten über Ärzte und Gesundheitseinrichtungen in Bielefeld, Deutschland. Der Scraper nutzt Playwright (eine moderne Browser-Automatisierungsbibliothek), um mit Google Search zu interagieren und Geschäftsinformationen zu extrahieren, darunter Bewertungen, Rezensionsanzahlen, Adressen und DSGVO-bezogene Löschhinweise.
 
-![ReviewProof Interface](/images/review_proof/Bildschirmfoto 2026-05-04 um 10.35.42.png)
-
-## Projektübersicht
+![Scraper Interface](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.35.42.png)
 
 **Hauptziele:**
 - Erfassung von Daten von 500+ Ärzten, Zahnärzten, Kliniken und Arztpraxen
@@ -121,15 +119,15 @@ Der Scraper verwendet eine Multi-Term-Suchstrategie für maximale Abdeckung:
 
 ```python
 search_terms = [
-    'Arzt Bielefeld',
-    'Zahnarzt Bielefeld',
-    'Klinik Bielefeld'
+    'Arzt Bielefeld',      # Allgemeinärzte
+    'Zahnarzt Bielefeld',  # Zahnärzte
+    'Klinik Bielefeld'     # Kliniken und Krankenhäuser
 ]
 ```
 
 Jeder Suchbegriff durchsucht 3 Seiten × 10 Ergebnisse = 30 potenzielle Einträge pro Begriff.
 
-![Scraper läuft](/images/review_proof/Bildschirmfoto 2026-05-04 um 10.36.08.png)
+![Suchergebnisse](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.08.png)
 
 ### Phase 2: Namensextraktion
 
@@ -174,7 +172,7 @@ browser = await p.chromium.launch(
 
 context = await browser.new_context(
     viewport={'width': 1920, 'height': 1080},
-    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64)...'
+    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36'
 )
 ```
 
@@ -182,6 +180,19 @@ context = await browser.new_context(
 - `headless=False`: Für visuelle Fehlersuche
 - `AutomationControlled` Flag: Bot-Erkennung umgehen
 - `no-sandbox`: Für einige Linux-Umgebungen erforderlich
+
+### Such-URL-Muster
+
+```python
+search_url = f'https://www.google.com/search?q={term}&tbm=lcl&hl=de-DE&start={page_num * 10}'
+```
+
+| Parameter | Wert | Zweck |
+|-----------|------|--------|
+| `q` | Suchbegriff | Google-Abfrage |
+| `tbm=lcl` | local | Lokale Geschäftsergebnisse |
+| `hl=de-DE` | Deutsch | Deutsche Sprachergebnisse |
+| `start` | 0, 10, 20 | Seitennummerierung |
 
 ### Consent-Handling
 
@@ -201,10 +212,19 @@ flowchart TD
 
 #### Bewertungsmuster
 ```python
+# Muster: "4,5(103)" → rating: 4.5, reviews: 103
 rating_match = re.search(r'(\d+[.,]\d+)\s*\(\s*(\d+)\s*\)', page_text)
 if rating_match:
     data['rating'] = rating_match.group(1).replace(',', '.')
     data['total_reviews'] = rating_match.group(2)
+```
+
+#### Adressmuster
+```python
+# Deutsches Postleitzahl-Muster: "33602 Bielefeld"
+addr_match = re.search(r'\d{5}\s+[\w\s]+(?:Bielefeld|Stadtteil|str\.?|straße)', page_text, re.IGNORECASE)
+if addr_match:
+    data['address'] = 'Adresse: ' + addr_match.group(0).strip()
 ```
 
 #### Gelöschte Rezensionen (DSGVO)
@@ -247,7 +267,8 @@ doctor_keywords = [
     'arzt', 'praxis', 'klinik', 'zentrum', 'dr.', 'dr ',
     'med.', 'med ', 'prof.', 'hausarzt', 'zahnarzt',
     'facharzt', 'mvz', 'therapie', 'psycholog', 'physio',
-    'heilkunde', 'chiro', 'podo', 'ergo', 'logo'
+    'heilkunde', 'chiro', 'podo', 'ergo', 'logo',
+    'apotheke', 'hospital', 'krankenhaus', 'zahn'
 ]
 ```
 
@@ -258,11 +279,29 @@ skip_patterns = [
     'bewertung', 'öffnet', 'geschlossen', 'anzeige',
     'website', 'telefon', 'google', 'suche', '·',
     'route', 'weiter', 'anmelden', 'nutzung',
-    'datenschutz', 'feedback', 'standort', 'hilfe'
+    'datenschutz', 'feedback', 'standort', 'hilfe',
+    'gesponsert', 'suche etwas', 'bielefeld', 'deutschland'
 ]
 ```
 
-![Datenvalidierung](/images/review_proof/Bildschirmfoto 2026-05-04 um 10.36.35.png)
+### Saubere Kategorien
+
+**Einschließen (Medizinisch):**
+- Ärzte (Dr., Dr. med., Prof.)
+- Praxen (Praxis, Gemeinschaftspraxis)
+- Kliniken (Klinik, Krankenhaus)
+- Zahnärzte (Zahnarzt, Zahnärzte)
+- Fachärzte (Facharzt, Centrum)
+- Therapiezentren
+
+**Ausschließen (Nicht-medizinisch):**
+- Apotheken (Apotheke)
+- Fitnessstudios (Fitness, Gym, McFIT)
+- Optiker (Optik, Augenoptik)
+- Labore (Labor, Diagnostik)
+- Sanatorien (Sanitätshaus)
+
+![Validierungsprozess](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.35.png)
 
 ## Datenbankschema
 
@@ -305,6 +344,22 @@ erDiagram
     }
 ```
 
+### Feldbeschreibungen
+
+| Feld | Typ | Beschreibung | Beispiel |
+|-------|------|-------------|---------|
+| id | INTEGER | Primärschlüssel | 1 |
+| name | TEXT | Geschäftsname | "Dr. med. Hans Müller" |
+| rating | TEXT | Bewertung (1.0-5.0) | "4.5" |
+| total_reviews | TEXT | Anzahl der Rezensionen | "103" |
+| deleted_reviews | TEXT | DSGVO-Löschhinweis | "Einige Ergebnisse..." |
+| address | TEXT | Vollständige Adresse | "Adresse: Hauptstr. 1, 33602 Bielefeld" |
+| url | TEXT | Google Maps URL | "https://www.google.com/maps/..." |
+| category | TEXT | Auto-kategorisierte Kategorie | "Doctor", "Dentist", "Clinic" |
+| scrape_date | TEXT | Erstes Scraping-Datum | "2026-05-11" |
+| last_updated | TEXT | Letztes Aktualisierungsdatum | "2026-05-11" |
+| status | TEXT | Aktiv/Inaktiv | "active" |
+
 ### Kategorie-Auto-Tagging
 
 ```python
@@ -314,7 +369,7 @@ def category_from_name(name):
         return 'Zahnarzt'
     if any(k in name_lower for k in ['klinik', 'krankenhaus', 'hospital']):
         return 'Klinik'
-    if any(k in name_lower for k in ['augen', 'dermat', 'herz', 'orthop']):
+    if any(k in name_lower for k in ['augen', 'dermat', 'herz', 'orthop', 'neurolog', 'gynäkolog', 'frauenarzt', 'urolog']):
         return 'Facharzt'
     if any(k in name_lower for k in ['praxis', 'medizinisches zentrum', 'mvz']):
         return 'Arztpraxis'
@@ -412,6 +467,19 @@ flowchart TD
 
 **Lösung:** Textbasierte Extraktion statt CSS-Selektoren verwenden:
 ```python
+# Statt: card = await page.query_selector('.vwVdIc')
+# Verwenden: text = await page.inner_text('body')
+```
+
+**Vorher (Selektor-basiert):**
+```python
+cards = await page.query_selector_all('.vwVdIc')
+for card in cards:
+    text = await card.inner_text()
+```
+
+**Nachher (Text-basiert):**
+```python
 text = await page.inner_text('body')
 for line in text.split('\n'):
     if 'Dr.' in line or 'Praxis' in line:
@@ -419,6 +487,8 @@ for line in text.split('\n'):
 ```
 
 ### Herausforderung 2: Consent-Cookie-Banner
+
+**Problem:** Google zeigt Cookie-Consent-Overlay, das Inhalte blockiert.
 
 **Lösung:** Automatisches Button-Klicken mit mehreren Versuchen:
 ```python
@@ -434,10 +504,12 @@ async def handle_consent(page):
 
 ### Herausforderung 3: Nicht-medizinische Einträge
 
+**Problem:** Suchergebnisse enthalten Fitnessstudios, Apotheken, Optiker.
+
 **Lösung:** Strenge Filterung mit Schlüsselwortvalidierung:
 ```python
-doctor_kw = ['arzt', 'praxis', 'klinik', 'dr.', 'zahn']
-non_medical = ['fitness', 'gym', 'optik', 'apotheke']
+doctor_kw = ['arzt', 'praxis', 'klinik', 'dr.', 'zahn', ...]
+non_medical = ['fitness', 'gym', 'optik', 'apotheke', ...]
 
 if not any(k in name.lower() for k in doctor_kw):
     skip_entry()
@@ -445,9 +517,9 @@ if any(k in name.lower() for k in non_medical):
     skip_entry()
 ```
 
-![Scrape-Ergebnisse](/images/review_proof/Bildschirmfoto 2026-05-04 um 10.36.56.png)
-
 ### Herausforderung 4: Doppelte Einträge
+
+**Problem:** Gleiche Klinik erscheint unter verschiedenen Namen (z.B. "EvKB Haus Gilead I" vs "EvKB Haus Gilead IV").
 
 **Lösung:** Datenbank-Level-Deduplizierung mit Namen-Abgleich:
 ```python
@@ -457,17 +529,23 @@ existing = conn.execute(
 ).fetchone()
 
 if existing:
+    # Update statt Insert
     conn.execute('UPDATE ... WHERE id = ?', ...)
+
 ```
 
 ### Herausforderung 5: Fehlende Bewertungsdaten
+
+**Problem:** Einige Einträge zeigen keine Bewertungen in Such-Snippets.
 
 **Lösung:** Strenge Validierung - nur Einträge mit vollständigen Daten speichern:
 ```python
 if not rating or not reviews:
     print('✗ - Übersprungen (keine Bewertung)')
-    continue
+    continue  # Unvollständige Einträge nicht speichern
 ```
+
+![Scraping-Ergebnisse](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.56.png)
 
 ## Ergebnisse & Statistiken
 
@@ -505,56 +583,74 @@ pie title Bewertungsverteilung
 
 ```mermaid
 flowchart TD
-    A[Gesamt: 157] --> B{Gelöschte Rezensionen?}
+    A[Gesamteinträge: 157] --> B{Gelöschte Rezensionen?}
     B -->|Ja| C[58 Einträge]
     B -->|Nein| D[99 Einträge]
     C --> E{Grundtyp}
     E -->|DSGVO| F["Einige Ergebnisse wurden entfernt"]
-    E -->|Beschwerde| G["Bewertungen entfernt"]
-    E -->|Anzahl| H["11 bis 20 entfernt"]
+    E -->|Beschwerde| G["Bewertungen aufgrund von Beschwerden entfernt"]
+    E -->|Anzahl| H["11 bis 20 Bewertungen entfernt"]
 ```
 
-![Ergebnisse Dashboard](/images/review_proof/Bildschirmfoto 2026-05-04 um 11.04.59.png)
+![Ergebnisse Dashboard](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2011.04.59.png)
 
 ## Technischer Stack
 
 ### Abhängigkeiten
 
-- playwright>=1.40.0
-- asyncio
-- sqlite3
-- csv
-- re
-- datetime
+```
+playwright>=1.40.0
+asyncio
+sqlite3
+csv
+re
+datetime
+```
 
 ### Dateistruktur
 
 ```
 Bielefeld_Scrape/
-├── doctor_scraper.py
-├── doctors.db
-├── doctors.csv
-├── visualization/
-│   ├── public/data/
-│   └── src/components/
-└── requirements.txt
+├── doctor_scraper.py      # Main scraper
+├── doctors.db             # SQLite database
+├── doctors.csv            # CSV export
+├── visualization/         # React visualization
+│   ├── public/data/      # CSV for charts
+│   └── src/components/   # React components
+└── requirements.txt       # Dependencies
 ```
 
-![Datenbankstruktur](/images/review_proof/Bildschirmfoto 2026-05-04 um 11.04.40.png)
+![Datenbankstruktur](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2011.04.40.png)
 
 ## Zukünftige Verbesserungen
 
 ### Geplante Verbesserungen
 
-1. **Parallele Verarbeitung** - Mehrere Browser-Kontexte gleichzeitig
-2. **Erweiterte Validierung** - Fuzzy-Namensabgleich für Duplikaterkennung
-3. **Adressextraktion** - Regex für deutsche Adressen verbessern
-4. **Rezensionsinhalt** - Tatsächlichen Rezensionstext erfassen (mit Consent)
-5. **Überwachung** - Änderungen über Zeit verfolgen
+1. **Parallele Verarbeitung**
+   - Mehrere Browser-Kontexte gleichzeitig verwenden
+   - Gesamt-Scraping-Zeit um 50% reduzieren
+
+2. **Erweiterte Validierung**
+   - Fuzzy-Namensabgleich für Duplikaterkennung
+   - URL-basierte Deduplizierung als Backup
+
+3. **Adressextraktion**
+   - Regex-Muster für deutsche Adressen verbessern
+   - Mehrere Adressformate parsen
+
+4. **Rezensionsinhalt**
+   - Tatsächlichen Rezensionstext erfassen (mit Consent)
+   - Stimmungsanalyse auf Rezensionen
+
+5. **Überwachung**
+   - Änderungen über Zeit verfolgen (Re-Scraping-Erkennung)
+   - Warnung bei Bewertungsänderungen
+
+### Potenzielle Erweiterungen
 
 ```mermaid
 mindmap
-  root((ReviewProof))
+  root((Bielefeld Scraper))
     Datensammlung
       Mehrere Städte
       Andere Quellen
@@ -568,6 +664,68 @@ mindmap
       Bewertungs-Heatmaps
       Trend-Diagramme
 ```
+
+## Anhang: Code-Referenz
+
+### Hauptschleifen-Struktur
+
+```python
+async def main():
+    conn = init_db()
+    existing_names = set(r[0] for r in conn.execute('SELECT name FROM establishments').fetchall())
+
+    search_terms = ['Arzt Bielefeld', 'Zahnarzt Bielefeld', 'Klinik Bielefeld']
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        page = await browser.new_page()
+
+        all_names = set()
+
+        # Phase 1: Namen sammeln
+        for term in search_terms:
+            for page_num in range(3):
+                await page.goto(f'https://www.google.com/search?q={term}&tbm=lcl&hl=de-DE&start={page_num * 10}')
+                await handle_consent(page)
+                text = await page.inner_text('body')
+
+                for line in text.split('\n'):
+                    line = line.strip()
+                    if is_valid_name(line):
+                        all_names.add(line)
+
+        # Phase 2: Jeden scrapen
+        for name in all_names:
+            if name not in existing_names:
+                data = await scrape_doctor(page, name)
+                if data and data['rating']:
+                    add_or_update(conn, data)
+
+        await browser.close()
+
+    export_csv(conn)
+```
+
+### CSV-Export-Funktion
+
+```python
+def export_csv(conn, filepath='doctors.csv'):
+    cursor = conn.execute('''
+        SELECT name, rating, total_reviews, deleted_reviews,
+               address, url, category, scrape_date, last_updated
+        FROM establishments
+        ORDER BY name
+    ''')
+
+    with open(filepath, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['name', 'rating', 'total_reviews', 'deleted_reviews',
+                        'address', 'url', 'category', 'scrape_date', 'last_updated'])
+        for row in cursor:
+            writer.writerow(row)
+```
+
+---
 
 ## Fazit
 
@@ -583,4 +741,5 @@ Der Scraper erfasst erfolgreich validierte medizinische Praktiker-Daten aus Biel
 ---
 
 *Dokumentversion: 1.0*  
-*Zuletzt aktualisiert: 11. Mai 2026*
+*Zuletzt aktualisiert: 11. Mai 2026*  
+*Lizenz: MIT*

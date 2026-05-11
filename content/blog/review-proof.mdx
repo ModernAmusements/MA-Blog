@@ -7,9 +7,7 @@ tags: ['python', 'web-scraping', 'playwright', 'medical-data', 'bielefeld', 'dat
 
 This project is a Python-based web scraping system designed to collect comprehensive data about medical practitioners and healthcare facilities in Bielefeld, Germany. The scraper uses Playwright (a modern browser automation library) to interact with Google Search and extract business information including ratings, review counts, addresses, and GDPR-related deletion notices.
 
-![ReviewProof Interface](/images/review_proof/Bildschirmfoto 2026-05-04 um 10.35.42.png)
-
-## Project Overview
+![Scraper Interface](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.35.42.png)
 
 **Key Objectives:**
 - Collect data on 500+ doctors, dentists, clinics, and medical practices
@@ -129,7 +127,7 @@ search_terms = [
 
 Each term searches 3 pages × 10 results = 30 potential entries per term.
 
-![Scraper Running](/images/review_proof/Bildschirmfoto 2026-05-04 um 10.36.08.png)
+![Search Results](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.08.png)
 
 ### Phase 2: Name Extraction
 
@@ -303,7 +301,7 @@ skip_patterns = [
 - Labs (Labor, Diagnostik)
 - Sanatoriums (Sanitätshaus)
 
-![Data Validation](/images/review_proof/Bildschirmfoto 2026-05-04 um 10.36.35.png)
+![Validation Process](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.35.png)
 
 ## Database Schema
 
@@ -547,7 +545,7 @@ if not rating or not reviews:
     continue  # Don't save incomplete entries
 ```
 
-![Scrape Results](/images/review_proof/Bildschirmfoto 2026-05-04 um 10.36.56.png)
+![Scraping Results](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.56.png)
 
 ## Results & Statistics
 
@@ -594,7 +592,7 @@ flowchart TD
     E -->|Count| H["11 bis 20 Bewertungen entfernt"]
 ```
 
-![Results Dashboard](/images/review_proof/Bildschirmfoto 2026-05-04 um 11.04.59.png)
+![Results Dashboard](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2011.04.59.png)
 
 ## Technical Stack
 
@@ -622,7 +620,7 @@ Bielefeld_Scrape/
 └── requirements.txt       # Dependencies
 ```
 
-![Database Structure](/images/review_proof/Bildschirmfoto 2026-05-04 um 11.04.40.png)
+![Database Structure](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2011.04.40.png)
 
 ## Future Enhancements
 
