@@ -141,15 +141,21 @@ export default function ContactPage() {
               </a>
             </div>
             <div className={styles.socialLink}>
-              <span className={styles.socialLabel}>Twitter</span>
-              <a href="https://twitter.com/modernamusements" target="_blank" rel="noopener noreferrer">
+              <span className={styles.socialLabel}>Reddit</span>
+              <a href="https://www.reddit.com/user/princessinsomnia/" target="_blank" rel="noopener noreferrer">
+                u/princessinsomnia
+              </a>
+            </div>
+            <div className={styles.socialLink}>
+              <span className={styles.socialLabel}>Instagram</span>
+              <a href="https://www.instagram.com/modernamusements" target="_blank" rel="noopener noreferrer">
                 @modernamusements
               </a>
             </div>
             <div className={styles.socialLink}>
-              <span className={styles.socialLabel}>LinkedIn</span>
-              <a href="https://linkedin.com/in/shadynathan" target="_blank" rel="noopener noreferrer">
-                linkedin.com/in/shadynathan
+              <span className={styles.socialLabel}>Behance</span>
+              <a href="https://www.behance.net/stawfik" target="_blank" rel="noopener noreferrer">
+                stawfik
               </a>
             </div>
           </div>

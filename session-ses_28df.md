@@ -7,7 +7,7 @@
 
 ## Summary
 
-Fixed previous agent issues and completed the blog post "Behavioral Maze CAPTCHA" in EN + DE with Mermaid diagram, video, and images.
+Fixed previous agent issues and completed the blog post "Behavioral Maze CAPTCHA" in EN + DE with multiple Mermaid diagrams, video, and images distributed evenly. Added social media preview images to all blog posts.
 
 ---
 
@@ -27,9 +27,29 @@ Created EN + DE versions at `content/blog/anti-ai-captcha.mdx` and `content/blog
 - Added missing images to blog post (2-5.png)
 - German blog post was missing, created `anti-ai-captcha.de.mdx`
 
-### 2. DotMatrix Grid Size Slider Removed
+### 3. DotMatrix Grid Size Slider Removed
 
 Removed range slider for grid size, kept only the preset buttons (8, 16, 32, 64) in `src/app/[lang]/dotmatrix/page.tsx`.
+
+### 5. Blog Post Enhancement
+
+Added 3 additional Mermaid diagrams to the blog post:
+- Algorithm comparison flowchart
+- Behavioral detection flowchart  
+- Dataset collection flow
+
+Distributed images evenly throughout the blog:
+- Image 2 after intro paragraph
+- Image 4 after "Human Path Dataset Collection"
+- Image 3 after "AI Safety Initiative"
+- Image 5 in final "Maze Examples" section
+
+### 6. Social Media Previews Fixed
+
+Added `/og-image.svg` to all blog posts in `src/app/[lang]/blog/[slug]/page.tsx`:
+- openGraph.images array
+- twitter.card set to "summary_large_image"
+- twitter.images array
 
 ---
 

@@ -13,9 +13,10 @@ export function Footer() {
         <p>© {currentYear}</p>
       </div>
       <div className={styles.social}>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter</a>
-        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://github.com/ModernAmusements" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.reddit.com/user/princessinsomnia/" target="_blank" rel="noopener noreferrer">Reddit</a>
+        <a href="https://www.instagram.com/modernamusements" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://www.behance.net/stawfik" target="_blank" rel="noopener noreferrer">Behance</a>
       </div>
     </footer>
   );
