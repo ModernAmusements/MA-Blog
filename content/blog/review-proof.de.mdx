@@ -1,745 +1,93 @@
 ---
 title: ReviewProof
-description: Ein Python-basiertes Web-Scraping-System zur Erfassung von medizinischen practitioners-Daten in Bielefeld, Deutschland mit Playwright und SQLite.
+description: Ein Python-basiertes Web-Scraping-System zur Erfassung von Geschaeftsdaten in Bielefeld mit Playwright und SQLite.
 date: 2026-05-11
-tags: ['python', 'web-scraping', 'playwright', 'medizinische-daten', 'bielefeld', 'datensammlung']
+tags: ['python', 'web-scraping', 'playwright', 'Geschaeftsdaten', 'bielefeld', 'datensammlung']
 ---
 
-Dieses Projekt ist ein Python-basiertes Web-Scraping-System zur Erfassung umfassender Daten über Ärzte und Gesundheitseinrichtungen in Bielefeld, Deutschland. Der Scraper nutzt Playwright (eine moderne Browser-Automatisierungsbibliothek), um mit Google Search zu interagieren und Geschäftsinformationen zu extrahieren, darunter Bewertungen, Rezensionsanzahlen, Adressen und DSGVO-bezogene Löschhinweise.
+Dieses Projekt ist ein Python-basiertes Web-Scraping-System zur Erfassung umfassender Daten ueber lokale Geschaefte in Bielefeld, Deutschland - einschliesslich Restaurants, Aerzten, Cafes, Geschaeften und mehr.
 
 ![Scraper Interface](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.35.42.png)
 
 **Hauptziele:**
-- Erfassung von Daten von 500+ Ärzten, Zahnärzten, Kliniken und Arztpraxen
-- Erfassung von Bewertungen, Rezensionsanzahlen, Adressen und gelöschten Rezensionshinweisen
-- Datenqualität durch strenge Validierungsregeln gewährleisten
+- Erfassung von Daten von 500+ Geschaeften aus mehreren Kategorien
+- Erfassung von Bewertungen, Rezensionsanzahlen, Adressen
+- Datenqualitaet durch strenge Validierungsregeln gewaehrleisten
 - Eine wiederverwendbare, wartbare Scraper-Architektur aufbauen
 
 ## Architektur
 
-### Systemübersicht
+Das System nutzt Playwright fuer Browser-Automatisierung, um Google-Suchergebnisse zu scrapen und Daten zu extrahieren.
 
-```mermaid
-graph TB
-    subgraph "Datenquellen"
-        GS[Google Suche]
-        GM[Google Maps]
-    end
+### Komponenten
 
-    subgraph "Scraper Core"
-        BP[Browser Playwright]
-        HP[HTML Parser]
-        RE[Regex Engine]
-    end
-
-    subgraph "Datenverarbeitung"
-        VA[Validator]
-        DR[Duplikatentfernung]
-        CT[Kategorisierung]
-    end
-
-    subgraph "Ausgabe"
-        DB[(SQLite DB)]
-        CS[CSV Export]
-        VP[Visualisierung]
-    end
-
-    GS --> BP
-    GM --> BP
-    BP --> HP
-    HP --> RE
-    RE --> VA
-    VA --> DR
-    DR --> CT
-    CT --> DB
-    CT --> CS
-    CS --> VP
-```
-
-### Komponentenarchitektur
-
-```mermaid
-classDiagram
-    class DoctorScraper {
-        +init_db()
-        +add_or_update()
-        +get_stats()
-        +export_csv()
-        +handle_consent()
-        +scrape_doctor()
-        +main()
-    }
-
-    class Database {
-        +establishments table
-        +idx_name index
-    }
-
-    class Validator {
-        +validate_name()
-        +validate_rating()
-        +check_medical_context()
-    }
-
-    class Parser {
-        +extract_rating()
-        +extract_address()
-        +extract_deleted_reviews()
-        +parse_page_text()
-    }
-
-    DoctorScraper --> Database
-    DoctorScraper --> Validator
-    DoctorScraper --> Parser
-```
+- **Browser Playwright** - Steuert den Chrome-Browser
+- **HTML Parser** - Extrahiert Strukturen aus Seiten
+- **Regex Engine** - Findet Bewertungen und Adressen
+- **Validator** - Prueft und bereinigt Daten
+- **SQLite DB** - Speichert alle Eintraege
 
 ## Daten-Pipeline
 
-### Ende-zu-Ende-Flow
+### Phase 1: Suche und Sammlung
 
-```mermaid
-flowchart LR
-    A[Suchbegriffe] --> B[Google Suche]
-    B --> C[Namen sammeln]
-    C --> D[Namensvalidierung]
-    D --> E{Gültig?}
-    E -->|Nein| F[Verwerfen]
-    E -->|Ja| G[Individuelle Suche]
-    G --> H[Daten extrahieren]
-    H --> I{Daten vollständig?}
-    I -->|Nein| J[Eintrag überspringen]
-    I -->|Ja| K[In DB speichern]
-    K --> L[CSV exportieren]
-    L --> M[Visualisierung]
-```
+Der Scraper verwendet verschiedene Suchbegriffe fuer verschiedene Geschaeftstypen:
 
-### Phase 1: Suche & Sammlung
+- Aerzte und Kliniken
+- Restaurants und Cafes
+- Geschaefte und Laeden
 
-Der Scraper verwendet eine Multi-Term-Suchstrategie für maximale Abdeckung:
+### Phase 2: Datenerfassung
 
-```python
-search_terms = [
-    'Arzt Bielefeld',      # Allgemeinärzte
-    'Zahnarzt Bielefeld',  # Zahnärzte
-    'Klinik Bielefeld'     # Kliniken und Krankenhäuser
-]
-```
+Fuer jeden Namen werden Details extrahiert:
+- Bewertung und Rezensionsanzahl
+- Adresse
+- URL
+- Kategorie
 
-Jeder Suchbegriff durchsucht 3 Seiten × 10 Ergebnisse = 30 potenzielle Einträge pro Begriff.
+![Scraping Results](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.56.png)
 
-![Suchergebnisse](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.08.png)
+## Datenvalidierung
 
-### Phase 2: Namensextraktion
+Das Filtersystem verwendet:
+- Laengenpruefung (8-70 Zeichen)
+- Schluesselwort-Abgleich
+- Ausschluss-Muster fuer nicht-relevante Eintraege
 
-```mermaid
-sequenceDiagram
-    participant Browser
-    participant Scraper
-    participant Validator
+### Kategorien
 
-    Browser->>Scraper: Suchergebnisse laden
-    Scraper->>Browser: inner_text('body')
-    Scraper->>Validator: Extrahierte Zeilen senden
-    Validator->>Validator: Nach Länge filtern (8-70 Zeichen)
-    Validator->>Validator: Arzt-Schlüsselwörter prüfen
-    Validator->>Validator: UI-Elemente ablehnen
-    Validator-->>Scraper: Gültige Namen
-```
+Das System kategorisiert automatisch:
+- Medizinisch (Aerzte, Zahnärzte, Kliniken)
+- Restaurants und Essen
+- Einzelhandel und Dienstleistungen
 
-### Phase 3: Individuelles Scraping
+## Herausforderungen und Loesungen
 
-```mermaid
-flowchart TD
-    A[Für jeden Namen] --> B{Bei Google suchen}
-    B --> C[Seitentext extrahieren]
-    C --> D[Bewertung parsen]
-    D --> E[Adresse parsen]
-    E --> F[Gelöschte Rezensionen prüfen]
-    F --> G{Alle Felder vorhanden?}
-    G -->|Nein| H[Eintrag überspringen]
-    G -->|Ja| I[In DB speichern]
-```
+1. **Dynamische Google-UI** - Textbasierte Extraktion statt CSS-Selektoren
+2. **Cookie-Consent** - Automatisches Klicken auf Accept-Buttons
+3. **Nicht-relevante Eintraege** - Strenge Schluesselwort-Filterung
+4. **Duplikate** - Datenbank-Level-Deduplizierung
 
-## Scraping-Methodik
-
-### Browser-Setup
-
-```python
-browser = await p.chromium.launch(
-    headless=False,
-    args=['--disable-blink-features=AutomationControlled', '--no-sandbox']
-)
-
-context = await browser.new_context(
-    viewport={'width': 1920, 'height': 1080},
-    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36'
-)
-```
-
-**Wichtige Konfigurationen:**
-- `headless=False`: Für visuelle Fehlersuche
-- `AutomationControlled` Flag: Bot-Erkennung umgehen
-- `no-sandbox`: Für einige Linux-Umgebungen erforderlich
-
-### Such-URL-Muster
-
-```python
-search_url = f'https://www.google.com/search?q={term}&tbm=lcl&hl=de-DE&start={page_num * 10}'
-```
-
-| Parameter | Wert | Zweck |
-|-----------|------|--------|
-| `q` | Suchbegriff | Google-Abfrage |
-| `tbm=lcl` | local | Lokale Geschäftsergebnisse |
-| `hl=de-DE` | Deutsch | Deutsche Sprachergebnisse |
-| `start` | 0, 10, 20 | Seitennummerierung |
-
-### Consent-Handling
-
-```mermaid
-flowchart TD
-    A[Seitenladen] --> B{Cookie-Banner vorhanden?}
-    B -->|Ja| C[Accept-Button suchen]
-    C --> D{"Alle akzeptieren" gefunden?}
-    D -->|Ja| E[Button klicken]
-    E --> F[2 Sekunden warten]
-    D -->|Nein| G["Akzeptieren" versuchen]
-    G -->|Gefunden| E
-    B -->|Nein| H[Fortfahren]
-```
-
-### Datenextraktionsmuster
-
-#### Bewertungsmuster
-```python
-# Muster: "4,5(103)" → rating: 4.5, reviews: 103
-rating_match = re.search(r'(\d+[.,]\d+)\s*\(\s*(\d+)\s*\)', page_text)
-if rating_match:
-    data['rating'] = rating_match.group(1).replace(',', '.')
-    data['total_reviews'] = rating_match.group(2)
-```
-
-#### Adressmuster
-```python
-# Deutsches Postleitzahl-Muster: "33602 Bielefeld"
-addr_match = re.search(r'\d{5}\s+[\w\s]+(?:Bielefeld|Stadtteil|str\.?|straße)', page_text, re.IGNORECASE)
-if addr_match:
-    data['address'] = 'Adresse: ' + addr_match.group(0).strip()
-```
-
-#### Gelöschte Rezensionen (DSGVO)
-```python
-if 'entfernt' in page_text.lower():
-    deleted = await page.evaluate('''() => {
-        const divs = document.querySelectorAll('div');
-        for (let d of divs) {
-            let t = d.innerText || '';
-            if (t.includes('entfernt') && t.length > 30 && t.length < 200) {
-                return t;
-            }
-        }
-        return '';
-    }''')
-    data['deleted_reviews'] = deleted.strip() if deleted else ''
-```
-
-## Datenvalidierung & Bereinigung
-
-### Validierungsregeln
-
-```mermaid
-flowchart TD
-    A[Roher Name] --> B{Länge 8-70?}
-    B -->|Nein| X[Ablehnen]
-    B -->|Ja| C{Mit Anführungszeichen?}
-    C -->|Ja| X
-    C -->|Nein| D{Arzt-Schlüsselwort?}
-    D -->|Nein| E{Anfang groß + 15+ Zeichen?}
-    E -->|Nein| X
-    E -->|Ja| F[Akzeptieren]
-    D -->|Ja| F
-```
-
-### Arzt-Schlüsselwörter (müssen übereinstimmen)
-
-```python
-doctor_keywords = [
-    'arzt', 'praxis', 'klinik', 'zentrum', 'dr.', 'dr ',
-    'med.', 'med ', 'prof.', 'hausarzt', 'zahnarzt',
-    'facharzt', 'mvz', 'therapie', 'psycholog', 'physio',
-    'heilkunde', 'chiro', 'podo', 'ergo', 'logo',
-    'apotheke', 'hospital', 'krankenhaus', 'zahn'
-]
-```
-
-### Ablehnungsmuster
-
-```python
-skip_patterns = [
-    'bewertung', 'öffnet', 'geschlossen', 'anzeige',
-    'website', 'telefon', 'google', 'suche', '·',
-    'route', 'weiter', 'anmelden', 'nutzung',
-    'datenschutz', 'feedback', 'standort', 'hilfe',
-    'gesponsert', 'suche etwas', 'bielefeld', 'deutschland'
-]
-```
-
-### Saubere Kategorien
-
-**Einschließen (Medizinisch):**
-- Ärzte (Dr., Dr. med., Prof.)
-- Praxen (Praxis, Gemeinschaftspraxis)
-- Kliniken (Klinik, Krankenhaus)
-- Zahnärzte (Zahnarzt, Zahnärzte)
-- Fachärzte (Facharzt, Centrum)
-- Therapiezentren
-
-**Ausschließen (Nicht-medizinisch):**
-- Apotheken (Apotheke)
-- Fitnessstudios (Fitness, Gym, McFIT)
-- Optiker (Optik, Augenoptik)
-- Labore (Labor, Diagnostik)
-- Sanatorien (Sanitätshaus)
-
-![Validierungsprozess](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.35.png)
-
-## Datenbankschema
-
-### SQLite-Schema
-
-```sql
-CREATE TABLE establishments (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    rating TEXT,
-    total_reviews TEXT,
-    deleted_reviews TEXT,
-    address TEXT,
-    url TEXT,
-    category TEXT,
-    scrape_date TEXT,
-    last_updated TEXT,
-    status TEXT DEFAULT 'active'
-);
-
-CREATE INDEX idx_name ON establishments(name);
-```
-
-### Entity-Beziehung
-
-```mermaid
-erDiagram
-    ESTABLISHMENT {
-        int id PK
-        string name
-        string rating
-        string total_reviews
-        string deleted_reviews
-        string address
-        string url
-        string category
-        string scrape_date
-        string last_updated
-        string status
-    }
-```
-
-### Feldbeschreibungen
-
-| Feld | Typ | Beschreibung | Beispiel |
-|-------|------|-------------|---------|
-| id | INTEGER | Primärschlüssel | 1 |
-| name | TEXT | Geschäftsname | "Dr. med. Hans Müller" |
-| rating | TEXT | Bewertung (1.0-5.0) | "4.5" |
-| total_reviews | TEXT | Anzahl der Rezensionen | "103" |
-| deleted_reviews | TEXT | DSGVO-Löschhinweis | "Einige Ergebnisse..." |
-| address | TEXT | Vollständige Adresse | "Adresse: Hauptstr. 1, 33602 Bielefeld" |
-| url | TEXT | Google Maps URL | "https://www.google.com/maps/..." |
-| category | TEXT | Auto-kategorisierte Kategorie | "Doctor", "Dentist", "Clinic" |
-| scrape_date | TEXT | Erstes Scraping-Datum | "2026-05-11" |
-| last_updated | TEXT | Letztes Aktualisierungsdatum | "2026-05-11" |
-| status | TEXT | Aktiv/Inaktiv | "active" |
-
-### Kategorie-Auto-Tagging
-
-```python
-def category_from_name(name):
-    name_lower = name.lower()
-    if any(k in name_lower for k in ['zahnarzt', 'dentist', 'dent', 'zahn']):
-        return 'Zahnarzt'
-    if any(k in name_lower for k in ['klinik', 'krankenhaus', 'hospital']):
-        return 'Klinik'
-    if any(k in name_lower for k in ['augen', 'dermat', 'herz', 'orthop', 'neurolog', 'gynäkolog', 'frauenarzt', 'urolog']):
-        return 'Facharzt'
-    if any(k in name_lower for k in ['praxis', 'medizinisches zentrum', 'mvz']):
-        return 'Arztpraxis'
-    return 'Arzt'
-```
-
-## Datenfluss-Diagramme
-
-### Vollständiger Pipeline
-
-```mermaid
-flowchart TB
-    subgraph "Eingabe"
-        ST[Suchbegriffe]
-    end
-
-    subgraph "Phase 1: Sammlung"
-        S1[Suchbegriffe durchlaufen]
-        S2[Seite laden]
-        S3[Cookies akzeptieren]
-        S4[Text extrahieren]
-        S5[Namen filtern]
-        S6[Namen speichern]
-    end
-
-    subgraph "Phase 2: Verarbeitung"
-        P1[Duplikate entfernen]
-        P2[Neue Namen finden]
-        P3[Batch begrenzen]
-    end
-
-    subgraph "Phase 3: Scraping"
-        R1[Für jeden Namen]
-        R2[Namen suchen]
-        R3[Bewertung parsen]
-        R4[Rezensionen parsen]
-        R5[Adresse parsen]
-        R6[Gelöschte prüfen]
-        R7[Validieren]
-    end
-
-    subgraph "Phase 4: Speicherung"
-        DB[(SQLite)]
-        CSV[CSV Export]
-    end
-
-    ST --> S1
-    S1 --> S2
-    S2 --> S3
-    S3 --> S4
-    S4 --> S5
-    S5 --> S6
-    S6 --> P1
-    P1 --> P2
-    P2 --> P3
-    P3 --> R1
-    R1 --> R2
-    R2 --> R3
-    R3 --> R4
-    R4 --> R5
-    R5 --> R6
-    R6 --> R7
-    R7 --> DB
-    DB --> CSV
-```
-
-### Fehlerbehandlungsflow
-
-```mermaid
-flowchart TD
-    A[Start] --> B[Seite laden]
-    B --> C{Erfolg?}
-    C -->|Nein| D[Begriff überspringen]
-    C -->|Ja| E[Text extrahieren]
-    E --> F{Text gültig?}
-    F -->|Nein| G[Fehler loggen]
-    G --> H[Fortfahren]
-    F -->|Ja| I[Namen filtern]
-    I --> J[Name Count > 0?]
-    J -->|Nein| K[Warnung loggen]
-    K --> L[Nächster Begriff]
-    J -->|Ja| M[Namen verarbeiten]
-    M --> N[Batch speichern]
-    N --> O{Jede 10?}
-    O -->|Ja| P[CSV exportieren]
-    O -->|Nein| L
-    P --> L
-```
-
-## Herausforderungen & Lösungen
-
-### Herausforderung 1: Dynamische Google-UI
-
-**Problem:** Google ändert häufig die HTML-Struktur und CSS-Klassennamen.
-
-**Lösung:** Textbasierte Extraktion statt CSS-Selektoren verwenden:
-```python
-# Statt: card = await page.query_selector('.vwVdIc')
-# Verwenden: text = await page.inner_text('body')
-```
-
-**Vorher (Selektor-basiert):**
-```python
-cards = await page.query_selector_all('.vwVdIc')
-for card in cards:
-    text = await card.inner_text()
-```
-
-**Nachher (Text-basiert):**
-```python
-text = await page.inner_text('body')
-for line in text.split('\n'):
-    if 'Dr.' in line or 'Praxis' in line:
-        all_names.add(line)
-```
-
-### Herausforderung 2: Consent-Cookie-Banner
-
-**Problem:** Google zeigt Cookie-Consent-Overlay, das Inhalte blockiert.
-
-**Lösung:** Automatisches Button-Klicken mit mehreren Versuchen:
-```python
-async def handle_consent(page):
-    for _ in range(3):
-        for text in ['Alle akzeptieren', 'Akzeptieren']:
-            btn = await page.query_selector(f'button:has-text("{text}")')
-            if btn:
-                await btn.click()
-                await asyncio.sleep(2)
-                return True
-```
-
-### Herausforderung 3: Nicht-medizinische Einträge
-
-**Problem:** Suchergebnisse enthalten Fitnessstudios, Apotheken, Optiker.
-
-**Lösung:** Strenge Filterung mit Schlüsselwortvalidierung:
-```python
-doctor_kw = ['arzt', 'praxis', 'klinik', 'dr.', 'zahn', ...]
-non_medical = ['fitness', 'gym', 'optik', 'apotheke', ...]
-
-if not any(k in name.lower() for k in doctor_kw):
-    skip_entry()
-if any(k in name.lower() for k in non_medical):
-    skip_entry()
-```
-
-### Herausforderung 4: Doppelte Einträge
-
-**Problem:** Gleiche Klinik erscheint unter verschiedenen Namen (z.B. "EvKB Haus Gilead I" vs "EvKB Haus Gilead IV").
-
-**Lösung:** Datenbank-Level-Deduplizierung mit Namen-Abgleich:
-```python
-existing = conn.execute(
-    'SELECT id FROM establishments WHERE name = ?',
-    (data['name'],)
-).fetchone()
-
-if existing:
-    # Update statt Insert
-    conn.execute('UPDATE ... WHERE id = ?', ...)
-
-```
-
-### Herausforderung 5: Fehlende Bewertungsdaten
-
-**Problem:** Einige Einträge zeigen keine Bewertungen in Such-Snippets.
-
-**Lösung:** Strenge Validierung - nur Einträge mit vollständigen Daten speichern:
-```python
-if not rating or not reviews:
-    print('✗ - Übersprungen (keine Bewertung)')
-    continue  # Unvollständige Einträge nicht speichern
-```
-
-![Scraping-Ergebnisse](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.56.png)
-
-## Ergebnisse & Statistiken
-
-### Aktueller Datensatz
+## Ergebnisse
 
 | Metrik | Wert |
 |--------|-------|
-| Gesamteinträge | 157 |
+| Gesamteintraege | 157 |
 | Mit Bewertungen | 157 (100%) |
-| Mit Rezensionen | 157 (100%) |
-| Mit gelöschten Rezensionen | 58 (37%) |
 | Mit Adressen | 16 (10%) |
-
-### Bewertungsverteilung
-
-```mermaid
-pie title Bewertungsverteilung
-    "4.5 - 5.0 ⭐" : 89
-    "4.0 - 4.4 ⭐" : 45
-    "3.5 - 3.9 ⭐" : 18
-    "Unter 3.5" : 5
-```
-
-### Kategorieaufschlüsselung
-
-| Kategorie | Anzahl | Prozentsatz |
-|----------|----|-------------|
-| Arzt | 62 | 39% |
-| Zahnarzt | 35 | 22% |
-| Klinik | 28 | 18% |
-| Arztpraxis | 20 | 13% |
-| Facharzt | 12 | 8% |
-
-### Gelöschte Rezensionen Analyse
-
-```mermaid
-flowchart TD
-    A[Gesamteinträge: 157] --> B{Gelöschte Rezensionen?}
-    B -->|Ja| C[58 Einträge]
-    B -->|Nein| D[99 Einträge]
-    C --> E{Grundtyp}
-    E -->|DSGVO| F["Einige Ergebnisse wurden entfernt"]
-    E -->|Beschwerde| G["Bewertungen aufgrund von Beschwerden entfernt"]
-    E -->|Anzahl| H["11 bis 20 Bewertungen entfernt"]
-```
-
-![Ergebnisse Dashboard](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2011.04.59.png)
 
 ## Technischer Stack
 
-### Abhängigkeiten
-
-```
-playwright>=1.40.0
-asyncio
-sqlite3
-csv
-re
-datetime
-```
-
-### Dateistruktur
-
-```
-Bielefeld_Scrape/
-├── doctor_scraper.py      # Main scraper
-├── doctors.db             # SQLite database
-├── doctors.csv            # CSV export
-├── visualization/         # React visualization
-│   ├── public/data/      # CSV for charts
-│   └── src/components/   # React components
-└── requirements.txt       # Dependencies
-```
-
-![Datenbankstruktur](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2011.04.40.png)
-
-## Zukünftige Verbesserungen
-
-### Geplante Verbesserungen
-
-1. **Parallele Verarbeitung**
-   - Mehrere Browser-Kontexte gleichzeitig verwenden
-   - Gesamt-Scraping-Zeit um 50% reduzieren
-
-2. **Erweiterte Validierung**
-   - Fuzzy-Namensabgleich für Duplikaterkennung
-   - URL-basierte Deduplizierung als Backup
-
-3. **Adressextraktion**
-   - Regex-Muster für deutsche Adressen verbessern
-   - Mehrere Adressformate parsen
-
-4. **Rezensionsinhalt**
-   - Tatsächlichen Rezensionstext erfassen (mit Consent)
-   - Stimmungsanalyse auf Rezensionen
-
-5. **Überwachung**
-   - Änderungen über Zeit verfolgen (Re-Scraping-Erkennung)
-   - Warnung bei Bewertungsänderungen
-
-### Potenzielle Erweiterungen
-
-```mermaid
-mindmap
-  root((Bielefeld Scraper))
-    Datensammlung
-      Mehrere Städte
-      Andere Quellen
-      Echtzeit-Updates
-    Analyse
-      Bewertungsvorhersage
-      Rezensions-Stimmung
-      Konkurrenzanalyse
-    Visualisierung
-      Interaktive Karten
-      Bewertungs-Heatmaps
-      Trend-Diagramme
-```
-
-## Anhang: Code-Referenz
-
-### Hauptschleifen-Struktur
-
-```python
-async def main():
-    conn = init_db()
-    existing_names = set(r[0] for r in conn.execute('SELECT name FROM establishments').fetchall())
-
-    search_terms = ['Arzt Bielefeld', 'Zahnarzt Bielefeld', 'Klinik Bielefeld']
-
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)
-        page = await browser.new_page()
-
-        all_names = set()
-
-        # Phase 1: Namen sammeln
-        for term in search_terms:
-            for page_num in range(3):
-                await page.goto(f'https://www.google.com/search?q={term}&tbm=lcl&hl=de-DE&start={page_num * 10}')
-                await handle_consent(page)
-                text = await page.inner_text('body')
-
-                for line in text.split('\n'):
-                    line = line.strip()
-                    if is_valid_name(line):
-                        all_names.add(line)
-
-        # Phase 2: Jeden scrapen
-        for name in all_names:
-            if name not in existing_names:
-                data = await scrape_doctor(page, name)
-                if data and data['rating']:
-                    add_or_update(conn, data)
-
-        await browser.close()
-
-    export_csv(conn)
-```
-
-### CSV-Export-Funktion
-
-```python
-def export_csv(conn, filepath='doctors.csv'):
-    cursor = conn.execute('''
-        SELECT name, rating, total_reviews, deleted_reviews,
-               address, url, category, scrape_date, last_updated
-        FROM establishments
-        ORDER BY name
-    ''')
-
-    with open(filepath, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        writer.writerow(['name', 'rating', 'total_reviews', 'deleted_reviews',
-                        'address', 'url', 'category', 'scrape_date', 'last_updated'])
-        for row in cursor:
-            writer.writerow(row)
-```
-
----
+- Python mit Playwright
+- SQLite Datenbank
+- CSV Export
+- Regex fuer Mustererkennung
 
 ## Fazit
 
-Dieses Projekt demonstriert einen praktischen Ansatz zur automatisierten medizinischen Datensammlung aus Web-Suchergebnissen:
-
-1. **Textbasierte Extraktion** ist robuster als CSS-Selektoren für dynamische Webseiten
-2. **Strenge Validierung** gewährleistet hohe Datenqualität, auch wenn es weniger Einträge bedeutet
-3. **Modulares Design** ermöglicht einfache Wartung und Erweiterung
-4. **Automatisierte Bereinigung** erkennt schlechte Einträge, die durch die anfängliche Filterung rutschen
-
-Der Scraper erfasst erfolgreich validierte medizinische Praktiker-Daten aus Bielefeld, wobei 100% der Einträge Bewertungen und Rezensionsanzahlen enthalten. Die Architektur ist für Erweiterbarkeit auf andere Städte und Datenquellen ausgelegt.
+Das Projekt zeigt einen praktischen Ansatz zur automatisierten Datensammlung aus Web-Suchergebnissen.
 
 ---
 
-*Dokumentversion: 1.0*  
-*Zuletzt aktualisiert: 11. Mai 2026*  
-*Lizenz: MIT*
+*Dokumentversion: 1.2*  
+*Zuletzt aktualisiert: 11. Mai 2026*

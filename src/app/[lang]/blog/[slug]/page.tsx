@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import { CollapsibleTOC } from '@/components/CollapsibleTOC';
 import styles from '../page.module.scss';
 import { getBlogPostByLang, getBlogPosts, extractHeadings } from '@/lib/mdx';
@@ -100,7 +103,16 @@ export default async function BlogPostPage(props: Props) {
           <CollapsibleTOC headings={headings} />
         )}
         <div className={styles.content}>
-          <MDXRemote source={post.content} components={components} />
+          <MDXRemote
+            source={post.content}
+            components={components}
+            options={{
+              mdxOptions: {
+                remarkPlugins: [remarkMath],
+                rehypePlugins: [rehypeKatex],
+              },
+            }}
+          />
         </div>
         <footer className={styles.metaFooter}>
           <div>
