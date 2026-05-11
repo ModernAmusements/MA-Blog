@@ -121,9 +121,9 @@ The scraper uses a multi-term search strategy to maximize coverage:
 
 ```python
 search_terms = [
-    'Arzt Bielefeld',
-    'Zahnarzt Bielefeld',
-    'Klinik Bielefeld'
+    'Arzt Bielefeld',      # General practitioners
+    'Zahnarzt Bielefeld',  # Dentists
+    'Klinik Bielefeld'     # Clinics and hospitals
 ]
 ```
 
@@ -154,7 +154,7 @@ sequenceDiagram
 flowchart TD
     A[For each name] --> B{Search on Google}
     B --> C[Extract page text]
-    C --> D[Parse rating: X.X (N)]
+    C --> D[Parse rating]
     D --> E[Parse address]
     E --> F[Check for deleted reviews]
     F --> G{All fields present?}
@@ -174,7 +174,7 @@ browser = await p.chromium.launch(
 
 context = await browser.new_context(
     viewport={'width': 1920, 'height': 1080},
-    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64)...'
+    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36'
 )
 ```
 
@@ -182,6 +182,19 @@ context = await browser.new_context(
 - `headless=False`: For visual debugging
 - `AutomationControlled` flag: Bypass bot detection
 - `no-sandbox`: Required for some Linux environments
+
+### Search URL Pattern
+
+```python
+search_url = f'https://www.google.com/search?q={term}&tbm=lcl&hl=de-DE&start={page_num * 10}'
+```
+
+| Parameter | Value | Purpose |
+|-----------|-------|---------|
+| `q` | Search term | Google query |
+| `tbm=lcl` | local | Local business results |
+| `hl=de-DE` | German | German language results |
+| `start` | 0, 10, 20 | Pagination |
 
 ### Consent Handling
 
@@ -201,10 +214,19 @@ flowchart TD
 
 #### Rating Pattern
 ```python
+# Pattern: "4,5(103)" → rating: 4.5, reviews: 103
 rating_match = re.search(r'(\d+[.,]\d+)\s*\(\s*(\d+)\s*\)', page_text)
 if rating_match:
     data['rating'] = rating_match.group(1).replace(',', '.')
     data['total_reviews'] = rating_match.group(2)
+```
+
+#### Address Pattern
+```python
+# German postal code pattern: "33602 Bielefeld"
+addr_match = re.search(r'\d{5}\s+[\w\s]+(?:Bielefeld|Stadtteil|str\.?|straße)', page_text, re.IGNORECASE)
+if addr_match:
+    data['address'] = 'Adresse: ' + addr_match.group(0).strip()
 ```
 
 #### Deleted Reviews (GDPR)
@@ -247,7 +269,8 @@ doctor_keywords = [
     'arzt', 'praxis', 'klinik', 'zentrum', 'dr.', 'dr ',
     'med.', 'med ', 'prof.', 'hausarzt', 'zahnarzt',
     'facharzt', 'mvz', 'therapie', 'psycholog', 'physio',
-    'heilkunde', 'chiro', 'podo', 'ergo', 'logo'
+    'heilkunde', 'chiro', 'podo', 'ergo', 'logo',
+    'apotheke', 'hospital', 'krankenhaus', 'zahn'
 ]
 ```
 
@@ -258,9 +281,27 @@ skip_patterns = [
     'bewertung', 'öffnet', 'geschlossen', 'anzeige',
     'website', 'telefon', 'google', 'suche', '·',
     'route', 'weiter', 'anmelden', 'nutzung',
-    'datenschutz', 'feedback', 'standort', 'hilfe'
+    'datenschutz', 'feedback', 'standort', 'hilfe',
+    'gesponsert', 'suche etwas', 'bielefeld', 'deutschland'
 ]
 ```
+
+### Clean Categories
+
+**Include (Medical):**
+- Doctors (Dr., Dr. med., Prof.)
+- Practices (Praxis, Gemeinschaftspraxis)
+- Clinics (Klinik, Krankenhaus)
+- Dentists (Zahnarzt, Zahnärzte)
+- Specialists (Facharzt, Centrum)
+- Therapy centers
+
+**Exclude (Non-Medical):**
+- Pharmacies (Apotheke)
+- Gyms/Fitness (Fitness, Gym, McFIT)
+- Opticians (Optik, Augenoptik)
+- Labs (Labor, Diagnostik)
+- Sanatoriums (Sanitätshaus)
 
 ![Data Validation](/images/review_proof/Bildschirmfoto 2026-05-04 um 10.36.35.png)
 
@@ -305,6 +346,22 @@ erDiagram
     }
 ```
 
+### Field Descriptions
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| id | INTEGER | Primary key | 1 |
+| name | TEXT | Business name | "Dr. med. Hans Müller" |
+| rating | TEXT | Rating (1.0-5.0) | "4.5" |
+| total_reviews | TEXT | Number of reviews | "103" |
+| deleted_reviews | TEXT | GDPR deletion notice | "Einige Ergebnisse..." |
+| address | TEXT | Full address | "Adresse: Hauptstr. 1, 33602 Bielefeld" |
+| url | TEXT | Google Maps URL | "https://www.google.com/maps/..." |
+| category | TEXT | Auto-tagged category | "Doctor", "Dentist", "Clinic" |
+| scrape_date | TEXT | First scrape date | "2026-05-11" |
+| last_updated | TEXT | Last update date | "2026-05-11" |
+| status | TEXT | Active/inactive | "active" |
+
 ### Category Auto-Tagging
 
 ```python
@@ -314,7 +371,7 @@ def category_from_name(name):
         return 'Dentist'
     if any(k in name_lower for k in ['klinik', 'krankenhaus', 'hospital']):
         return 'Clinic'
-    if any(k in name_lower for k in ['augen', 'dermat', 'herz', 'orthop']):
+    if any(k in name_lower for k in ['augen', 'dermat', 'herz', 'orthop', 'neurolog', 'gynäkolog', 'frauenarzt', 'urolog']):
         return 'Specialist'
     if any(k in name_lower for k in ['praxis', 'medizinisches zentrum', 'mvz']):
         return 'Medical Practice'
@@ -412,6 +469,19 @@ flowchart TD
 
 **Solution:** Use text-based extraction instead of CSS selectors:
 ```python
+# Instead of: card = await page.query_selector('.vwVdIc')
+# Use: text = await page.inner_text('body')
+```
+
+**Before (Selector-based):**
+```python
+cards = await page.query_selector_all('.vwVdIc')
+for card in cards:
+    text = await card.inner_text()
+```
+
+**After (Text-based):**
+```python
 text = await page.inner_text('body')
 for line in text.split('\n'):
     if 'Dr.' in line or 'Praxis' in line:
@@ -419,6 +489,8 @@ for line in text.split('\n'):
 ```
 
 ### Challenge 2: Consent Cookie Banners
+
+**Problem:** Google shows cookie consent overlay that blocks content.
 
 **Solution:** Automated button clicking with multiple attempts:
 ```python
@@ -434,10 +506,12 @@ async def handle_consent(page):
 
 ### Challenge 3: Non-Medical Entries
 
+**Problem:** Search results include gyms, pharmacies, opticians.
+
 **Solution:** Strict filtering with keyword validation:
 ```python
-doctor_kw = ['arzt', 'praxis', 'klinik', 'dr.', 'zahn']
-non_medical = ['fitness', 'gym', 'optik', 'apotheke']
+doctor_kw = ['arzt', 'praxis', 'klinik', 'dr.', 'zahn', ...]
+non_medical = ['fitness', 'gym', 'optik', 'apotheke', ...]
 
 if not any(k in name.lower() for k in doctor_kw):
     skip_entry()
@@ -445,9 +519,9 @@ if any(k in name.lower() for k in non_medical):
     skip_entry()
 ```
 
-![Scrape Results](/images/review_proof/Bildschirmfoto 2026-05-04 um 10.36.56.png)
-
 ### Challenge 4: Duplicate Entries
+
+**Problem:** Same clinic appears under different names (e.g., "EvKB Haus Gilead I" vs "EvKB Haus Gilead IV").
 
 **Solution:** Database-level dedup with name matching:
 ```python
@@ -457,17 +531,23 @@ existing = conn.execute(
 ).fetchone()
 
 if existing:
+    # Update instead of insert
     conn.execute('UPDATE ... WHERE id = ?', ...)
+
 ```
 
 ### Challenge 5: Missing Rating Data
+
+**Problem:** Some entries don't display ratings in search snippets.
 
 **Solution:** Strict validation - only save entries with complete data:
 ```python
 if not rating or not reviews:
     print('✗ - Skipped (no rating)')
-    continue
+    continue  # Don't save incomplete entries
 ```
+
+![Scrape Results](/images/review_proof/Bildschirmfoto 2026-05-04 um 10.36.56.png)
 
 ## Results & Statistics
 
@@ -494,7 +574,7 @@ pie title Rating Distribution
 ### Category Breakdown
 
 | Category | Count | Percentage |
-|----------|----|------------|
+|----------|-------|------------|
 | Doctor | 62 | 39% |
 | Dentist | 35 | 22% |
 | Clinic | 28 | 18% |
@@ -505,52 +585,74 @@ pie title Rating Distribution
 
 ```mermaid
 flowchart TD
-    A[Total: 157] --> B{Deleted Reviews?}
+    A[Total Entries: 157] --> B{Deleted Reviews?}
     B -->|Yes| C[58 Entries]
     B -->|No| D[99 Entries]
     C --> E{Reason Type}
     E -->|GDPR| F["Einige Ergebnisse wurden entfernt"]
-    E -->|Complaint| G["Bewertungen entfernt"]
-    E -->|Count| H["11 bis 20 entfernt"]
+    E -->|Complaint| G["Bewertungen aufgrund von Beschwerden entfernt"]
+    E -->|Count| H["11 bis 20 Bewertungen entfernt"]
 ```
+
+![Results Dashboard](/images/review_proof/Bildschirmfoto 2026-05-04 um 11.04.59.png)
 
 ## Technical Stack
 
 ### Dependencies
 
-- playwright>=1.40.0
-- asyncio
-- sqlite3
-- csv
-- re
-- datetime
+```
+playwright>=1.40.0
+asyncio
+sqlite3
+csv
+re
+datetime
+```
 
 ### File Structure
 
 ```
 Bielefeld_Scrape/
-├── doctor_scraper.py
-├── doctors.db
-├── doctors.csv
-├── visualization/
-│   ├── public/data/
-│   └── src/components/
-└── requirements.txt
+├── doctor_scraper.py      # Main scraper
+├── doctors.db             # SQLite database
+├── doctors.csv            # CSV export
+├── visualization/         # React visualization
+│   ├── public/data/      # CSV for charts
+│   └── src/components/   # React components
+└── requirements.txt       # Dependencies
 ```
+
+![Database Structure](/images/review_proof/Bildschirmfoto 2026-05-04 um 11.04.40.png)
 
 ## Future Enhancements
 
 ### Planned Improvements
 
-1. **Parallel Processing** - Multiple browser contexts simultaneously
-2. **Enhanced Validation** - Fuzzy name matching for duplicate detection
-3. **Address Extraction** - Improve regex for German addresses
-4. **Review Content** - Collect actual review text with consent
-5. **Monitoring** - Track changes over time
+1. **Parallel Processing**
+   - Use multiple browser contexts simultaneously
+   - Reduce total scraping time by 50%
+
+2. **Enhanced Validation**
+   - Fuzzy name matching for duplicate detection
+   - URL-based deduplication as backup
+
+3. **Address Extraction**
+   - Improve regex patterns for German addresses
+   - Parse multiple address formats
+
+4. **Review Content**
+   - Collect actual review text (with consent)
+   - Sentiment analysis on reviews
+
+5. **Monitoring**
+   - Track changes over time (re-scrape detection)
+   - Alert on rating changes
+
+### Potential Extensions
 
 ```mermaid
 mindmap
-  root((ReviewProof))
+  root((Bielefeld Scraper))
     Data Collection
       Multi-city support
       Other data sources
@@ -565,9 +667,71 @@ mindmap
       Trend charts
 ```
 
+## Appendix: Code Reference
+
+### Main Loop Structure
+
+```python
+async def main():
+    conn = init_db()
+    existing_names = set(r[0] for r in conn.execute('SELECT name FROM establishments').fetchall())
+
+    search_terms = ['Arzt Bielefeld', 'Zahnarzt Bielefeld', 'Klinik Bielefeld']
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        page = await browser.new_page()
+
+        all_names = set()
+
+        # Phase 1: Collect names
+        for term in search_terms:
+            for page_num in range(3):
+                await page.goto(f'https://www.google.com/search?q={term}&tbm=lcl&hl=de-DE&start={page_num * 10}')
+                await handle_consent(page)
+                text = await page.inner_text('body')
+
+                for line in text.split('\n'):
+                    line = line.strip()
+                    if is_valid_name(line):
+                        all_names.add(line)
+
+        # Phase 2: Scrape each
+        for name in all_names:
+            if name not in existing_names:
+                data = await scrape_doctor(page, name)
+                if data and data['rating']:
+                    add_or_update(conn, data)
+
+        await browser.close()
+
+    export_csv(conn)
+```
+
+### CSV Export Function
+
+```python
+def export_csv(conn, filepath='doctors.csv'):
+    cursor = conn.execute('''
+        SELECT name, rating, total_reviews, deleted_reviews,
+               address, url, category, scrape_date, last_updated
+        FROM establishments
+        ORDER BY name
+    ''')
+
+    with open(filepath, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['name', 'rating', 'total_reviews', 'deleted_reviews',
+                        'address', 'url', 'category', 'scrape_date', 'last_updated'])
+        for row in cursor:
+            writer.writerow(row)
+```
+
+---
+
 ## Conclusion
 
-This project demonstrates a practical approach to automated medical data collection from web search results:
+This project demonstrates a practical approach to automated medical data collection from web search results. Key learnings include:
 
 1. **Text-based extraction** is more robust than CSS selectors for dynamic web pages
 2. **Strict validation** ensures high data quality even if it means fewer entries
@@ -579,4 +743,5 @@ The scraper successfully collects validated medical practitioner data from Biele
 ---
 
 *Document Version: 1.0*  
-*Last Updated: May 11, 2026*
+*Last Updated: May 11, 2026*  
+*License: MIT*
