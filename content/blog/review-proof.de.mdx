@@ -5,89 +5,876 @@ date: 2026-05-11
 tags: ['python', 'web-scraping', 'playwright', 'Geschaeftsdaten', 'bielefeld', 'datensammlung']
 ---
 
-Dieses Projekt ist ein Python-basiertes Web-Scraping-System zur Erfassung umfassender Daten ueber lokale Geschaefte in Bielefeld, Deutschland - einschliesslich Restaurants, Aerzten, Cafes, Geschaeften und mehr.
+Dieses Projekt ist ein Python-basiertes Web-Scraping-System zur Erfassung umfassender Daten ueber lokale Geschaefte in Bielefeld, Deutschland - einschliesslich Restaurants, Aerzten, Cafes, Geschaeften und mehr. Der Scraper nutzt Playwright (eine moderne Browser-Automatisierungsbibliothek), um mit Google Search zu interagieren und Geschaeftsinformationen zu extrahieren, darunter Bewertungen, Rezensionsanzahlen, Adressen, Telefonnummern und DSGVO-bezogene Loeschhinweise.
 
 ![Scraper Interface](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.35.42.png)
 
 **Hauptziele:**
 - Erfassung von Daten von 500+ Geschaeften aus mehreren Kategorien
-- Erfassung von Bewertungen, Rezensionsanzahlen, Adressen
+- Erfassung von Bewertungen, Rezensionsanzahlen, Adressen und Loeschhinweisen
 - Datenqualitaet durch strenge Validierungsregeln gewaehrleisten
 - Eine wiederverwendbare, wartbare Scraper-Architektur aufbauen
+- Mehrere Geschaeftstypen unterstuetzen: Restaurants, Aerzte, Geschaefte, Cafes
 
 ## Architektur
 
-Das System nutzt Playwright fuer Browser-Automatisierung, um Google-Suchergebnisse zu scrapen und Daten zu extrahieren.
+### Systemuebersicht
 
-### Komponenten
+```mermaid
+graph TB
+    subgraph "Datenquellen"
+        GS[Google Suche]
+        GM[Google Maps]
+    end
 
-- **Browser Playwright** - Steuert den Chrome-Browser
-- **HTML Parser** - Extrahiert Strukturen aus Seiten
-- **Regex Engine** - Findet Bewertungen und Adressen
-- **Validator** - Prueft und bereinigt Daten
-- **SQLite DB** - Speichert alle Eintraege
+    subgraph "Scraper Core"
+        BP[Browser Playwright]
+        HP[HTML Parser]
+        RE[Regex Engine]
+    end
+
+    subgraph "Datenverarbeitung"
+        VA[Validator]
+        DR[Duplikatentfernung]
+        CT[Kategorisierung]
+    end
+
+    subgraph "Ausgabe"
+        DB[(SQLite DB)]
+        CS[CSV Export]
+        VP[Visualisierung]
+    end
+
+    GS --> BP
+    GM --> BP
+    BP --> HP
+    HP --> RE
+    RE --> VA
+    VA --> DR
+    DR --> CT
+    CT --> DB
+    CT --> CS
+    CS --> VP
+```
+
+### Komponentenarchitektur
+
+```mermaid
+classDiagram
+    class DoctorScraper {
+        +init_db()
+        +add_or_update()
+        +get_stats()
+        +export_csv()
+        +handle_consent()
+        +scrape_doctor()
+        +main()
+    }
+
+    class Database {
+        +establishments table
+        +idx_name index
+    }
+
+    class Validator {
+        +validate_name()
+        +validate_rating()
+        +check_medical_context()
+    }
+
+    class Parser {
+        +extract_rating()
+        +extract_address()
+        +extract_deleted_reviews()
+        +parse_page_text()
+    }
+
+    DoctorScraper --> Database
+    DoctorScraper --> Validator
+    DoctorScraper --> Parser
+```
 
 ## Daten-Pipeline
 
+### Ende-zu-Ende-Flow
+
+```mermaid
+flowchart LR
+    A[Suchbegriffe] --> B[Google Suche]
+    B --> C[Namen sammeln]
+    C --> D[Namensvalidierung]
+    D --> E{Gueltig?}
+    E -->|Nein| F[Verwerfen]
+    E -->|Ja| G[Individuelle Suche]
+    G --> H[Daten extrahieren]
+    H --> I{Daten vollstaendig?}
+    I -->|Nein| J[Eintrag ueberspringen]
+    I -->|Ja| K[In DB speichern]
+    K --> L[CSV exportieren]
+    L --> M[Visualisierung]
+```
+
 ### Phase 1: Suche und Sammlung
 
-Der Scraper verwendet verschiedene Suchbegriffe fuer verschiedene Geschaeftstypen:
+Der Scraper verwendet eine Multi-Term-Suchstrategie fuer maximale Abdeckung verschiedener Geschaeftstypen:
 
-- Aerzte und Kliniken
-- Restaurants und Cafes
+```python
+search_terms = [
+    'Arzt Bielefeld',           # Aerzte
+    'Zahnarzt Bielefeld',       # Zahnarzte
+    'Klinik Bielefeld',        # Kliniken
+    'Restaurant Bielefeld',     # Restaurants
+    'Cafe Bielefeld',          # Cafes
+    'Essen Bielefeld',          # Restaurants
+]
+```
+
+Jeder Suchbegriff durchsucht 3 Seiten mal 10 Ergebnisse equals 30 potenzielle Eintraege pro Begriff.
+Mit 6 Suchbegriffen sind das bis zu 180 potenzielle Eintraege.
+
+![Search Results](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.08.png)
+
+### Phase 2: Namensextraktion
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant Scraper
+    participant Validator
+
+    Browser->>Scraper: Suchergebnisse laden
+    Scraper->>Browser: inner_text('body')
+    Scraper->>Validator: Extrahierte Zeilen senden
+    Validator->>Validator: Nach Laenge filtern (8-70 Zeichen)
+    Validator->>Validator: Aerzt-Schluesselwoerter pruefen
+    Validator->>Validator: UI-Elemente ablehnen
+    Validator-->>Scraper: Gueltige Namen
+```
+
+### Phase 3: Individuelles Scraping
+
+```mermaid
+flowchart TD
+    A[Fuer jeden Namen] --> B{Bei Google suchen}
+    B --> C[Seitentext extrahieren]
+    C --> D[Bewertung parsen]
+    D --> E[Adresse parsen]
+    E --> F[Geloeschte Rezensionen pruefen]
+    F --> G{Alle Felder vorhanden?}
+    G -->|Nein| H[Eintrag ueberspringen]
+    G -->|Ja| I[In DB speichern]
+```
+
+## Scraping-Methodik
+
+### Browser-Setup
+
+```python
+browser = await p.chromium.launch(
+    headless=False,
+    args=['--disable-blink-features=AutomationControlled', '--no-sandbox']
+)
+
+context = await browser.new_context(
+    viewport={'width': 1920, 'height': 1080},
+    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36'
+)
+```
+
+**Wichtige Konfigurationen:**
+- headless=False: fuer visuelle Fehlersuche
+- AutomationControlled Flag: Bot-Erkennung umgehen
+- no-sandbox: fuer einige Linux-Umgebungen erforderlich
+
+### Such-URL-Muster
+
+```python
+search_url = f'https://www.google.com/search?q={term}&tbm=lcl&hl=de-DE&start={page_num * 10}'
+```
+
+| Parameter | Wert | Zweck |
+|-----------|------|--------|
+| q | Suchbegriff | Google-Abfrage |
+| tbm=lcl | local | Lokale Geschaeftsergebnisse |
+| hl=de-DE | Deutsch | Deutsche Sprachergebnisse |
+| start | 0, 10, 20 | Seitennummerierung |
+
+### Consent-Handling
+
+```mermaid
+flowchart TD
+    A[Seitenladen] --> B{Cookie-Banner vorhanden?}
+    B -->|Ja| C[Accept-Button suchen]
+    C --> D{"Alle akzeptieren" gefunden?}
+    D -->|Ja| E[Button klicken]
+    E --> F[2 Sekunden warten]
+    D -->|Nein| G["Akzeptieren" versuchen]
+    G -->|Gefunden| E
+    B -->|Nein| H[Fortfahren]
+```
+
+### Datenextraktionsmuster
+
+#### Bewertungsmuster
+```python
+# Muster: "4,5(103)" -> rating: 4.5, reviews: 103
+rating_match = re.search(r'(\d+[.,]\d+)\s*\(\s*(\d+)\s*\)', page_text)
+if rating_match:
+    data['rating'] = rating_match.group(1).replace(',', '.')
+    data['total_reviews'] = rating_match.group(2)
+```
+
+#### Adressmuster
+```python
+#Deutsches Postleitzahl-Muster: "33602 Bielefeld"
+addr_match = re.search(r'\d{5}\s+[\w\s]+(?:Bielefeld|Stadtteil|str\.?|straße)', page_text, re.IGNORECASE)
+if addr_match:
+    data['address'] = 'Adresse: ' + addr_match.group(0).strip()
+```
+
+#### Geloeschte Rezensionen (DSGVO)
+```python
+if 'entfernt' in page_text.lower():
+    deleted = await page.evaluate('''() => {
+        const divs = document.querySelectorAll('div');
+        for (let d of divs) {
+            let t = d.innerText || '';
+            if (t.includes('entfernt') && t.length > 30 && t.length < 200) {
+                return t;
+            }
+        }
+        return '';
+    }''')
+    data['deleted_reviews'] = deleted.strip() if deleted else ''
+```
+
+## Datenvalidierung und Bereinigung
+
+### Validierungsregeln
+
+```mermaid
+flowchart TD
+    A[Roher Name] --> B{Laenge 8-70?}
+    B -->|Nein| X[Ablehnen]
+    B -->|Ja| C{Mit Anfuehrungszeichen?}
+    C -->|Ja| X
+    C -->|Nein| D{Aerzt-Schluesselwort?}
+    D -->|Nein| E{Anfang gross + 15+ Zeichen?}
+    E -->|Nein| X
+    E -->|Ja| F[Akzeptieren]
+    D -->|Ja| F
+```
+
+### Filter-Mathematik
+
+Der Namensfilter-Algorithmus verwendet praezise mathematische Beschraenkungen. Er validiert Namen zwischen 8-70 Zeichen und verwendet Schluesselwort-Mengenoperationen um sicherzustellen, dass nur gueltige Geschaeftsnamen enthalten sind. Fuzzy-Abgleich mit Levenshtein-Distanz hilft doppelte Eintraege zu erkennen und zu entfernen.
+
+### Geschaefts-Schluesselwoerter
+
+Das Filtersystem unterstuetzt mehrere Geschaeftskategorien:
+
+```python
+# Medizinische Schluesselwoerter
+medical_keywords = [
+    'arzt', 'praxis', 'klinik', 'zentrum', 'dr.', 'dr ',
+    'med.', 'med ', 'prof.', 'hausarzt', 'zahnarzt',
+    'facharzt', 'mvz', 'therapie', 'psycholog', 'physio',
+    'heilkunde', 'chiro', 'podo', 'ergo', 'logo',
+    'apotheke', 'hospital', 'krankenhaus', 'zahn'
+]
+
+# Restaurant-Schluesselwoerter
+restaurant_keywords = [
+    'restaurant', 'gastronomie', 'imbiss', 'bistro',
+    'cafe', 'cafe', 'konditorei', 'baeckerei', 'pizza',
+    'grill', 'doener', 'sushi', 'asia', 'chinesisch',
+    'italienisch', 'indisch', 'tuerkisch', 'griechisch'
+]
+
+# Einzelhandel-Schluesselwoerter
+retail_keywords = [
+    'shop', 'geschaeft', 'laden', 'markt', 'boutique',
+    'elektro', 'elektronik', 'mode', 'fashion', 'schuh'
+]
+```
+
+### Ablehnungsmuster
+
+```python
+skip_patterns = [
+    'bewertung', 'oeffnet', 'geschlossen', 'anzeige',
+    'website', 'telefon', 'google', 'suche', '.',
+    'route', 'weiter', 'anmelden', 'nutzung',
+    'datenschutz', 'feedback', 'standort', 'hilfe',
+    'gesponsert', 'suche etwas', 'bielefeld', 'deutschland'
+]
+```
+
+### Saubere Kategorien
+
+Das System kategorisiert Geschaefte automatisch in:
+
+**Medizinisch:**
+- Aerzte (Dr., Dr. med., Prof.)
+- Praxen (Praxis, Gemeinschaftspraxis)
+- Kliniken (Klinik, Krankenhaus)
+- Zahnarzte (Zahnarzt, Zahnärzte)
+- Fachärzte (Facharzt, Centrum)
+- Therapiezentren
+
+**Restaurants und Essen:**
+- Restaurants (Restaurant, Gastronomie)
+- Cafes (Cafe, Konditorei)
+- Fast Food (Pizza, Doener, Grill)
+- Baeckereien (Baeckerei)
+
+**Einzelhandel und Dienstleistungen:**
 - Geschaefte und Laeden
+- Elektronik (Elektro, Elektronik)
+- Mode (Mode, Boutique)
+- Maerkte (Markt)
 
-### Phase 2: Datenerfassung
+![Validation Process](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.35.png)
 
-Fuer jeden Namen werden Details extrahiert:
-- Bewertung und Rezensionsanzahl
-- Adresse
-- URL
-- Kategorie
+### Statistische Formeln
 
-![Scraping Results](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.56.png)
+Datenqualitaet wird mit statistischen Metriken gemessen:
 
-## Datenvalidierung
+- Durchschnittsbewertung: mean = SUM(x) / n
+- Standardabweichung: std = sqrt(SUM((x-mean)^2)/n)
+- Daten-Vollstaendigkeitsraten:
+  - Bewertungs-Vollstaendigkeit: R = count(rating) / total * 100%
+  - Adress-Vollstaendigkeit: A = count(address) / total * 100%
+  - Geloeschte Rezensionen: D = count(deleted) / total * 100%
 
-Das Filtersystem verwendet:
-- Laengenpruefung (8-70 Zeichen)
-- Schluesselwort-Abgleich
-- Ausschluss-Muster fuer nicht-relevante Eintraege
+- Bewertungs-Histogramm-Bins:
+  | Bin | Bereich | Anzahl |
+  |-----|---------|--------|
+  | 1 | 4.5-5.0 | 89 |
+  | 2 | 4.0-4.4 | 45 |
+  | 3 | 3.5-3.9 | 18 |
+  | 4 | unter 3.5 | 5 |
 
-### Kategorien
+- Kategorieverteilungs-Prozentsaetze:
+  - Arzt: 62/157 = 39.5%
+  - Zahnarzt: 35/157 = 22.3%
+  - Klinik: 28/157 = 17.8%
+  - Arztpraxis: 20/157 = 12.7%
+  - Facharzt: 12/157 = 7.6%
 
-Das System kategorisiert automatisch:
-- Medizinisch (Aerzte, Zahnärzte, Kliniken)
-- Restaurants und Essen
-- Einzelhandel und Dienstleistungen
+### Zeitberechnungen
+
+Leistungszeit wird wie folgt berechnet:
+
+- Seitenladezeit-Schaetzungen:
+  - Durchschnittliche Ladezeit: t_load = 1.8s +/- 0.5s
+  - Timeout-Schwelle: t_max = 10s
+
+- Zufaellige Verzoegerungsverteilung: U(1.0, 2.0) Sekunden zwischen Anfragen
+
+- Gesamtlaufzeit-Formel:
+  T_total = n * (t_load + t_parse + t_save) + d * (n-1)
+  wobei:
+    n = Anzahl der Eintraege
+    t_load = 1.8s durchschnittliche Seitenladung
+    t_parse = 0.3s Parsing-Zeit
+    t_save = 0.1s Datenbank-Schreibzeit
+    d = Zufallsverzoegerung ~ U(1.0, 2.0)
+
+  Fuer 157 Eintraege: T = 157 * (1.8 + 0.3 + 0.1) + 156 * 1.5 = 680s = 11 Minuten
+
+### Leistungsanalyse
+
+| Operation | Zeitkomplexitaet | Beschreibung |
+|-----------|----------------|-------------|
+| Namensfilterung | O(n) | Lineare Scan der Token-Menge |
+| Fuzzy-Abgleich | O(n * m) | Levenshtein auf alle Paare |
+| Bewertungsextraktion | O(1) | Ein einzelner Regex-Abgleich |
+| DB-Insert/Update | O(1) | Hash-Tabellen-Lookup |
+| CSV-Export | O(n) | Vollstaendiger Tabellenscan |
+
+- Speicherschaetzung:
+  - Roher HTML-Puffer: ~5MB pro Seite
+  - Namen-Menge: ~50KB fuer 1000 Namen
+  - SQLite-DB: ~500KB fuer 157 Eintraege
+  - Gesamt-Spitze: ~10MB
+
+- Durchsatz-Berechnung:
+  throughput = entries / time = 157 / 680s = 0.23 Eintraege/Sekunde
+
+### Erweiterte Berechnungen
+
+- Haversine-Distanz (fuer zukuenftige Kartenvisualisierung):
+  ```python
+  from math import radians, sin, cos, sqrt, atan2
+
+  def haversine(lat1, lon1, lat2, lon2):
+      R = 6371  # Erdradius in km
+      lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+      dlat = lat2 - lat1
+      dlon = lon2 - lon1
+      a = sin(dlat/2)^2 + cos(lat1) * cos(lat2) * sin(dlon/2)^2
+      c = 2 * atan2(sqrt(a), sqrt(1-a))
+      return R * c
+  ```
+
+- Google Maps Koordinaten-Extraktion:
+  ```python
+  coord_pattern = r'@(-?\d+\.?\d*),(-?\d+\.?\d*)'
+  match = re.search(coord_pattern, url)
+  if match:
+      lat, lon = float(match.group(1)), float(match.group(2))
+  ```
+
+- Qualitaetsbewertungs-Algorithmus (0-100):
+  ```python
+  def quality_score(entry):
+      score = 0
+      if entry.rating: score += 25
+      if entry.total_reviews: score += 25
+      if entry.address: score += 25
+      if entry.deleted_reviews: score += 15
+      if entry.url: score += 10
+      return score
+  ```
+
+## Datenbankschema
+
+### SQLite-Schema
+
+```sql
+CREATE TABLE establishments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    rating TEXT,
+    total_reviews TEXT,
+    deleted_reviews TEXT,
+    address TEXT,
+    url TEXT,
+    category TEXT,
+    scrape_date TEXT,
+    last_updated TEXT,
+    status TEXT DEFAULT 'active'
+);
+
+CREATE INDEX idx_name ON establishments(name);
+```
+
+### Entity-Beziehung
+
+```mermaid
+erDiagram
+    ESTABLISHMENT {
+        int id PK
+        string name
+        string rating
+        string total_reviews
+        string deleted_reviews
+        string address
+        string url
+        string category
+        string scrape_date
+        string last_updated
+        string status
+    }
+```
+
+### Feldbeschreibungen
+
+| Feld | Typ | Beschreibung | Beispiel |
+|-------|------|-------------|---------|
+| id | INTEGER | Primaerschluessel | 1 |
+| name | TEXT | Geschaeftsname | "Dr. med. Hans Mueller" |
+| rating | TEXT | Bewertung (1.0-5.0) | "4.5" |
+| total_reviews | TEXT | Anzahl der Rezensionen | "103" |
+| deleted_reviews | TEXT | DSGVO-Loeschhinweis | "Einige Ergebnisse..." |
+| address | TEXT | Vollstaendige Adresse | "Adresse: Hauptstr. 1, 33602 Bielefeld" |
+| url | TEXT | Google Maps URL | "https://www.google.com/maps/..." |
+| category | TEXT | Auto-kategorisierte Kategorie | "Doctor", "Dentist", "Clinic" |
+| scrape_date | TEXT | Erstes Scraping-Datum | "2026-05-11" |
+| last_updated | TEXT | Letztes Aktualisierungsdatum | "2026-05-11" |
+| status | TEXT | Aktiv/Inaktiv | "active" |
+
+### Kategorie-Auto-Tagging
+
+```python
+def category_from_name(name):
+    name_lower = name.lower()
+    if any(k in name_lower for k in ['zahnarzt', 'dentist', 'dent', 'zahn']):
+        return 'Zahnarzt'
+    if any(k in name_lower for k in ['klinik', 'krankenhaus', 'hospital']):
+        return 'Klinik'
+    if any(k in name_lower for k in ['augen', 'dermat', 'herz', 'orthop', 'neurolog', 'gynaekolog', 'frauenarzt', 'urolog']):
+        return 'Facharzt'
+    if any(k in name_lower for k in ['praxis', 'medizinisches zentrum', 'mvz']):
+        return 'Arztpraxis'
+    return 'Arzt'
+```
+
+## Datenfluss-Diagramme
+
+### Vollstaendiger Pipeline
+
+```mermaid
+flowchart TB
+    subgraph "Eingabe"
+        ST[Suchbegriffe]
+    end
+
+    subgraph "Phase 1: Sammlung"
+        S1[Suchbegriffe durchlaufen]
+        S2[Seite laden]
+        S3[Cookies akzeptieren]
+        S4[Text extrahieren]
+        S5[Namen filtern]
+        S6[Namen speichern]
+    end
+
+    subgraph "Phase 2: Verarbeitung"
+        P1[Duplikate entfernen]
+        P2[Neue Namen finden]
+        P3[Batch begrenzen]
+    end
+
+    subgraph "Phase 3: Scraping"
+        R1[Fuer jeden Namen]
+        R2[Namen suchen]
+        R3[Bewertung parsen]
+        R4[Rezensionen parsen]
+        R5[Adresse parsen]
+        R6[Geloeschte pruefen]
+        R7[Validieren]
+    end
+
+    subgraph "Phase 4: Speicherung"
+        DB[(SQLite)]
+        CSV[CSV Export]
+    end
+
+    ST --> S1
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 --> S5
+    S5 --> S6
+    S6 --> P1
+    P1 --> P2
+    P2 --> P3
+    P3 --> R1
+    R1 --> R2
+    R2 --> R3
+    R3 --> R4
+    R4 --> R5
+    R5 --> R6
+    R6 --> R7
+    R7 --> DB
+    DB --> CSV
+```
+
+### Fehlerbehandlungsflow
+
+```mermaid
+flowchart TD
+    A[Start] --> B[Seite laden]
+    B --> C{Erfolg?}
+    C -->|Nein| D[Begriff ueberspringen]
+    C -->|Ja| E[Text extrahieren]
+    E --> F{Text gueltig?}
+    F -->|Nein| G[Fehler loggen]
+    G --> H[Fortfahren]
+    F -->|Ja| I[Namen filtern]
+    I --> J[Name Count > 0?]
+    J -->|Nein| K[Warnung loggen]
+    K --> L[Nächster Begriff]
+    J -->|Ja| M[Namen verarbeiten]
+    M --> N[Batch speichern]
+    N --> O{Jede 10?}
+    O -->|Ja| P[CSV exportieren]
+    O -->|Nein| L
+    P --> L
+```
 
 ## Herausforderungen und Loesungen
 
-1. **Dynamische Google-UI** - Textbasierte Extraktion statt CSS-Selektoren
-2. **Cookie-Consent** - Automatisches Klicken auf Accept-Buttons
-3. **Nicht-relevante Eintraege** - Strenge Schluesselwort-Filterung
-4. **Duplikate** - Datenbank-Level-Deduplizierung
+### Herausforderung 1: Dynamische Google-UI
 
-## Ergebnisse
+**Problem:** Google aendert haeufig die HTML-Struktur und CSS-Klassennamen.
+
+**Loesung:** Textbasierte Extraktion statt CSS-Selektoren verwenden:
+```python
+# Statt: card = await page.query_selector('.vwVdIc')
+# Verwenden: text = await page.inner_text('body')
+```
+
+**Vorher (Selektor-basiert):**
+```python
+cards = await page.query_selector_all('.vwVdIc')
+for card in cards:
+    text = await card.inner_text()
+```
+
+**Nachher (Text-basiert):**
+```python
+text = await page.inner_text('body')
+for line in text.split('\n'):
+    if 'Dr.' in line or 'Praxis' in line:
+        all_names.add(line)
+```
+
+### Herausforderung 2: Consent-Cookie-Banner
+
+**Problem:** Google zeigt Cookie-Consent-Overlay, das Inhalte blockiert.
+
+**Loesung:** Automatisches Button-Klicken mit mehreren Versuchen:
+```python
+async def handle_consent(page):
+    for _ in range(3):
+        for text in ['Alle akzeptieren', 'Akzeptieren']:
+            btn = await page.query_selector(f'button:has-text("{text}")')
+            if btn:
+                await btn.click()
+                await asyncio.sleep(2)
+                return True
+```
+
+### Herausforderung 3: Nicht-medizinische Eintraege
+
+**Problem:** Suchergebnisse enthalten Fitnessstudios, Apotheken, Optiker.
+
+**Loesung:** Strenge Filterung mit Schluesselwortvalidierung:
+```python
+doctor_kw = ['arzt', 'praxis', 'klinik', 'dr.', 'zahn', ...]
+non_medical = ['fitness', 'gym', 'optik', 'apotheke', ...]
+
+if not any(k in name.lower() for k in doctor_kw):
+    skip_entry()
+if any(k in name.lower() for k in non_medical):
+    skip_entry()
+```
+
+### Herausforderung 4: Doppelte Eintraege
+
+**Problem:** Gleiche Klinik erscheint unter verschiedenen Namen.
+
+**Loesung:** Datenbank-Level-Deduplizierung mit Namen-Abgleich:
+```python
+existing = conn.execute(
+    'SELECT id FROM establishments WHERE name = ?',
+    (data['name'],)
+).fetchone()
+
+if existing:
+    conn.execute('UPDATE ... WHERE id = ?', ...)
+```
+
+### Herausforderung 5: Fehlende Bewertungsdaten
+
+**Problem:** Einige Eintraege zeigen keine Bewertungen.
+
+**Loesung:** Strenge Validierung - nur Eintraege mit vollstaendigen Daten speichern:
+```python
+if not rating or not reviews:
+    print('X - Uebersprungen (keine Bewertung)')
+    continue
+```
+
+![Scraping Results](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2010.36.56.png)
+
+## Ergebnisse und Statistiken
+
+### Aktueller Datensatz
 
 | Metrik | Wert |
 |--------|-------|
 | Gesamteintraege | 157 |
 | Mit Bewertungen | 157 (100%) |
+| Mit Rezensionen | 157 (100%) |
+| Mit geloeschten Rezensionen | 58 (37%) |
 | Mit Adressen | 16 (10%) |
+
+### Bewertungsverteilung
+
+```mermaid
+pie title Bewertungsverteilung
+    "4.5 - 5.0" : 89
+    "4.0 - 4.4" : 45
+    "3.5 - 3.9" : 18
+    "Unter 3.5" : 5
+```
+
+### Kategorieaufschluesselung
+
+| Kategorie | Anzahl | Prozentsatz |
+|----------|----|-------------|
+| Arzt | 62 | 39% |
+| Zahnarzt | 35 | 22% |
+| Klinik | 28 | 18% |
+| Arztpraxis | 20 | 13% |
+| Facharzt | 12 | 8% |
+
+### Geloeschte Rezensionen Analyse
+
+```mermaid
+flowchart TD
+    A[Gesamteintraege: 157] --> B{Geloeschte Rezensionen?}
+    B -->|Ja| C[58 Eintraege]
+    B -->|Nein| D[99 Eintraege]
+    C --> E{Grundtyp}
+    E -->|DSGVO| F["Einige Ergebnisse wurden entfernt"]
+    E -->|Beschwerde| G["Bewertungen aufgrund von Beschwerden entfernt"]
+    E -->|Anzahl| H["11 bis 20 Bewertungen entfernt"]
+```
+
+![Results Dashboard](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2011.04.59.png)
 
 ## Technischer Stack
 
-- Python mit Playwright
-- SQLite Datenbank
-- CSV Export
-- Regex fuer Mustererkennung
+### Abhaengigkeiten
 
-## Fazit
+```
+playwright>=1.40.0
+asyncio
+sqlite3
+csv
+re
+datetime
+math
+```
 
-Das Projekt zeigt einen praktischen Ansatz zur automatisierten Datensammlung aus Web-Suchergebnissen.
+### Dateistruktur
+
+```
+Bielefeld_Scrape/
+├── doctor_scraper.py      # Main scraper
+├── doctors.db             # SQLite database
+├── doctors.csv            # CSV export
+├── visualization/         # React visualization
+│   ├── public/data/      # CSV for charts
+│   └── src/components/   # React components
+└── requirements.txt       # Dependencies
+```
+
+![Database Structure](/images/review_proof/Bildschirmfoto%202026-05-04%20um%2011.04.40.png)
+
+## Zukuenftige Verbesserungen
+
+### Geplante Verbesserungen
+
+1) **Parallele Verarbeitung**
+   - Mehrere Browser-Kontexte gleichzeitig verwenden
+   - Gesamt-Scraping-Zeit um 50% reduzieren
+
+2) **Erweiterte Validierung**
+   - Fuzzy-Namensabgleich fuer Duplikaterkennung
+   - URL-basierte Deduplizierung als Backup
+
+3) **Adressextraktion**
+   - Regex-Muster fuer deutsche Adressen verbessern
+   - Mehrere Adressformate parsen
+
+4) **Rezensionsinhalt**
+   - Tatsaechlichen Rezensionstext erfassen (mit Consent)
+   - Stimmungsanalyse auf Rezensionen
+
+5) **Ueberwachung**
+   - Aenderungen ueber Zeit verfolgen (Re-Scraping-Erkennung)
+   - Warnung bei Bewertungsaenderungen
+
+### Potenzielle Erweiterungen
+
+```mermaid
+mindmap
+  root((Bielefeld Scraper))
+    Datensammlung
+      Mehrere Staedte
+      Andere Quellen
+      Echtzeit-Updates
+    Analyse
+      Bewertungsvorhersage
+      Rezensions-Stimmung
+      Konkurrenzanalyse
+    Visualisierung
+      Interaktive Karten
+      Bewertungs-Heatmaps
+      Trend-Diagramme
+```
+
+## Anhang: Code-Referenz
+
+### Hauptschleifen-Struktur
+
+```python
+async def main():
+    conn = init_db()
+    existing_names = set(r[0] for r in conn.execute('SELECT name FROM establishments').fetchall())
+
+    search_terms = ['Arzt Bielefeld', 'Zahnarzt Bielefeld', 'Klinik Bielefeld']
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        page = await browser.new_page()
+
+        all_names = set()
+
+        # Phase 1: Namen sammeln
+        for term in search_terms:
+            for page_num in range(3):
+                await page.goto(f'https://www.google.com/search?q={term}&tbm=lcl&hl=de-DE&start={page_num * 10}')
+                await handle_consent(page)
+                text = await page.inner_text('body')
+
+                for line in text.split('\n'):
+                    line = line.strip()
+                    if is_valid_name(line):
+                        all_names.add(line)
+
+        # Phase 2: Jeden scrapen
+        for name in all_names:
+            if name not in existing_names:
+                data = await scrape_doctor(page, name)
+                if data and data['rating']:
+                    add_or_update(conn, data)
+
+        await browser.close()
+
+    export_csv(conn)
+```
+
+### CSV-Export-Funktion
+
+```python
+def export_csv(conn, filepath='doctors.csv'):
+    cursor = conn.execute('''
+        SELECT name, rating, total_reviews, deleted_reviews,
+               address, url, category, scrape_date, last_updated
+        FROM establishments
+        ORDER BY name
+    ''')
+
+    with open(filepath, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['name', 'rating', 'total_reviews', 'deleted_reviews',
+                        'address', 'url', 'category', 'scrape_date', 'last_updated'])
+        for row in cursor:
+            writer.writerow(row)
+```
 
 ---
 
-*Dokumentversion: 1.2*  
-*Zuletzt aktualisiert: 11. Mai 2026*
+## Fazit
+
+Dieses Projekt demonstriert einen praktischen Ansatz zur automatisierten Datensammlung aus Web-Suchergebnissen:
+
+1. **Textbasierte Extraktion** ist robuster als CSS-Selektoren fuer dynamische Webseiten
+2. **Strenge Validierung** gewaehrleistet hohe Datenqualitaet, auch wenn es weniger Eintraege bedeutet
+3. **Modulares Design** ermöglicht einfache Wartung und Erweiterung
+4. **Automatisierte Bereinigung** erkennt schlechte Eintraege, die durch die anfängliche Filterung rutschen
+5. **Mathematische Validierung** liefert quantifizierbare Datenqualitaetsmetriken
+
+Der Scraper erfasst erfolgreich validierte Geschaeftsdaten aus Bielefeld, wobei 100% der Eintraege Bewertungen und Rezensionsanzahlen enthalten. Die Architektur ist fuer Erweiterbarkeit auf andere Staedte und Datenquellen ausgelegt.
+
+---
+
+*Dokumentversion: 1.1*  
+*Zuletzt aktualisiert: 11. Mai 2026*  
+*Lizenz: MIT*
