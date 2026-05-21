@@ -12,7 +12,7 @@
       "name": "ModernAmusements Development",
       "author": "Shady Nathan Tawfik",
       "tags": "Data Science | Maschinelles Lernen | KI",
-      "viewProjects": "Projekte ansehen",
+      "viewProjects": "Zum Blog",
       "getInTouch": "Kontakt aufnehmen"
     },
     "exploreMyWork": "Meine Arbeit erkunden",
@@ -253,6 +253,18 @@
       {
         "question": "Was ist deine Erfahrung mit Code-Qualität?",
         "answer": "Ich lege Wert auf sauberen, wartbaren Code mit umfassenden Tests. Ich bin vertraut mit CI/CD-Pipelines, Code-Reviews und der Implementierung von Best Practices für Performance-Optimierung und Barrierefreiheit."
+      },
+      {
+        "question": "Was machst du außerhalb der Arbeit?",
+        "answer": "Außerhalb des Programmierens erkunde ich gerne neue Technologien, trage zu Open-Source-Projekten bei und arbeite an kreativen Nebenprojekten. Ich habe auch ein starkes Interesse an UI/UX-Design und daran, Werkzeuge zu entwickeln, die die Lücke zwischen Funktionalität und Ästhetik schließen."
+      },
+      {
+        "question": "Wie lernst du neue Technologien?",
+        "answer": "Ich bevorzuge einen praktischen Ansatz — ich tauche direkt in kleine Projekte ein, um die Kernkonzepte zu verstehen, und gehe dann schrittweise zu komplexeren Herausforderungen über. Ich lese auch gründlich die Dokumentation und folge den Best Practices der Community."
+      },
+      {
+        "question": "Was ist deine Lieblingsprogrammiersprache?",
+        "answer": "Ich arbeite am liebsten mit C++ und Swift — C++ für seine rohe Leistung und Kontrolle, Swift für seine elegante Syntax und modernen Funktionen. TypeScript ist für die Webentwicklung ein enger Dritter."
       }
     ]
   },
@@ -260,7 +272,24 @@
     "builtWith": "Erstellt mit Next.js",
     "github": "GitHub",
     "twitter": "Twitter",
-    "linkedin": "LinkedIn"
+    "linkedin": "LinkedIn",
+    "impressum": "Impressum"
+  },
+  "impressum": {
+    "title": "Impressum",
+    "description": "Pflichtangaben nach §5 TMG (Telemediengesetz) und §55 RStV",
+    "responsible": "Verantwortlich für den Inhalt",
+    "name": "Shady Nathan Tawfik",
+    "address": "Bielefeld, Deutschland",
+    "contact": "Kontakt",
+    "email": "contact@modern-amusement.dev",
+    "phone": "",
+    "disclaimerTitle": "Haftungsausschluss",
+    "disclaimerContent": "Die Informationen auf dieser Website dienen nur zu allgemeinen Informationszwecken. Alle Informationen werden nach bestem Wissen bereitgestellt, jedoch übernehmen wir keinerlei ausdrückliche oder stillschweigende Gewähr für die Richtigkeit, Angemessenheit, Gültigkeit, Zuverlässigkeit, Verfügbarkeit oder Vollständigkeit der Informationen.",
+    "copyrightTitle": "Urheberrecht",
+    "copyrightContent": "Alle Inhalte, Texte, Bilder und der Code auf dieser Website sind geistiges Eigentum von Shady Nathan Tawfik, sofern nicht anders angegeben. Jegliche unbefugte Vervielfältigung oder Verbreitung ist untersagt.",
+    "liabilityTitle": "Haftung für Links",
+    "liabilityContent": "Diese Website kann Links zu externen Websites Dritter enthalten. Wir haben keinen Einfluss auf den Inhalt und die Gestaltung dieser Seiten und können keine Gewähr für die Richtigkeit oder Vollständigkeit der dortigen Informationen übernehmen."
   },
   "common": {
     "back": "Zurück",

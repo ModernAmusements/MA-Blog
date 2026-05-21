@@ -15,7 +15,7 @@ interface TUINavItem {
 }
 
 interface TUIHeroProps {
-  navItems: TUINavItem[];
+  navItems?: TUINavItem[];
   lang: string;
   heroText?: {
     title: string;
@@ -28,6 +28,8 @@ interface TUIHeroProps {
   };
   exploreText?: string;
   initialExpanded?: Set<number>;
+  rightPane?: React.ReactNode;
+  faqPane?: React.ReactNode;
 }
 
 const getIcon = (item: TUINavItem, isExpanded: boolean) => {
@@ -43,7 +45,7 @@ const getIcon = (item: TUINavItem, isExpanded: boolean) => {
   return <FileIcon />;
 };
 
-export function TUIHero({ navItems, lang, heroText, exploreText, initialExpanded }: TUIHeroProps) {
+export function TUIHero({ navItems = [], lang, heroText, exploreText, initialExpanded, rightPane, faqPane }: TUIHeroProps) {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
   const [expandedDirs, setExpandedDirs] = useState<Set<number>>(initialExpanded || new Set());
@@ -77,10 +79,10 @@ export function TUIHero({ navItems, lang, heroText, exploreText, initialExpanded
     }
   };
 
-  const scrollToProjects = () => {
-    const projectsSection = document.getElementById('projects');
-    if (projectsSection) {
-      projectsSection.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBlog = () => {
+    const blogSection = document.getElementById('blog');
+    if (blogSection) {
+      blogSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -90,7 +92,7 @@ export function TUIHero({ navItems, lang, heroText, exploreText, initialExpanded
     name: 'ModernAmusements Development',
     author: 'Shady Nathan Tawfik',
     tags: 'Data Science | Machine Learning | AI',
-    viewProjects: 'View Projects',
+    viewProjects: 'View Blog',
     getInTouch: 'Get in Touch'
   };
 
@@ -114,79 +116,90 @@ export function TUIHero({ navItems, lang, heroText, exploreText, initialExpanded
             <li>{t.tags}</li>
           </ul>
           <div className={styles.cta}>
-            <button onClick={scrollToProjects} className={styles.primary}>
+            <button onClick={scrollToBlog} className={styles.primary}>
               {t.viewProjects} <span className={styles.arrow}>↓</span>
             </button>
             <Link href={`/${lang}/contact`} className={styles.secondary}>
               {t.getInTouch} <span style={{ color: 'var(--accent)', fontWeight: 700 }}>→</span>
             </Link>
           </div>
+          {faqPane && <div className={styles.faqSection}>{faqPane}</div>}
         </div>
         
         <div className={styles.explorePane}>
-          <h2>{exploreText || 'Explore My Work'}</h2>
-          <div className={styles.fileList}>
-            <ul>
-              {navItems.map((item, index) => (
-                <li key={item.path || `dir-${index}`}>
-                  {item.type === 'file' ? (
-                    <Link href={item.path} className={`${styles.itemRow} ${index === activeIndex ? styles.active : ''}`} onClick={() => setActiveIndex(index)}>
-                      <span className={styles.chevronContainer}></span>
-                      <span className={styles.icon}>{getIcon(item, false)}</span>
-                      <span className={styles.name}>{item.label}</span>
-                      <span className={styles.meta}>{item.size}</span>
-                    </Link>
-                  ) : (
-                    <div className={`${styles.itemRow} ${index === activeIndex ? styles.active : ''}`} onClick={() => {
-                      setActiveIndex(index);
-                      if (item.subItems && item.subItems.length > 0) {
-                        toggleExpand(index);
-                      }
-                    }}
-                      onKeyDown={(e) => handleKeyDown(e, index)}
-                      tabIndex={0}
-                    >
-                      <span className={styles.chevronContainer}>
-                        <ChevronIcon isExpanded={expandedDirs.has(index)} />
-                      </span>
-                      <span className={styles.icon}>{getIcon(item, expandedDirs.has(index))}</span>
-                      <span className={styles.name}>{item.label}</span>
-                      <span className={styles.meta}>{item.type === 'dir' ? '[DIR]' : item.size}</span>
-                    </div>
-                  )}
-                  {item.subItems && expandedDirs.has(index) && (
-                    <ul className={styles.subList}>
-                      {item.subItems.map((sub, subIndex) => (
-                        <li key={sub.path || `disabled-${subIndex}`} className={styles.subItem}>
-                          {sub.path ? (
-                            <Link href={sub.path} className={styles.subLink}>
-                              <span className={styles.icon}><FileIcon /></span>
-                              <span className={styles.name}>{sub.label}</span>
-                              <span className={styles.meta}>{sub.size}</span>
-                            </Link>
-                          ) : (
-                            <span className={styles.subLink}>
-                              <span className={styles.icon}><FileIcon /></span>
-                              <span className={styles.name}>{sub.label}</span>
-                              <span className={styles.meta}>{sub.size}</span>
-                            </span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {rightPane ? rightPane : (
+            <>
+              <h2>{exploreText || 'Explore My Work'}</h2>
+              <div className={styles.fileList}>
+                <ul>
+                  {navItems.map((item, index) => (
+                    <li key={item.path || `dir-${index}`}>
+                      {item.type === 'file' ? (
+                        <Link href={item.path} className={`${styles.itemRow} ${index === activeIndex ? styles.active : ''}`} onClick={() => setActiveIndex(index)}>
+                          <span className={styles.chevronContainer}></span>
+                          <span className={styles.icon}>{getIcon(item, false)}</span>
+                          <span className={styles.name}>{item.label}</span>
+                          <span className={styles.meta}>{item.size}</span>
+                        </Link>
+                      ) : (
+                        <div className={`${styles.itemRow} ${index === activeIndex ? styles.active : ''}`} onClick={() => {
+                          setActiveIndex(index);
+                          if (item.subItems && item.subItems.length > 0) {
+                            toggleExpand(index);
+                          }
+                        }}
+                          onKeyDown={(e) => handleKeyDown(e, index)}
+                          tabIndex={0}
+                        >
+                          <span className={styles.chevronContainer}>
+                            <ChevronIcon isExpanded={expandedDirs.has(index)} />
+                          </span>
+                          <span className={styles.icon}>{getIcon(item, expandedDirs.has(index))}</span>
+                          <span className={styles.name}>{item.label}</span>
+                          <span className={styles.meta}>{item.type === 'dir' ? '[DIR]' : item.size}</span>
+                        </div>
+                      )}
+                      {item.subItems && expandedDirs.has(index) && (
+                        <ul className={styles.subList}>
+                          {item.subItems.map((sub, subIndex) => (
+                            <li key={sub.path || `disabled-${subIndex}`} className={styles.subItem}>
+                              {sub.path ? (
+                                <Link href={sub.path} className={styles.subLink}>
+                                  <span className={styles.icon}><FileIcon /></span>
+                                  <span className={styles.name}>{sub.label}</span>
+                                  <span className={styles.meta}>{sub.size}</span>
+                                </Link>
+                              ) : (
+                                <span className={styles.subLink}>
+                                  <span className={styles.icon}><FileIcon /></span>
+                                  <span className={styles.name}>{sub.label}</span>
+                                  <span className={styles.meta}>{sub.size}</span>
+                                </span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </>
+          )}
         </div>
       </main>
       
       <footer className={styles.footer}>
-        <div className={styles.statusLeft}>{navItems.length} items</div>
+        <div className={styles.statusLeft}>{rightPane ? 'Online' : `${navItems.length} items`}</div>
         <div className={styles.controlsRight}>
-          <span>[↑↓] Navigate</span>
-          <span>[Enter] Open</span>
+          {rightPane ? (
+            <span>[v1.0.0]</span>
+          ) : (
+            <>
+              <span>[↑↓] Navigate</span>
+              <span>[Enter] Open</span>
+            </>
+          )}
         </div>
       </footer>
     </div>

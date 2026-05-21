@@ -1,7 +1,15 @@
+import Link from 'next/link';
 import styles from './Footer.module.scss';
+import { translations } from '@/i18n';
+import type { Lang } from '@/i18n';
 
-export function Footer() {
+interface FooterProps {
+  lang: Lang;
+}
+
+export function Footer({ lang }: FooterProps) {
   const currentYear = new Date().getFullYear();
+  const t = translations[lang].footer;
 
   return (
     <footer className={styles.footer}>
@@ -17,6 +25,7 @@ export function Footer() {
         <a href="https://www.reddit.com/user/princessinsomnia/" target="_blank" rel="noopener noreferrer">Reddit</a>
         <a href="https://www.instagram.com/modernamusements" target="_blank" rel="noopener noreferrer">Instagram</a>
         <a href="https://www.behance.net/stawfik" target="_blank" rel="noopener noreferrer">Behance</a>
+        <Link href={`/${lang}/impressum`}>{t.impressum}</Link>
       </div>
     </footer>
   );

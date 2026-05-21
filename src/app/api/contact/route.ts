@@ -4,7 +4,7 @@ import sgMail from '@sendgrid/mail';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
-const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'newsletter@modern-amusements.vercel.app';
+const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'newsletter@modern-amusement.dev';
 const FROM_NAME = process.env.SENDGRID_FROM_NAME || 'Modern Amusements';
 const CONTACT_TO_EMAIL = process.env.CONTACT_TO_EMAIL || FROM_EMAIL;
 

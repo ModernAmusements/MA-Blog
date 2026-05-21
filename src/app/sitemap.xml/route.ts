@@ -1,6 +1,6 @@
 import { getBlogPosts, getProjectPosts } from '@/lib/mdx';
 
-const baseUrl = 'https://modern-amusements.vercel.app';
+const baseUrl = 'https://modern-amusement.dev';
 
 export async function GET() {
   const posts = getBlogPosts();

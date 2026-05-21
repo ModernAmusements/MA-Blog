@@ -1,0 +1,76 @@
+.terminalFrame {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.terminalHeader {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.status {
+  color: var(--accent);
+}
+
+.terminalContent {
+  padding: 1.25rem;
+}
+
+.title {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.item {
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.65rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+
+  &:hover {
+    color: var(--accent);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.answer {
+  padding: 0 0.65rem 0.65rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  font-family: 'JetBrains Mono', monospace;
+
+  p {
+    margin: 0;
+  }
+}

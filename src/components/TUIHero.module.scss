@@ -53,7 +53,7 @@
   }
 
   h1 {
-    font-size: 36px;
+    font-size: 28px;
     margin-bottom: 16px;
     color: var(--foreground);
     padding-bottom: 12px;
@@ -68,7 +68,7 @@
   }
 
   p {
-    font-size: 18px;
+    font-size: 15px;
     color: var(--muted);
     margin-bottom: 24px;
     max-width: 400px;
@@ -109,6 +109,10 @@
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
+}
+
+.faqSection {
+  margin-top: 4rem;
 }
 
 .primary, .secondary {
@@ -316,7 +320,11 @@
     }
   }
 
-  .explorePane {
+.faqSection {
+  margin-top: 3rem;
+}
+
+.explorePane {
     h2 {
       font-size: 1rem;
     }

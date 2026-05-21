@@ -1,57 +1,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './page.module.scss';
-import { getBlogPosts, getProjectPosts, filterByLanguage } from '@/lib/mdx';
+import { getBlogPosts, filterByLanguage } from '@/lib/mdx';
 import { translations } from '@/i18n';
 import type { Lang } from '@/i18n';
 import { TerminalFrame } from '@/components/TerminalFrame';
 import { TUIHero } from '@/components/TUIHero';
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return bytes + 'B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'K';
-  return (bytes / (1024 * 1024)).toFixed(1) + 'M';
-}
-
-interface TUINavItem {
-  label: string;
-  path: string;
-  type: 'dir' | 'file';
-  size?: string;
-  subItems?: { label: string; path: string; type: 'dir' | 'file'; size?: string }[];
-}
-
-function buildNavItems(lang: string): TUINavItem[] {
-  const allProjects = getProjectPosts();
-  const allPosts = getBlogPosts();
-  
-  const projects = filterByLanguage(allProjects, lang);
-  const filteredPosts = filterByLanguage(allPosts, lang);
-  
-  const projectSubItems = projects.map((p) => ({
-    label: p.title,
-    path: `/${lang}/projects/${p.slug}`,
-    type: 'file' as const,
-    size: formatFileSize(p.content.length * 2),
-  }));
-  
-  const blogSubItems = filteredPosts.map((p) => ({
-    label: p.title,
-    path: `/${lang}/blog/${p.slug}`,
-    type: 'file' as const,
-    size: formatFileSize(p.content.length * 2),
-  }));
-  
-  return [
-    { label: 'about', path: `/${lang}/about`, type: 'file' as const, size: '1.2K' },
-    { label: 'projects', path: `/${lang}/projects`, type: 'dir' as const, subItems: projectSubItems },
-    { label: 'blog', path: `/${lang}/blog`, type: 'dir' as const, subItems: blogSubItems },
-    { label: 'dotmatrix', path: `/${lang}/dotmatrix`, type: 'dir' as const, subItems: [
-      { label: 'editor.md', path: `/${lang}/dotmatrix`, type: 'file' as const, size: '512B' },
-    ]},
-    { label: 'contact', path: `/${lang}/contact`, type: 'file' as const, size: '256B' },
-  ];
-}
+import { HomeHeroContact } from '@/components/HomeHeroContact';
+import { HomeContactForm } from '@/components/HomeContactForm';
+import { HeroFAQ } from '@/components/HeroFAQ';
 
 interface Props {
   params: Promise<{ lang: string }>;
@@ -63,23 +20,16 @@ export default async function Home(props: Props) {
   const t = translations[lang].home;
   
   const allPosts = getBlogPosts();
-  const allProjects = getProjectPosts();
   
   const posts = filterByLanguage(allPosts, lang).slice(0, 3);
-  const projects = filterByLanguage(allProjects, lang).slice(0, 2);
-  
-  const navItems = buildNavItems(lang);
-
-  const blogIndex = navItems.findIndex(item => item.path === `/${lang}/blog`);
-  const initialExpanded = blogIndex > -1 ? new Set<number>([blogIndex]) : new Set<number>();
 
   return (
     <div className={styles.home}>
-      <TUIHero navItems={navItems} lang={lang} heroText={t.hero} exploreText={t.exploreMyWork} initialExpanded={initialExpanded} />
+      <TUIHero lang={lang} heroText={t.hero} rightPane={<HomeHeroContact lang={lang} />} faqPane={<HeroFAQ lang={lang} />} />
 
       {posts.length > 0 && (
         <TerminalFrame title={t.featuredProjects}>
-          <div className={styles.sectionHeader}>
+          <div id="blog" className={styles.sectionHeader}>
             <h2><span className={styles.prompt}>~ &gt;</span> [{t.featuredProjects}]</h2>
             <Link href={`/${lang}/blog`}>{t.viewAll} →</Link>
           </div>
@@ -100,6 +50,9 @@ export default async function Home(props: Props) {
         </TerminalFrame>
       )}
 
+      <HomeContactForm lang={lang} />
+
+      {/* Projects section — commented out for future use
       {projects.length > 0 && (
         <TerminalFrame title={t.latestPosts}>
           <div id="projects" className={styles.sectionHeader}>
@@ -130,6 +83,7 @@ export default async function Home(props: Props) {
           </div>
         </TerminalFrame>
       )}
+      */}
     </div>
   );
 }

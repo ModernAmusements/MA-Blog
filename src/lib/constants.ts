@@ -1,4 +1,4 @@
-export const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://modern-amusements.vercel.app';
+export const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://modern-amusement.dev';
 
 export const SITE_NAME = 'ModernAmusements Development';
 

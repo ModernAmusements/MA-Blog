@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from 'next';
 import { Footer } from '@/components/Footer';
 import { languages, defaultLang } from '@/i18n';
+import type { Lang } from '@/i18n';
 import '@/styles/globals.scss';
 import { ClientProviders } from '@/components/ClientProviders';
 import { Header } from '@/components/Header';
 
-const BASE_URL = 'https://modern-amusements.vercel.app';
+const BASE_URL = 'https://modern-amusement.dev';
 
 export const viewport: Viewport = {
   themeColor: [
@@ -129,7 +130,7 @@ export default async function RootLayout({
           <main className="main-content" style={{ margin: '0 auto', maxWidth: '1400px', minHeight: 'calc(100vh - 200px)', width: '100%' }}>
             {children}
           </main>
-          <Footer />
+          <Footer lang={lang as Lang} />
         </ClientProviders>
       </body>
     </html>

@@ -12,7 +12,7 @@
       "name": "ModernAmusements Development",
       "author": "Shady Nathan Tawfik",
       "tags": "Data Science | Machine Learning | AI",
-      "viewProjects": "View Projects",
+      "viewProjects": "View Blog",
       "getInTouch": "Get in Touch"
     },
     "exploreMyWork": "Explore My Work",
@@ -253,6 +253,18 @@
       {
         "question": "What's your experience with code quality?",
         "answer": "I emphasize writing clean, maintainable code with comprehensive testing. I'm familiar with CI/CD pipelines, code reviews, and implementing best practices for performance optimization and accessibility."
+      },
+      {
+        "question": "What do you do outside of work?",
+        "answer": "Outside of coding, I enjoy exploring new technologies, contributing to open-source projects, and working on creative side projects. I also have a strong interest in UI/UX design and building tools that bridge the gap between functionality and aesthetics."
+      },
+      {
+        "question": "How do you approach learning new technologies?",
+        "answer": "I prefer a hands-on approach — I dive straight into building small projects to understand core concepts, then progressively tackle more complex challenges. I also read documentation thoroughly and follow community best practices."
+      },
+      {
+        "question": "What's your favorite programming language?",
+        "answer": "I enjoy working with C++ and Swift the most — C++ for its raw performance and control, and Swift for its elegant syntax and modern features. TypeScript is a close third for web development."
       }
     ]
   },
@@ -260,7 +272,24 @@
     "builtWith": "Built with Next.js",
     "github": "GitHub",
     "twitter": "Twitter",
-    "linkedin": "LinkedIn"
+    "linkedin": "LinkedIn",
+    "impressum": "Imprint"
+  },
+  "impressum": {
+    "title": "Imprint",
+    "description": "Legally required disclosure according to §5 TMG (Telemediengesetz) and §55 RStV",
+    "responsible": "Responsible for Content",
+    "name": "Shady Nathan Tawfik",
+    "address": "Bielefeld, Germany",
+    "contact": "Contact",
+    "email": "contact@modern-amusement.dev",
+    "phone": "",
+    "disclaimerTitle": "Disclaimer",
+    "disclaimerContent": "The information provided on this website is for general informational purposes only. All information is provided in good faith, however we make no representation or warranty of any kind, express or implied, regarding the accuracy, adequacy, validity, reliability, availability or completeness of any information on this site.",
+    "copyrightTitle": "Copyright",
+    "copyrightContent": "All content, text, images, and code on this website are the intellectual property of Shady Nathan Tawfik unless otherwise stated. Any unauthorized reproduction or distribution is prohibited.",
+    "liabilityTitle": "Liability for Links",
+    "liabilityContent": "This website may contain links to external websites of third parties. We have no control over the content and nature of these sites and cannot guarantee the accuracy or completeness of any information found there."
   },
   "common": {
     "back": "Back",
